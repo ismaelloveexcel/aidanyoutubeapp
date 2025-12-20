@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -20,12 +20,101 @@ const SOUNDS = [
 
 export default function Soundboard() {
   const [playing, setPlaying] = useState<string | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  const getAudioContext = () => {
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    }
+    return audioContextRef.current;
+  };
 
   const playSound = (soundId: string) => {
     setPlaying(soundId);
     setTimeout(() => setPlaying(null), 500);
-    // In a real app, this would play actual audio files
-    console.log(`Playing sound: ${soundId}`);
+
+    const ctx = getAudioContext();
+    const now = ctx.currentTime;
+
+    switch (soundId) {
+      case "airhorn": {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(400, now);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+        break;
+      }
+      case "ding": {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(800, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.3);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+        break;
+      }
+      case "success": {
+        [0, 0.15, 0.3].forEach((time, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.frequency.setValueAtTime(400 + (i * 200), now + time);
+          gain.gain.setValueAtTime(0.2, now + time);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + time + 0.2);
+          osc.start(now + time);
+          osc.stop(now + time + 0.2);
+        });
+        break;
+      }
+      case "fail": {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(100, now + 0.5);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+        osc.start(now);
+        osc.stop(now + 0.5);
+        break;
+      }
+      case "dramatic": {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(50, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 1);
+        gain.gain.setValueAtTime(0.4, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 1);
+        osc.start(now);
+        osc.stop(now + 1);
+        break;
+      }
+      default: {
+        // Generic beep for other sounds
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(440, now);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
   };
 
   return (
@@ -106,13 +195,13 @@ export default function Soundboard() {
 
       <Card>
         <CardHeader>
-          <CardTitle>📝 Note About Sounds</CardTitle>
+          <CardTitle>📝 Using These Sounds</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-400">
-            This is a demo soundboard showing the buttons. To use actual sounds in your videos, search for "royalty-free
-            sound effects" on YouTube or use sites like Freesound.org. Always check the license before using sounds in
-            your videos!
+            These are synthesized sound effects you can use freely! Click any button to preview the sound.
+            For even more sound effects, check out royalty-free libraries like Freesound.org or YouTube Audio Library.
+            Always verify the license before using external sounds in your videos!
           </p>
         </CardContent>
       </Card>

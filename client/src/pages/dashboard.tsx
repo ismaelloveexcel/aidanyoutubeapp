@@ -26,8 +26,10 @@ export default function Dashboard() {
   const quickActions = [
     { title: "Generate Idea", emoji: "💡", path: "/ideas", color: "hsl(320, 100%, 50%)" },
     { title: "Write Script", emoji: "📝", path: "/script", color: "hsl(180, 100%, 50%)" },
+    { title: "Record Video", emoji: "🎬", path: "/recorder", color: "hsl(0, 100%, 50%)" },
     { title: "Design Thumbnail", emoji: "🎨", path: "/thumbnail", color: "hsl(50, 100%, 50%)" },
-    { title: "Browse Templates", emoji: "📋", path: "/templates", color: "hsl(280, 100%, 50%)" },
+    { title: "Go Viral", emoji: "🚀", path: "/viral", color: "hsl(280, 100%, 50%)" },
+    { title: "Upload to YouTube", emoji: "📤", path: "/upload", color: "hsl(140, 100%, 50%)" },
   ];
 
   return (

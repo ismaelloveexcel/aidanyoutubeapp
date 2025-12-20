@@ -80,6 +80,61 @@ export default function Thumbnail() {
     setSelectedEmoji(template.emoji);
   };
 
+  const downloadThumbnail = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 720;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Convert HSL to RGB for canvas
+    const tempDiv = document.createElement('div');
+    tempDiv.style.color = bgColor;
+    document.body.appendChild(tempDiv);
+    const computedColor = window.getComputedStyle(tempDiv).color;
+    document.body.removeChild(tempDiv);
+
+    // Fill background
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, 1280, 720);
+
+    // Add title text
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 80px "Carter One", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Add text shadow
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 4;
+    ctx.shadowOffsetY = 4;
+
+    ctx.fillText(title || 'Your Title Here', 640, 360);
+
+    // Add emoji (simplified - just text)
+    ctx.shadowColor = 'transparent';
+    ctx.font = '120px Arial';
+    ctx.fillText(selectedEmoji, 1100, 150);
+
+    // Download
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tubestar-thumbnail-${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        toast({
+          title: "Thumbnail Downloaded!",
+          description: "Your thumbnail has been saved as a PNG image.",
+        });
+      }
+    });
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -144,9 +199,14 @@ export default function Thumbnail() {
                 </div>
               </div>
 
-              <Button onClick={() => saveThumbnailMutation.mutate()} className="w-full">
-                💾 Save Thumbnail
-              </Button>
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={() => saveThumbnailMutation.mutate()}>
+                  💾 Save
+                </Button>
+                <Button onClick={downloadThumbnail} variant="secondary">
+                  📥 Download PNG
+                </Button>
+              </div>
             </CardContent>
           </Card>
 

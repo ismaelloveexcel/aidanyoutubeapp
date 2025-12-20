@@ -16,6 +16,9 @@ export default function Layout({ children }: LayoutProps) {
     { path: "/templates", label: "Templates", emoji: "📋" },
     { path: "/thumbnail", label: "Thumbnail", emoji: "🎨" },
     { path: "/soundboard", label: "Sounds", emoji: "🔊" },
+    { path: "/recorder", label: "Record", emoji: "🎬" },
+    { path: "/viral", label: "Go Viral", emoji: "🚀" },
+    { path: "/upload", label: "Upload", emoji: "📤" },
   ];
 
   return (
