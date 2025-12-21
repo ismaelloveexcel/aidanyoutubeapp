@@ -12,6 +12,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // Security headers with helmet
+// NOTE: CSP is disabled in development to allow Vite HMR (hot module replacement) to work.
+// In production (NODE_ENV=production), strict CSP is enforced.
 app.use(helmet({
   contentSecurityPolicy: process.env.NODE_ENV === "production" ? {
     directives: {
@@ -22,14 +24,32 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "blob:"],
       connectSrc: ["'self'"],
     }
-  } : false, // Disable CSP in development for Vite hot reload
+  } : false, // CSP disabled in development only - see note above
 }));
 
-// CORS configuration
+// CORS configuration - in production, require explicit ALLOWED_ORIGINS
+const getCorsOrigin = (): string[] | boolean | ((origin: string | undefined, callback: (err: Error | null, origin?: boolean) => void) => void) => {
+  if (process.env.NODE_ENV !== "production") {
+    return true; // Allow all origins in development
+  }
+  const allowedOrigins = process.env.ALLOWED_ORIGINS;
+  if (allowedOrigins) {
+    return allowedOrigins.split(',').map(o => o.trim());
+  }
+  // Same-origin only: allow requests with no origin (same-origin) or matching host
+  console.warn('⚠️ ALLOWED_ORIGINS not set in production - CORS will only allow same-origin requests');
+  return (origin, callback) => {
+    // Allow requests with no origin (same-origin requests from browser)
+    if (!origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed - set ALLOWED_ORIGINS environment variable'));
+    }
+  };
+};
+
 app.use(cors({
-  origin: process.env.NODE_ENV === "production" 
-    ? process.env.ALLOWED_ORIGINS?.split(',') || true
-    : true,
+  origin: getCorsOrigin(),
   credentials: true,
 }));
 
