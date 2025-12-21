@@ -6,6 +6,16 @@ import { z } from "zod";
 import { moderateObject } from "./moderation";
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
+  // Health check endpoint for monitoring
+  app.get("/health", (req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  });
+
+  // API routes
   app.post("/api/scripts", async (req, res) => {
     try {
       const script = insertScriptSchema.parse(req.body);
