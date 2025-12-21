@@ -6,3 +6,6 @@ dist/
 *.swp
 .vscode/
 .idea/
+.replit.db
+.upm/
+.cache/

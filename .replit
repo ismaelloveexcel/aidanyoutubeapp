@@ -1,0 +1,16 @@
+run = "npm run dev"
+entrypoint = "server/index.ts"
+modules = ["nodejs-20"]
+
+hidden = [".config", "tsconfig.json", "tsconfig.node.json", ".gitignore"]
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run build && npm start"]
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 5000
+externalPort = 80

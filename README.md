@@ -64,6 +64,19 @@ npm run build
 npm start
 ```
 
+## Deploy to Replit
+
+This app is Replit-ready! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
+
+**Quick Start on Replit:**
+1. Import this repository to Replit
+2. Add `DATABASE_URL` to Replit Secrets
+3. Run `npm install`
+4. Run `npm run db:push`
+5. Run `npm run dev`
+
+**⚠️ Security Note**: Before deploying to production, review [SECURITY.md](./SECURITY.md) for critical security issues that must be addressed.
+
 ## Database Tables
 
 - **users**: User authentication
