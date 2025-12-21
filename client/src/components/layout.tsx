@@ -11,14 +11,18 @@ export default function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: "/", label: "Home", emoji: "🏠" },
+    { path: "/progress", label: "Progress", emoji: "🏆" },
     { path: "/ideas", label: "Ideas", emoji: "💡" },
     { path: "/script", label: "Script", emoji: "📝" },
-    { path: "/templates", label: "Templates", emoji: "📋" },
-    { path: "/thumbnail", label: "Thumbnail", emoji: "🎨" },
-    { path: "/soundboard", label: "Sounds", emoji: "🔊" },
     { path: "/recorder", label: "Record", emoji: "🎬" },
+    { path: "/editor", label: "Edit", emoji: "✂️" },
+    { path: "/thumbnail", label: "Thumbnail", emoji: "🎨" },
+    { path: "/ai-assistant", label: "AI Help", emoji: "🤖" },
     { path: "/viral", label: "Go Viral", emoji: "🚀" },
+    { path: "/multi-platform", label: "Export", emoji: "📱" },
     { path: "/upload", label: "Upload", emoji: "📤" },
+    { path: "/analytics", label: "Analytics", emoji: "📊" },
+    { path: "/calendar", label: "Calendar", emoji: "📅" },
   ];
 
   return (

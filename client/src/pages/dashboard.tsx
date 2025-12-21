@@ -24,12 +24,14 @@ export default function Dashboard() {
   };
 
   const quickActions = [
+    { title: "View Progress", emoji: "🏆", path: "/progress", color: "hsl(50, 100%, 50%)" },
     { title: "Generate Idea", emoji: "💡", path: "/ideas", color: "hsl(320, 100%, 50%)" },
-    { title: "Write Script", emoji: "📝", path: "/script", color: "hsl(180, 100%, 50%)" },
     { title: "Record Video", emoji: "🎬", path: "/recorder", color: "hsl(0, 100%, 50%)" },
-    { title: "Design Thumbnail", emoji: "🎨", path: "/thumbnail", color: "hsl(50, 100%, 50%)" },
+    { title: "Edit Video", emoji: "✂️", path: "/editor", color: "hsl(180, 100%, 50%)" },
+    { title: "AI Assistant", emoji: "🤖", path: "/ai-assistant", color: "hsl(220, 100%, 50%)" },
     { title: "Go Viral", emoji: "🚀", path: "/viral", color: "hsl(280, 100%, 50%)" },
-    { title: "Upload to YouTube", emoji: "📤", path: "/upload", color: "hsl(140, 100%, 50%)" },
+    { title: "Analytics", emoji: "📊", path: "/analytics", color: "hsl(140, 100%, 50%)" },
+    { title: "Content Calendar", emoji: "📅", path: "/calendar", color: "hsl(340, 100%, 50%)" },
   ];
 
   return (
