@@ -1,9 +1,17 @@
 import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { type Server } from "http";
 import { storage } from "./storage";
 import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema } from "@shared/schema";
 import { z } from "zod";
 import { moderateObject } from "./moderation";
+
+const updateScriptSchema = insertScriptSchema.partial();
+const updateIdeaSchema = insertIdeaSchema.partial();
+
+function parseIdParam(idParam: string): number | null {
+  const id = Number.parseInt(idParam, 10);
+  return Number.isNaN(id) ? null : id;
+}
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   // Health check endpoint for monitoring
@@ -36,23 +44,46 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
   app.get("/api/scripts/:id", async (req, res) => {
     try {
-      const script = await storage.getScript(parseInt(req.params.id));
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid script id" });
+        return;
+      }
+      const script = await storage.getScript(id);
       if (!script) { res.status(404).json({ error: "Script not found" }); return; }
       res.json(script);
     } catch { res.status(500).json({ error: "Failed to fetch script" }); }
   });
   app.patch("/api/scripts/:id", async (req, res) => {
     try {
-      const moderation = moderateObject(req.body);
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid script id" });
+        return;
+      }
+      const updateData = updateScriptSchema.parse(req.body);
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({ error: "No updates provided" });
+        return;
+      }
+      const moderation = moderateObject(updateData);
       if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
-      const updated = await storage.updateScript(parseInt(req.params.id), req.body);
+      const updated = await storage.updateScript(id, updateData);
       if (!updated) { res.status(404).json({ error: "Script not found" }); return; }
       res.json(updated);
-    } catch { res.status(500).json({ error: "Failed to update script" }); }
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to update script" });
+    }
   });
   app.delete("/api/scripts/:id", async (req, res) => {
     try {
-      const success = await storage.deleteScript(parseInt(req.params.id));
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid script id" });
+        return;
+      }
+      const success = await storage.deleteScript(id);
       if (!success) { res.status(404).json({ error: "Script not found" }); return; }
       res.json({ success: true });
     } catch { res.status(500).json({ error: "Failed to delete script" }); }
@@ -76,16 +107,34 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
   app.patch("/api/ideas/:id", async (req, res) => {
     try {
-      const moderation = moderateObject(req.body);
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid idea id" });
+        return;
+      }
+      const updateData = updateIdeaSchema.parse(req.body);
+      if (Object.keys(updateData).length === 0) {
+        res.status(400).json({ error: "No updates provided" });
+        return;
+      }
+      const moderation = moderateObject(updateData);
       if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
-      const updated = await storage.updateIdea(parseInt(req.params.id), req.body);
+      const updated = await storage.updateIdea(id, updateData);
       if (!updated) { res.status(404).json({ error: "Idea not found" }); return; }
       res.json(updated);
-    } catch { res.status(500).json({ error: "Failed to update idea" }); }
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to update idea" });
+    }
   });
   app.delete("/api/ideas/:id", async (req, res) => {
     try {
-      const success = await storage.deleteIdea(parseInt(req.params.id));
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid idea id" });
+        return;
+      }
+      const success = await storage.deleteIdea(id);
       if (!success) { res.status(404).json({ error: "Idea not found" }); return; }
       res.json({ success: true });
     } catch { res.status(500).json({ error: "Failed to delete idea" }); }
@@ -106,14 +155,24 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   });
   app.get("/api/thumbnails/:id", async (req, res) => {
     try {
-      const thumbnail = await storage.getThumbnail(parseInt(req.params.id));
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid thumbnail id" });
+        return;
+      }
+      const thumbnail = await storage.getThumbnail(id);
       if (!thumbnail) { res.status(404).json({ error: "Thumbnail not found" }); return; }
       res.json(thumbnail);
     } catch { res.status(500).json({ error: "Failed to fetch thumbnail" }); }
   });
   app.delete("/api/thumbnails/:id", async (req, res) => {
     try {
-      const success = await storage.deleteThumbnail(parseInt(req.params.id));
+      const id = parseIdParam(req.params.id);
+      if (id === null) {
+        res.status(400).json({ error: "Invalid thumbnail id" });
+        return;
+      }
+      const success = await storage.deleteThumbnail(id);
       if (!success) { res.status(404).json({ error: "Thumbnail not found" }); return; }
       res.json({ success: true });
     } catch { res.status(500).json({ error: "Failed to delete thumbnail" }); }
