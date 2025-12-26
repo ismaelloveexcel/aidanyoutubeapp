@@ -8,7 +8,7 @@ hidden = [".config", "tsconfig.json", "tsconfig.node.json", ".gitignore"]
 channel = "stable-25_05"
 
 [deployment]
-run = ["npm", "run", "start"]
+run = ["npm", "start"]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 

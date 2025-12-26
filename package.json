@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx server/index.ts",
     "prebuild": "mkdir -p dist",
-    "build": "npm run prebuild && npm run build:client && npm run build:server && npm run postbuild",
+    "build": "npm run prebuild && npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "npx esbuild server/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --external:pg-native --external:lightningcss --external:bcrypt",
     "postbuild": "node -e \"const fs = require('fs'); if (!fs.existsSync('dist/index.js')) { console.error('Build failed: dist/index.js not found'); process.exit(1); } console.log('Build verified: dist/index.js exists (' + Math.round(fs.statSync('dist/index.js').size / 1024) + ' KB)');\"",
