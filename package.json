@@ -8,7 +8,7 @@
     "prebuild": "mkdir -p dist",
     "build": "npm run prebuild && npm run build:client && npm run build:server",
     "build:client": "vite build",
-    "build:server": "npx esbuild server/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs --external:pg-native --external:lightningcss --external:bcrypt",
+    "build:server": "npx esbuild server/index.ts --bundle --platform=node --format=cjs --outfile=dist/index.cjs --packages=external",
     "postbuild": "node -e \"const fs = require('fs'); if (!fs.existsSync('dist/index.cjs')) { console.error('Build failed: dist/index.cjs not found'); process.exit(1); } console.log('Build verified: dist/index.cjs exists (' + Math.round(fs.statSync('dist/index.cjs').size / 1024) + ' KB)');\"",
     "start": "NODE_ENV=production node dist/index.cjs",
     "db:push": "drizzle-kit push",

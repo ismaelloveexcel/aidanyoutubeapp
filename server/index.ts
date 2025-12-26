@@ -110,9 +110,12 @@ app.use((req, res, next) => {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(currentDir, "../dist/public")));
+    // In production, serve static files from dist/public
+    // When running from dist/index.cjs, currentDir is the dist directory
+    const publicDir = path.resolve(currentDir, "public");
+    app.use(express.static(publicDir));
     app.get("*", (_req, res) => {
-      res.sendFile(path.resolve(currentDir, "../dist/public/index.html"));
+      res.sendFile(path.resolve(publicDir, "index.html"));
     });
   }
 
