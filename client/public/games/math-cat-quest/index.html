@@ -1,0 +1,1323 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Math Cat Quest</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+    :root{
+      --hot-pink: #ff006e;
+      --bright-cyan: #00d9ff;
+      --sunny-yellow: #ffbe0b;
+      --purple-pop: #8338ec;
+      --orange-burst: #ff6d00;
+      --lime-green: #06ffa5;
+      --bg-sky: #87ceeb;
+      --bg-grass: #90ee90;
+      --text-dark: #2d1b69;
+      --white: #ffffff;
+      --shadow-fun: 0 8px 0 rgba(0,0,0,0.2);
+      --shadow-hover: 0 12px 0 rgba(0,0,0,0.15);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,body{
+      height:100%;
+      margin:0;
+      background: linear-gradient(180deg, #87ceeb 0%, #b4e7ff 40%, #fffacd 70%, #90ee90 100%);
+      color: var(--text-dark);
+      font-family: 'Fredoka', 'Comic Sans MS', cursive, sans-serif;
+      overflow:hidden;
+    }
+
+    canvas{
+      display:block;
+      width:100vw;
+      height:100vh;
+    }
+
+    .overlay{position:fixed; inset:0; pointer-events:none;}
+
+    .hud{
+      position:fixed;
+      left:20px;
+      top:20px;
+      display:flex;
+      gap:16px;
+      flex-wrap:wrap;
+      pointer-events:none;
+      animation: slideInLeft 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes slideInLeft {
+      from { transform: translateX(-100px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    .panel{
+      pointer-events:auto;
+      background: var(--white);
+      border: 5px solid var(--text-dark);
+      border-radius: 24px;
+      box-shadow: var(--shadow-fun);
+      padding: 16px 20px;
+      min-width: 240px;
+      transform: rotate(-1deg);
+      transition: all 0.3s ease;
+    }
+
+    .panel:hover {
+      transform: rotate(0deg) scale(1.02);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .panel h3{
+      margin:0 0 12px 0;
+      font-size:20px;
+      font-weight:700;
+      color: var(--purple-pop);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      font-size:16px;
+      color: var(--text-dark);
+      margin: 6px 0;
+    }
+
+    .row b{
+      color: var(--hot-pink);
+      font-weight:700;
+      font-size: 18px;
+    }
+
+    .controls{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:24px;
+      width:min(900px, calc(100vw - 40px));
+      pointer-events:auto;
+      background: var(--white);
+      border: 6px solid var(--text-dark);
+      border-radius: 28px;
+      box-shadow: 0 10px 0 rgba(0,0,0,0.25);
+      padding: 20px;
+      display:flex;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+      animation: slideInUp 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes slideInUp {
+      from { transform: translateX(-50%) translateY(200px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    .q{flex:1 1 300px;}
+    .q .title{
+      font-size:14px;
+      color: var(--purple-pop);
+      margin-bottom:6px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .q .expr{
+      font-size:26px;
+      font-weight:700;
+      color: var(--text-dark);
+      letter-spacing:.5px;
+    }
+
+    input[type="text"]{
+      flex:0 0 200px;
+      background: #fff8dc;
+      border: 4px solid var(--text-dark);
+      color: var(--text-dark);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-size:22px;
+      font-weight: 700;
+      font-family: 'Fredoka', cursive;
+      outline:none;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+      transition: all 0.2s;
+    }
+
+    input[type="text"]:focus{
+      border-color: var(--bright-cyan);
+      box-shadow: 0 8px 0 rgba(0,217,255,0.3);
+      transform: translateY(-2px);
+    }
+
+    button{
+      cursor:pointer;
+      border: 4px solid var(--text-dark);
+      background: var(--sunny-yellow);
+      color: var(--text-dark);
+      border-radius: 16px;
+      padding: 14px 24px;
+      font-weight:700;
+      font-size: 16px;
+      font-family: 'Fredoka', cursive;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover{
+      transform: translateY(-3px);
+      box-shadow: 0 9px 0 rgba(0,0,0,0.2);
+    }
+
+    button:active{
+      transform: translateY(3px);
+      box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+    }
+
+    button.primary{
+      background: var(--lime-green);
+      border-color: var(--text-dark);
+      animation: pulse 2s infinite;
+    }
+
+    button.danger{
+      background: var(--hot-pink);
+      color: var(--white);
+      border-color: var(--text-dark);
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 18px;
+      border-radius:999px;
+      font-size:18px;
+      font-weight: 700;
+      border: 4px solid var(--text-dark);
+      background: var(--orange-burst);
+      color: var(--white);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+    }
+
+    .bar{
+      height:16px;
+      border-radius:999px;
+      border: 3px solid var(--text-dark);
+      background: #ffe4e1;
+      overflow:hidden;
+      margin-top:10px;
+      box-shadow: inset 0 3px 6px rgba(0,0,0,0.15);
+    }
+
+    .bar > div{
+      height:100%;
+      width:50%;
+      background: linear-gradient(90deg, var(--lime-green) 0%, var(--bright-cyan) 100%);
+      transition: width 0.3s ease, background 0.3s ease;
+      box-shadow: 0 2px 8px rgba(6,255,165,0.5);
+    }
+
+    .centerModal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(45,27,105,.75);
+      backdrop-filter: blur(8px);
+      pointer-events:auto;
+    }
+
+    .modal{
+      width:min(880px, calc(100vw - 40px));
+      background: var(--white);
+      border: 6px solid var(--text-dark);
+      border-radius: 32px;
+      padding: 32px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+      transform: rotate(-0.5deg);
+      animation: modalPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    @keyframes modalPop {
+      0% { transform: rotate(-0.5deg) scale(0.5); opacity: 0; }
+      100% { transform: rotate(-0.5deg) scale(1); opacity: 1; }
+    }
+
+    .modal h1{
+      margin:0 0 16px 0;
+      font-size:42px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--hot-pink), var(--purple-pop), var(--bright-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-transform: uppercase;
+    }
+
+    .modal p{
+      margin:0 0 20px 0;
+      color: var(--text-dark);
+      font-size:18px;
+      line-height:1.6;
+      font-weight: 500;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:16px;
+    }
+
+    .card{
+      grid-column: span 6;
+      border: 4px solid var(--text-dark);
+      background: linear-gradient(135deg, #fffacd 0%, #fff8dc 100%);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.15);
+      transform: rotate(0.5deg);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: rotate(0deg) scale(1.02);
+      box-shadow: 0 8px 0 rgba(0,0,0,0.15);
+    }
+
+    .card:nth-child(even) {
+      transform: rotate(-0.5deg);
+    }
+
+    .card h4{
+      margin:0 0 10px 0;
+      font-size:20px;
+      font-weight: 700;
+      color: var(--purple-pop);
+      text-transform: uppercase;
+    }
+
+    .card .sub{
+      color: var(--text-dark);
+      font-size:14px;
+      margin-bottom:14px;
+      opacity: 0.8;
+    }
+
+    .optRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items: center;
+    }
+
+    .optRow label{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:16px;
+      color: var(--text-dark);
+      cursor:pointer;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 12px;
+      transition: all 0.2s;
+    }
+
+    .optRow label:hover {
+      background: rgba(131,56,236,0.1);
+    }
+
+    .optRow input[type="radio"],
+    .optRow input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+    }
+
+    .optRow select, .optRow input[type="range"]{
+      background: var(--white);
+      border: 3px solid var(--text-dark);
+      color: var(--text-dark);
+      border-radius: 12px;
+      padding: 10px 14px;
+      outline:none;
+      font-family: 'Fredoka', cursive;
+      font-weight: 600;
+      font-size: 16px;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.15);
+      cursor: pointer;
+    }
+
+    .optRow small{
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .modalActions{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .note{
+      font-size:14px;
+      color: var(--text-dark);
+      margin-top:16px;
+      padding: 12px;
+      background: rgba(131,56,236,0.1);
+      border-radius: 12px;
+      border: 2px dashed var(--purple-pop);
+    }
+
+    @media (max-width:720px){
+      .card{grid-column: span 12;}
+      input[type="text"]{flex:1 1 140px; font-size: 20px;}
+      .modal h1 { font-size: 32px; }
+      .panel h3 { font-size: 18px; }
+      .q .expr { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <div class="hud">
+    <div class="panel">
+      <h3>Run Status</h3>
+      <div class="row"><span>Mode</span><b id="hudMode">—</b></div>
+      <div class="row"><span>Score</span><b id="hudScore">0</b></div>
+      <div class="row"><span>Streak</span><b id="hudStreak">0</b></div>
+      <div class="row"><span>Level</span><b id="hudLevel">1</b></div>
+      <div class="bar" title="Time left">
+        <div id="timeBar"></div>
+      </div>
+      <div class="note" id="hudHint">Solve before the cat reaches the pit.</div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls" style="display:none;">
+    <div class="q">
+      <div class="title">Question</div>
+      <div class="expr" id="expr">—</div>
+    </div>
+    <div class="pill" id="pill">⏱ <span id="timeLeft">0.0s</span></div>
+    <input id="answer" type="text" inputmode="numeric" autocomplete="off" placeholder="Answer"/>
+    <button class="primary" id="submitBtn">Submit</button>
+    <button id="skipBtn" class="danger" title="Counts as wrong">Skip</button>
+    <button id="pauseBtn" title="Pause">Pause</button>
+  </div>
+
+  <div class="centerModal" id="menu">
+    <div class="modal">
+      <h1>Math Cat Quest</h1>
+      <p>Pick a category. Each correct answer builds a bridge. Wrong answer or timeout: the cat falls.</p>
+
+      <div class="grid">
+        <div class="card">
+          <h4>Category</h4>
+          <div class="sub">This controls what kinds of questions appear.</div>
+          <div class="optRow">
+            <label><input type="radio" name="mode" value="mixed" checked> Mixed</label>
+            <label><input type="radio" name="mode" value="bodmas"> BODMAS</label>
+            <label><input type="radio" name="mode" value="arith"> Arithmetic</label>
+            <label><input type="radio" name="mode" value="algebra"> Find X / Y</label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Difficulty</h4>
+          <div class="sub">Adjust number range and complexity.</div>
+          <div class="optRow">
+            <select id="difficulty">
+              <option value="easy">Easy (8–9)</option>
+              <option value="medium" selected>Medium (9–11)</option>
+              <option value="hard">Hard (11–12)</option>
+            </select>
+            <small id="diffNote">Timer and complexity scale with difficulty.</small>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Timer</h4>
+          <div class="sub">How long per question (seconds).</div>
+          <div class="optRow">
+            <input id="timer" type="range" min="5" max="20" value="10"/>
+            <small><b id="timerVal">10</b>s</small>
+          </div>
+        </div>
+
+        <div class="card">
+          <h4>Options</h4>
+          <div class="sub">Quality-of-life and learning helpers.</div>
+          <div class="optRow">
+            <label><input id="showSteps" type="checkbox"> Show solution steps after a miss</label>
+            <label><input id="livesMode" type="checkbox"> 3 mistakes before falling</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="modalActions">
+        <button id="startBtn" class="primary">Start</button>
+        <button id="howBtn">How to play</button>
+      </div>
+      <div class="note">
+        Assets expected next to this HTML: <b>cat_walk.png</b>, <b>cat_fall.png</b>, <b>pit.png</b>, <b>bridge.png</b>. If missing, the game still runs with simple shapes.
+      </div>
+    </div>
+  </div>
+
+  <div class="centerModal" id="message">
+    <div class="modal">
+      <h1 id="msgTitle">—</h1>
+      <p id="msgBody">—</p>
+      <div class="modalActions">
+        <button id="restartBtn" class="primary">Play again</button>
+        <button id="menuBtn">Back to menu</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // -------------------------
+  // Asset loading
+  // -------------------------
+  const assets = {
+    walk: { src: 'cat_walk.png', img: null, frameW: 220, frameH: 224, frames: 4 },
+    fall: { src: 'cat_fall.png', img: null, frameW: 234, frameH: 269, frames: 4 },
+    pit:  { src: 'pit.png', img: null },
+    bridge:{ src: 'bridge.png', img: null },
+  };
+
+  function loadImage(src){
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve({ok:true, img});
+      img.onerror = () => resolve({ok:false, img:null});
+      img.src = src;
+    });
+  }
+
+  async function loadAssets(){
+    const w = await loadImage(assets.walk.src);
+    if(w.ok){ assets.walk.img = w.img; assets.walk.frameW = Math.floor(w.img.width / assets.walk.frames); assets.walk.frameH = w.img.height; }
+    const f = await loadImage(assets.fall.src);
+    if(f.ok){ assets.fall.img = f.img; assets.fall.frameW = Math.floor(f.img.width / assets.fall.frames); assets.fall.frameH = f.img.height; }
+    const p = await loadImage(assets.pit.src);
+    if(p.ok) assets.pit.img = p.img;
+    const b = await loadImage(assets.bridge.src);
+    if(b.ok) assets.bridge.img = b.img;
+  }
+
+  // -------------------------
+  // Canvas setup
+  // -------------------------
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+
+  const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  function resize(){
+    canvas.width = Math.floor(window.innerWidth * DPR);
+    canvas.height = Math.floor(window.innerHeight * DPR);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // -------------------------
+  // UI elements
+  // -------------------------
+  const el = {
+    menu: document.getElementById('menu'),
+    message: document.getElementById('message'),
+    msgTitle: document.getElementById('msgTitle'),
+    msgBody: document.getElementById('msgBody'),
+
+    hudMode: document.getElementById('hudMode'),
+    hudScore: document.getElementById('hudScore'),
+    hudStreak: document.getElementById('hudStreak'),
+    hudLevel: document.getElementById('hudLevel'),
+    hudHint: document.getElementById('hudHint'),
+    timeBar: document.getElementById('timeBar'),
+
+    controls: document.getElementById('controls'),
+    expr: document.getElementById('expr'),
+    answer: document.getElementById('answer'),
+    timeLeft: document.getElementById('timeLeft'),
+    pill: document.getElementById('pill'),
+    submitBtn: document.getElementById('submitBtn'),
+    skipBtn: document.getElementById('skipBtn'),
+    pauseBtn: document.getElementById('pauseBtn'),
+
+    startBtn: document.getElementById('startBtn'),
+    howBtn: document.getElementById('howBtn'),
+    restartBtn: document.getElementById('restartBtn'),
+    menuBtn: document.getElementById('menuBtn'),
+
+    difficulty: document.getElementById('difficulty'),
+    timer: document.getElementById('timer'),
+    timerVal: document.getElementById('timerVal'),
+    showSteps: document.getElementById('showSteps'),
+    livesMode: document.getElementById('livesMode'),
+  };
+
+  el.timer.addEventListener('input', () => el.timerVal.textContent = el.timer.value);
+
+  function getSelectedMode(){
+    const r = document.querySelector('input[name="mode"]:checked');
+    return r ? r.value : 'mixed';
+  }
+
+  // -------------------------
+  // Math question generation
+  // -------------------------
+  function randInt(min, max){ return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function choice(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function cfgForDifficulty(diff){
+    if(diff === 'easy')   return { maxN: 20, maxMul: 10, steps: 2, timerBias: +2 };
+    if(diff === 'hard')   return { maxN: 120, maxMul: 20, steps: 4, timerBias: -2 };
+    return               { maxN: 60, maxMul: 12, steps: 3, timerBias: 0 };
+  }
+
+  function genArithmetic(cfg){
+    const ops = ['+','-','×','÷'];
+    let op = choice(ops);
+    let a, b, ans, text, steps=[];
+    if(op === '+'){
+      a = randInt(2, cfg.maxN); b = randInt(2, cfg.maxN);
+      ans = a + b; text = `${a} + ${b} = ?`;
+      steps.push(`Add: ${a} + ${b} = ${ans}`);
+    } else if(op === '-'){
+      a = randInt(2, cfg.maxN); b = randInt(2, cfg.maxN);
+      if(b > a) [a,b] = [b,a];
+      ans = a - b; text = `${a} − ${b} = ?`;
+      steps.push(`Subtract: ${a} − ${b} = ${ans}`);
+    } else if(op === '×'){
+      a = randInt(2, cfg.maxMul); b = randInt(2, cfg.maxMul);
+      ans = a * b; text = `${a} × ${b} = ?`;
+      steps.push(`Multiply: ${a} × ${b} = ${ans}`);
+    } else { // ÷ integer only
+      b = randInt(2, cfg.maxMul);
+      ans = randInt(2, cfg.maxMul);
+      a = b * ans;
+      text = `${a} ÷ ${b} = ?`;
+      steps.push(`Divide: ${a} ÷ ${b} = ${ans}`);
+    }
+    return { type:'arith', text, answer: String(ans), steps };
+  }
+
+  function genBodmas(cfg){
+    // Build an integer-only BODMAS expression with parentheses.
+    // Example: (a + b) × c − d
+    const a = randInt(2, cfg.maxMul);
+    const b = randInt(2, cfg.maxMul);
+    const c = randInt(2, Math.max(4, Math.floor(cfg.maxMul/2)));
+    const d = randInt(2, cfg.maxMul);
+    const form = choice([0,1,2]);
+    let expr, value, steps=[];
+    if(form === 0){
+      // (a + b) × c
+      value = (a + b) * c;
+      expr = `(${a} + ${b}) × ${c}`;
+      steps.push(`1) Brackets: (${a}+${b}) = ${a+b}`);
+      steps.push(`2) Multiply: ${a+b} × ${c} = ${value}`);
+    } else if(form === 1){
+      // a + b × c
+      value = a + (b * c);
+      expr = `${a} + ${b} × ${c}`;
+      steps.push(`1) Multiply: ${b} × ${c} = ${b*c}`);
+      steps.push(`2) Add: ${a} + ${b*c} = ${value}`);
+    } else {
+      // (a + b) × c − d (keep non-negative)
+      let v = (a + b) * c - d;
+      if(v < 0){
+        // flip to plus if negative would appear
+        v = (a + b) * c + d;
+        expr = `(${a} + ${b}) × ${c} + ${d}`;
+        steps.push(`1) Brackets: (${a}+${b}) = ${a+b}`);
+        steps.push(`2) Multiply: ${a+b} × ${c} = ${(a+b)*c}`);
+        steps.push(`3) Add: ${(a+b)*c} + ${d} = ${v}`);
+      } else {
+        value = v;
+        expr = `(${a} + ${b}) × ${c} − ${d}`;
+        steps.push(`1) Brackets: (${a}+${b}) = ${a+b}`);
+        steps.push(`2) Multiply: ${a+b} × ${c} = ${(a+b)*c}`);
+        steps.push(`3) Subtract: ${(a+b)*c} − ${d} = ${value}`);
+      }
+      value = v;
+    }
+    return { type:'bodmas', text: `${expr} = ?`, answer: String(value), steps };
+  }
+
+  function genAlgebra(cfg){
+    // Simple linear: ax + b = c OR ay - b = c; ensure integer solution.
+    const varName = choice(['x','y']);
+    const a = randInt(2, Math.max(4, Math.floor(cfg.maxMul/1.5)));
+    const x = randInt(1, Math.max(8, Math.floor(cfg.maxMul/1.2)));
+    const b = randInt(1, cfg.maxMul);
+    const sign = choice([+1, -1]);
+    let c, text, steps=[];
+    if(sign === +1){
+      c = a*x + b;
+      text = `${a}${varName} + ${b} = ${c}. Find ${varName}.`;
+      steps.push(`1) Subtract ${b}: ${a}${varName} = ${c} − ${b} = ${a*x}`);
+      steps.push(`2) Divide by ${a}: ${varName} = ${(a*x)} ÷ ${a} = ${x}`);
+    } else {
+      c = a*x - b;
+      // keep positive c
+      if(c <= 0){
+        const b2 = Math.max(1, Math.floor((a*x)/2));
+        c = a*x - b2;
+        text = `${a}${varName} − ${b2} = ${c}. Find ${varName}.`;
+        steps.push(`1) Add ${b2}: ${a}${varName} = ${c} + ${b2} = ${a*x}`);
+        steps.push(`2) Divide by ${a}: ${varName} = ${(a*x)} ÷ ${a} = ${x}`);
+      } else {
+        text = `${a}${varName} − ${b} = ${c}. Find ${varName}.`;
+        steps.push(`1) Add ${b}: ${a}${varName} = ${c} + ${b} = ${a*x}`);
+        steps.push(`2) Divide by ${a}: ${varName} = ${(a*x)} ÷ ${a} = ${x}`);
+      }
+    }
+    return { type:'algebra', text, answer: String(x), steps };
+  }
+
+  function genQuestion(mode, diff){
+    const cfg = cfgForDifficulty(diff);
+    if(mode === 'arith') return genArithmetic(cfg);
+    if(mode === 'bodmas') return genBodmas(cfg);
+    if(mode === 'algebra') return genAlgebra(cfg);
+    // mixed: weight by difficulty
+    const pick = choice(['arith','arith','bodmas','algebra']);
+    return genQuestion(pick, diff);
+  }
+
+  // -------------------------
+  // Game state
+  // -------------------------
+  const state = {
+    phase: 'menu', // menu | playing | falling | paused | gameover
+    mode: 'mixed',
+    difficulty: 'medium',
+    baseTimer: 10,
+    showSteps: false,
+    livesMode: false,
+    lives: 3,
+    score: 0,
+    streak: 0,
+    level: 1,
+
+    q: null,
+    qStart: 0,
+    qTimeLimit: 10,
+    qTimeLeft: 10,
+
+    // movement / scene
+    worldT: 0,
+    scroll: 0,
+    pitX: 0, // world coordinate
+    pitIsBridged: false,
+    cat: {
+      x: 0, y: 0,
+      baseY: 0,
+      walkFrame: 0,
+      fallFrame: 0,
+      falling: false,
+      vy: 0,
+    },
+    // feedback
+    lastMissSteps: [],
+    missReason: '',
+  };
+
+  function resetRun(){
+    state.score = 0;
+    state.streak = 0;
+    state.level = 1;
+    state.lives = state.livesMode ? 3 : 1;
+    state.scroll = 0;
+    state.pitIsBridged = false;
+    state.cat.falling = false;
+    state.cat.vy = 0;
+    state.worldT = 0;
+    nextQuestion(true);
+  }
+
+  function nextQuestion(isFirst=false){
+    state.q = genQuestion(state.mode, state.difficulty);
+    state.pitIsBridged = false;
+    state.missReason = '';
+    state.lastMissSteps = [];
+    const cfg = cfgForDifficulty(state.difficulty);
+    state.qTimeLimit = Math.max(5, state.baseTimer + cfg.timerBias);
+    state.qStart = performance.now();
+    state.qTimeLeft = state.qTimeLimit;
+
+    // place pit in world ahead; cat stays ~left; world scrolls so pit approaches
+    const vw = canvas.width / DPR;
+    const gapAhead = isFirst ? vw * 0.55 : vw * 0.70;
+    state.pitX = state.scroll + gapAhead;
+
+    el.expr.textContent = state.q.text;
+    el.answer.value = '';
+    el.answer.focus({preventScroll:true});
+    updateHud();
+  }
+
+  function updateHud(){
+    el.hudMode.textContent = ({
+      mixed:'Mixed',
+      bodmas:'BODMAS',
+      arith:'Arithmetic',
+      algebra:'Find X/Y'
+    })[state.mode] || state.mode;
+    el.hudScore.textContent = state.score;
+    el.hudStreak.textContent = state.streak;
+    el.hudLevel.textContent = state.level;
+  }
+
+  function showMenu(){
+    state.phase = 'menu';
+    el.menu.style.display = 'flex';
+    el.controls.style.display = 'none';
+    el.message.style.display = 'none';
+    updateHud();
+  }
+
+  function startGame(){
+    state.phase = 'playing';
+    el.menu.style.display = 'none';
+    el.message.style.display = 'none';
+    el.controls.style.display = 'flex';
+    resetRun();
+  }
+
+  function showMessage(title, body){
+    el.msgTitle.textContent = title;
+    el.msgBody.textContent = body;
+    el.message.style.display = 'flex';
+    el.controls.style.display = 'none';
+  }
+
+  function lose(reason){
+    state.phase = 'gameover';
+    const steps = (state.showSteps && state.lastMissSteps.length)
+      ? `\n\nSolution:\n- ${state.lastMissSteps.join('\n- ')}`
+      : '';
+    showMessage('Game Over', `${reason}\n\nScore: ${state.score}${steps}`);
+  }
+
+  function winBridge(){
+    state.pitIsBridged = true;
+    state.score += 10 + Math.min(20, state.streak * 2);
+    state.streak += 1;
+    if(state.streak % 5 === 0) state.level += 1;
+    updateHud();
+  }
+
+  function registerMiss(reason){
+    state.streak = 0;
+    state.lastMissSteps = state.q ? (state.q.steps || []) : [];
+    state.missReason = reason;
+
+    if(state.livesMode){
+      state.lives -= 1;
+      if(state.lives > 0){
+        // penalty, but keep playing with a new question
+        state.score = Math.max(0, state.score - 5);
+        updateHud();
+        nextQuestion(false);
+        return;
+      }
+    }
+
+    // Start fall sequence
+    state.phase = 'falling';
+    state.cat.falling = true;
+    state.cat.vy = 0;
+  }
+
+  function checkAnswer(raw){
+    const a = String(raw).trim();
+    if(!state.q) return;
+    if(a === '') return;
+    if(a === state.q.answer){
+      winBridge();
+      // Advance scene: move scroll forward and spawn next pit
+      state.scroll = state.pitX + (canvas.width/DPR)*0.25;
+      nextQuestion(false);
+    } else {
+      registerMiss(`Wrong answer. Correct was ${state.q.answer}.`);
+    }
+  }
+
+  // UI events
+  el.submitBtn.addEventListener('click', () => checkAnswer(el.answer.value));
+  el.answer.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') checkAnswer(el.answer.value);
+  });
+  el.skipBtn.addEventListener('click', () => registerMiss('Skipped.'));
+  el.pauseBtn.addEventListener('click', () => {
+    if(state.phase === 'playing'){
+      state.phase = 'paused';
+      el.pauseBtn.textContent = 'Resume';
+      el.hudHint.textContent = 'Paused.';
+    } else if(state.phase === 'paused'){
+      state.phase = 'playing';
+      state.qStart = performance.now() - (state.qTimeLimit - state.qTimeLeft) * 1000; // keep timer consistent
+      el.pauseBtn.textContent = 'Pause';
+      el.hudHint.textContent = 'Solve before the cat reaches the pit.';
+    }
+  });
+
+  el.startBtn.addEventListener('click', () => {
+    state.mode = getSelectedMode();
+    state.difficulty = el.difficulty.value;
+    state.baseTimer = parseInt(el.timer.value, 10);
+    state.showSteps = el.showSteps.checked;
+    state.livesMode = el.livesMode.checked;
+    startGame();
+  });
+  el.howBtn.addEventListener('click', () => {
+    showMessage('How to play',
+      '1) Choose a category and start.\n' +
+      '2) Answer before the timer hits 0.\n' +
+      '3) Correct answer builds a bridge so the cat keeps going.\n' +
+      '4) Wrong answer or timeout: the cat falls.\n\n' +
+      'Tip: Enable "Show solution steps" to learn from mistakes.'
+    );
+  });
+  el.restartBtn.addEventListener('click', () => startGame());
+  el.menuBtn.addEventListener('click', () => showMenu());
+
+  // -------------------------
+  // Rendering helpers
+  // -------------------------
+  function clear(){
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0,0,w,h);
+  }
+
+  function drawBackground(t){
+    const w = canvas.width, h = canvas.height;
+
+    // Colorful floating shapes and sparkles
+    ctx.save();
+    const sparkles = 60;
+    for(let i=0; i<sparkles; i++){
+      const x = ((i*997 + t*0.015) % (w/DPR)) * DPR;
+      const y = ((i*571 + t*0.008) % (h/DPR)) * DPR;
+      const r = (i%4+2) * DPR * 0.8;
+      const colors = ['#ff006e', '#00d9ff', '#ffbe0b', '#8338ec', '#06ffa5'];
+      ctx.globalAlpha = 0.25 + Math.sin(t*0.003 + i) * 0.15;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Fluffy clouds
+    ctx.save();
+    const cloudCount = 5;
+    for(let i=0; i<cloudCount; i++){
+      const x = ((i*450 + t*0.02) % (w/DPR + 200)) * DPR - 100*DPR;
+      const y = (50 + i*40) * DPR;
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#ffffff';
+      // Three circles to make a fluffy cloud
+      ctx.beginPath();
+      ctx.arc(x, y, 25*DPR, 0, Math.PI*2);
+      ctx.arc(x + 30*DPR, y, 30*DPR, 0, Math.PI*2);
+      ctx.arc(x + 60*DPR, y, 25*DPR, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Bright sun
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    const sunX = w - 80*DPR;
+    const sunY = 80*DPR;
+    // Sun glow
+    const gradient = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, 60*DPR);
+    gradient.addColorStop(0, 'rgba(255,190,11,0.4)');
+    gradient.addColorStop(1, 'rgba(255,190,11,0)');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 60*DPR, 0, Math.PI*2);
+    ctx.fill();
+    // Sun center
+    ctx.fillStyle = '#ffbe0b';
+    ctx.beginPath();
+    ctx.arc(sunX, sunY, 35*DPR, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    // Vibrant ground line
+    const y = groundY();
+    ctx.save();
+    ctx.strokeStyle = '#2d1b69';
+    ctx.lineWidth = 6*DPR;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+
+    // Colorful grass tufts
+    ctx.lineWidth = 3*DPR;
+    const spacing = 90;
+    const grassColors = ['#06ffa5', '#00d9ff', '#8338ec'];
+    for(let x=-(state.scroll%spacing); x<w/DPR; x+=spacing){
+      ctx.strokeStyle = grassColors[Math.floor(x/spacing) % grassColors.length];
+      ctx.beginPath();
+      ctx.moveTo(x*DPR, y - 2*DPR);
+      ctx.lineTo(x*DPR - 4*DPR, y + 18*DPR);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x*DPR, y - 2*DPR);
+      ctx.lineTo(x*DPR, y + 20*DPR);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x*DPR, y - 2*DPR);
+      ctx.lineTo(x*DPR + 4*DPR, y + 18*DPR);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function groundY(){
+    return (canvas.height / DPR) * 0.70 * DPR;
+  }
+
+  function worldToScreenX(wx){
+    // Keep cat anchored, world scrolls
+    const anchor = (canvas.width/DPR) * 0.25;
+    return (wx - state.scroll + anchor) * DPR;
+  }
+
+  function drawPit(){
+    const y = groundY();
+    const x = worldToScreenX(state.pitX);
+    const pitScale = 0.32; // tuned for isometric assets
+    const pitW = (assets.pit.img ? assets.pit.img.width : 260) * pitScale * DPR;
+    const pitH = (assets.pit.img ? assets.pit.img.height : 180) * pitScale * DPR;
+
+    // draw "danger zone" shadow with warning stripes
+    ctx.save();
+    ctx.globalAlpha = 0.3;
+    ctx.fillStyle = '#2d1b69';
+    ctx.beginPath();
+    ctx.ellipse(x, y + 18*DPR, pitW*0.34, pitH*0.12, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+
+    if(assets.pit.img){
+      ctx.drawImage(assets.pit.img, x - pitW/2, y - pitH*0.55, pitW, pitH);
+    } else {
+      // fallback hole - colorful danger pit
+      ctx.save();
+      // Outer warning ring
+      ctx.strokeStyle = '#ff006e';
+      ctx.lineWidth = 6*DPR;
+      ctx.beginPath();
+      ctx.ellipse(x, y+8*DPR, 95*DPR, 30*DPR, 0, 0, Math.PI*2);
+      ctx.stroke();
+      // Inner dark pit
+      ctx.fillStyle = '#2d1b69';
+      ctx.beginPath();
+      ctx.ellipse(x, y+8*DPR, 85*DPR, 24*DPR, 0, 0, Math.PI*2);
+      ctx.fill();
+      // Highlight to show depth
+      ctx.globalAlpha = 0.3;
+      ctx.fillStyle = '#8338ec';
+      ctx.beginPath();
+      ctx.ellipse(x - 15*DPR, y+4*DPR, 30*DPR, 10*DPR, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    if(state.pitIsBridged){
+      if(assets.bridge.img){
+        const bScale = 0.36;
+        const bW = assets.bridge.img.width * bScale * DPR;
+        const bH = assets.bridge.img.height * bScale * DPR;
+        ctx.drawImage(assets.bridge.img, x - bW/2, y - bH*0.62, bW, bH);
+      } else {
+        // Colorful rainbow bridge
+        ctx.save();
+        // Bridge planks
+        const bridgeColors = ['#ff006e', '#ffbe0b', '#00d9ff', '#06ffa5', '#8338ec'];
+        for(let i=0; i<5; i++){
+          ctx.fillStyle = bridgeColors[i];
+          ctx.fillRect(x - 110*DPR + i*44*DPR, y - 12*DPR, 40*DPR, 18*DPR);
+        }
+        // Bridge outline
+        ctx.strokeStyle = '#2d1b69';
+        ctx.lineWidth = 5*DPR;
+        ctx.strokeRect(x - 110*DPR, y - 12*DPR, 220*DPR, 18*DPR);
+        ctx.restore();
+      }
+    }
+  }
+
+  function drawCat(dt){
+    const y = groundY();
+    const catX = (canvas.width/DPR) * 0.25 * DPR;
+    let catY = y - 70*DPR;
+
+    // approach logic: cat "walks" towards pit by increasing its x slightly as time passes
+    // (visual only; world scroll handles actual pit approach)
+    const tNorm = 1 - Math.max(0, Math.min(1, state.qTimeLeft / state.qTimeLimit));
+    const bob = Math.sin(state.worldT * 0.012) * 3 * DPR;
+
+    if(state.phase === 'falling'){
+      // fall into pit
+      const pitSX = worldToScreenX(state.pitX);
+      const targetX = pitSX;
+      const dx = (targetX - catX) * 0.06;
+      const dy = (y + 130*DPR) - catY;
+
+      state.cat.x = catX + dx;
+      state.cat.vy += 0.9 * DPR;
+      state.cat.y = (state.cat.y || catY) + state.cat.vy;
+      catY = Math.min(state.cat.y, y + 160*DPR);
+    } else {
+      state.cat.x = catX + (tNorm * 120 * DPR);
+      state.cat.y = catY + bob;
+    }
+
+    // choose sprite / fallback shape
+    const useWalk = (state.phase === 'playing' || state.phase === 'paused') && !state.cat.falling;
+    const useFall = (state.phase === 'falling') || state.cat.falling;
+
+    if(useFall && assets.fall.img){
+      // animate fall frames
+      state.cat.fallFrame = (state.cat.fallFrame + dt*0.012) % assets.fall.frames;
+      const fi = Math.floor(state.cat.fallFrame);
+      const sx = fi * assets.fall.frameW;
+      ctx.drawImage(
+        assets.fall.img,
+        sx, 0, assets.fall.frameW, assets.fall.frameH,
+        state.cat.x - (assets.fall.frameW*0.45)*DPR,
+        catY - (assets.fall.frameH*0.55)*DPR,
+        assets.fall.frameW*DPR,
+        assets.fall.frameH*DPR
+      );
+    } else if(useWalk && assets.walk.img){
+      state.cat.walkFrame = (state.cat.walkFrame + dt*0.012) % assets.walk.frames;
+      const fi = Math.floor(state.cat.walkFrame);
+      const sx = fi * assets.walk.frameW;
+      ctx.drawImage(
+        assets.walk.img,
+        sx, 0, assets.walk.frameW, assets.walk.frameH,
+        state.cat.x - (assets.walk.frameW*0.45)*DPR,
+        catY - (assets.walk.frameH*0.55)*DPR,
+        assets.walk.frameW*DPR,
+        assets.walk.frameH*DPR
+      );
+    } else {
+      // fallback cat - cute and colorful
+      ctx.save();
+
+      // Cat body - bright orange
+      ctx.fillStyle = '#ff6d00';
+      ctx.strokeStyle = '#2d1b69';
+      ctx.lineWidth = 5*DPR;
+      ctx.beginPath();
+      ctx.roundRect(state.cat.x - 40*DPR, catY - 30*DPR, 80*DPR, 55*DPR, 22*DPR);
+      ctx.fill();
+      ctx.stroke();
+
+      // Cat ears - triangular
+      ctx.fillStyle = '#ff006e';
+      ctx.beginPath();
+      ctx.moveTo(state.cat.x - 30*DPR, catY - 28*DPR);
+      ctx.lineTo(state.cat.x - 20*DPR, catY - 48*DPR);
+      ctx.lineTo(state.cat.x - 10*DPR, catY - 28*DPR);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(state.cat.x + 10*DPR, catY - 28*DPR);
+      ctx.lineTo(state.cat.x + 20*DPR, catY - 48*DPR);
+      ctx.lineTo(state.cat.x + 30*DPR, catY - 28*DPR);
+      ctx.fill();
+      ctx.stroke();
+
+      // Cat face - eyes
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(state.cat.x - 12*DPR, catY - 10*DPR, 10*DPR, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(state.cat.x + 12*DPR, catY - 10*DPR, 10*DPR, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Pupils
+      ctx.fillStyle = '#2d1b69';
+      ctx.beginPath();
+      ctx.arc(state.cat.x - 12*DPR, catY - 8*DPR, 5*DPR, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(state.cat.x + 12*DPR, catY - 8*DPR, 5*DPR, 0, Math.PI*2);
+      ctx.fill();
+
+      // Nose
+      ctx.fillStyle = '#8338ec';
+      ctx.beginPath();
+      ctx.arc(state.cat.x, catY + 6*DPR, 6*DPR, 0, Math.PI*2);
+      ctx.fill();
+
+      // Whiskers
+      ctx.strokeStyle = '#2d1b69';
+      ctx.lineWidth = 2*DPR;
+      ctx.beginPath();
+      ctx.moveTo(state.cat.x - 40*DPR, catY);
+      ctx.lineTo(state.cat.x - 55*DPR, catY - 5*DPR);
+      ctx.moveTo(state.cat.x - 40*DPR, catY + 5*DPR);
+      ctx.lineTo(state.cat.x - 55*DPR, catY + 5*DPR);
+      ctx.moveTo(state.cat.x + 40*DPR, catY);
+      ctx.lineTo(state.cat.x + 55*DPR, catY - 5*DPR);
+      ctx.moveTo(state.cat.x + 40*DPR, catY + 5*DPR);
+      ctx.lineTo(state.cat.x + 55*DPR, catY + 5*DPR);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  function drawTextHint(){
+    if(state.phase === 'playing' || state.phase === 'paused'){
+      ctx.save();
+      // Bright hint box
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#2d1b69';
+      ctx.lineWidth = 4*DPR;
+      const boxX = 16*DPR;
+      const boxY = (canvas.height/DPR)*0.20*DPR;
+      const boxW = 450*DPR;
+      const boxH = 70*DPR;
+      ctx.beginPath();
+      ctx.roundRect(boxX, boxY, boxW, boxH, 16*DPR);
+      ctx.fill();
+      ctx.stroke();
+
+      // Hint text
+      ctx.fillStyle = '#8338ec';
+      ctx.font = `bold ${16*DPR}px Fredoka, system-ui`;
+      ctx.fillText('💡 Tip: Press Enter to submit!', boxX + 16*DPR, boxY + 28*DPR);
+      ctx.fillStyle = '#2d1b69';
+      ctx.font = `${14*DPR}px Fredoka, system-ui`;
+      ctx.fillText('Correct answer builds a rainbow bridge 🌈', boxX + 16*DPR, boxY + 52*DPR);
+      ctx.restore();
+    }
+  }
+
+  // -------------------------
+  // Main loop
+  // -------------------------
+  let last = performance.now();
+  function tick(now){
+    const dt = Math.min(40, now - last);
+    last = now;
+
+    if(state.phase !== 'menu'){
+      state.worldT += dt;
+
+      if(state.phase === 'playing'){
+        // timer
+        const elapsed = (now - state.qStart) / 1000;
+        state.qTimeLeft = Math.max(0, state.qTimeLimit - elapsed);
+
+        // progress: pit approaches as time runs out
+        const speed = 2.1 + state.level * 0.12; // world scroll speed
+        state.scroll += speed * (dt/16.67);
+
+        // timeout triggers miss
+        if(state.qTimeLeft <= 0){
+          registerMiss('Time is up.');
+        }
+      }
+
+      if(state.phase === 'falling'){
+        // let fall animation run briefly then end
+        if(state.cat.y > groundY() + 140*DPR){
+          lose(state.missReason || 'You fell.');
+        }
+      }
+    }
+
+    // UI timer
+    if(state.phase === 'playing' || state.phase === 'paused'){
+      el.timeLeft.textContent = `${state.qTimeLeft.toFixed(1)}s`;
+      const p = Math.max(0, Math.min(1, state.qTimeLeft / state.qTimeLimit));
+      el.timeBar.style.width = `${Math.round(p*100)}%`;
+      el.timeBar.style.background = p < 0.25 ? 'rgba(239,68,68,.8)' : (p < 0.5 ? 'rgba(245,158,11,.8)' : 'rgba(34,197,94,.75)');
+      el.pill.style.borderColor = p < 0.25 ? 'rgba(239,68,68,.55)' : 'rgba(148,163,184,.22)';
+      el.hudHint.textContent = state.livesMode ? `Lives left: ${state.lives}` : 'Solve before the cat reaches the pit.';
+    }
+
+    // Draw
+    clear();
+    drawBackground(state.worldT);
+    if(state.phase !== 'menu'){
+      drawPit();
+      drawCat(dt);
+      drawTextHint();
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  // -------------------------
+  // Boot
+  // -------------------------
+  // RoundRect polyfill for older browsers
+  if(!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      const rr = Math.min(r, w/2, h/2);
+      this.beginPath();
+      this.moveTo(x+rr, y);
+      this.arcTo(x+w, y, x+w, y+h, rr);
+      this.arcTo(x+w, y+h, x, y+h, rr);
+      this.arcTo(x, y+h, x, y, rr);
+      this.arcTo(x, y, x+w, y, rr);
+      this.closePath();
+      return this;
+    };
+  }
+
+  loadAssets().then(() => {
+    showMenu();
+    requestAnimationFrame(tick);
+  });
+
+})();
+</script>
+</body>
+</html>
