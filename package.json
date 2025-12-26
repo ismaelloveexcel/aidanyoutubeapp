@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "npm run build:client && npm run build:server",
+    "build": "npm run build:client && npm run build:server && npm run postbuild",
     "build:client": "vite build",
     "build:server": "esbuild server/index.ts --bundle --platform=node --format=esm --outfile=dist/index.js --external:pg-native --external:lightningcss --external:bcrypt",
+    "postbuild": "node -e \"const fs = require('fs'); if (!fs.existsSync('dist/index.js')) { console.error('Build failed: dist/index.js not found'); process.exit(1); } console.log('Build verified: dist/index.js exists (' + Math.round(fs.statSync('dist/index.js').size / 1024) + ' KB)');\"",
     "start": "NODE_ENV=production node dist/index.js",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
@@ -20,6 +21,7 @@
     "cors": "^2.8.5",
     "drizzle-orm": "^0.38.0",
     "drizzle-zod": "^0.6.1",
+    "esbuild": "^0.20.0",
     "express": "^4.18.2",
     "express-rate-limit": "^8.2.1",
     "framer-motion": "^11.15.0",
@@ -29,6 +31,7 @@
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.2.1",
     "tsx": "^4.21.0",
+    "vite": "^5.0.12",
     "wouter": "^3.3.5",
     "zod": "^3.22.4"
   },
@@ -43,11 +46,9 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "drizzle-kit": "^0.29.1",
-    "esbuild": "^0.20.0",
     "postcss": "^8.4.33",
     "tailwindcss": "^4.0.0",
     "typescript": "^5.3.3",
-    "vite": "^5.0.12",
     "vite-tsconfig-paths": "^4.3.1"
   }
 }
