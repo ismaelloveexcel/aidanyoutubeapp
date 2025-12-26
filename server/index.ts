@@ -2,12 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import path from "path";
-import { fileURLToPath } from "url";
 import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const currentDir = typeof __dirname !== 'undefined' ? __dirname : process.cwd();
 
 const app = express();
 
@@ -111,9 +110,9 @@ app.use((req, res, next) => {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(__dirname, "../dist/public")));
+    app.use(express.static(path.resolve(currentDir, "../dist/public")));
     app.get("*", (_req, res) => {
-      res.sendFile(path.resolve(__dirname, "../dist/public/index.html"));
+      res.sendFile(path.resolve(currentDir, "../dist/public/index.html"));
     });
   }
 
