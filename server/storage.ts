@@ -1,11 +1,15 @@
 import { users, scripts, ideas, thumbnails, type User, type InsertUser, type Script, type InsertScript, type Idea, type InsertIdea, type Thumbnail, type InsertThumbnail } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
+import bcrypt from "bcrypt";
+
+const SALT_ROUNDS = 12;
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean>;
   createScript(script: InsertScript): Promise<Script>;
   updateScript(id: number, script: Partial<InsertScript>): Promise<Script | undefined>;
   getScript(id: number): Promise<Script | undefined>;
@@ -32,8 +36,16 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(insertUser.password, SALT_ROUNDS);
+    const [user] = await db.insert(users).values({
+      ...insertUser,
+      password: hashedPassword,
+    }).returning();
     return user;
+  }
+  async verifyPassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
   }
   async createScript(script: InsertScript): Promise<Script> {
     const [newScript] = await db.insert(scripts).values({ templateId: script.templateId, title: script.title, steps: script.steps as any }).returning();

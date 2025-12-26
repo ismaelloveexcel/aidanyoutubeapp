@@ -54,7 +54,9 @@ export default function MultiPlatform() {
                   : "hover:scale-102"
               }`}
               style={{
-                ringColor: selectedPlatforms.includes(platform.id) ? platform.color : 'transparent',
+                boxShadow: selectedPlatforms.includes(platform.id) 
+                  ? `0 0 0 4px ${platform.color}` 
+                  : 'none',
               }}
               onClick={() => togglePlatform(platform.id)}
             >
