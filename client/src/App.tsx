@@ -21,11 +21,13 @@ import Analytics from "@/pages/analytics";
 import Calendar from "@/pages/calendar";
 import MultiPlatform from "@/pages/multi-platform";
 import AIAssistant from "@/pages/ai-assistant";
+import Login from "@/pages/login";
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
+    <Switch>
+      <Route path="/login" component={Login} />
+      <Layout>
         <Route path="/" component={Dashboard} />
         <Route path="/ideas" component={Ideas} />
         <Route path="/script" component={Script} />
@@ -42,8 +44,8 @@ function Router() {
         <Route path="/multi-platform" component={MultiPlatform} />
         <Route path="/ai-assistant" component={AIAssistant} />
         <Route component={NotFound} />
-      </Switch>
-    </Layout>
+      </Layout>
+    </Switch>
   );
 }
 
