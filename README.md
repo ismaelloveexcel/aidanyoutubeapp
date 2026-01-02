@@ -44,6 +44,9 @@ A YouTube video creation helper app designed for 8-12 year old kids. Create amaz
    ```bash
    npm install
    ```
+   > Note: Vite/rollup needs the platform-specific native binding (`@rollup/rollup-linux-x64-gnu`).
+   > The included `.npmrc` forces optional dependencies on so the native build is installed when the npm registry is reachable.
+   > If installs still fail, verify outbound registry access or pre-populate your npm cache with the rollup binary.
 
 4. Set up the database:
    ```bash
