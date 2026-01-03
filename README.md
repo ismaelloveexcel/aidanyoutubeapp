@@ -69,14 +69,20 @@ npm start
 
 ## Deploy to Replit
 
-This app is Replit-ready! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
+This app is Replit-ready with autoscale deployment support! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
 
 **Quick Start on Replit:**
 1. Import this repository to Replit
 2. Add `DATABASE_URL` to Replit Secrets
 3. Run `npm install`
 4. Run `npm run db:push`
-5. Run `npm run dev`
+5. Click "Run" to start development
+
+**Production Deployment:**
+1. Click the "Deploy" button in Replit
+2. Select "Autoscale" deployment
+3. Add production secrets
+4. Click "Deploy"
 
 **⚠️ Security Note**: Before deploying to production, review [SECURITY.md](./SECURITY.md) for critical security issues that must be addressed.
 
