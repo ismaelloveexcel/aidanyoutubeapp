@@ -93,11 +93,14 @@ export default function Dashboard() {
       {/* Welcome Header */}
       <div className="flex items-start justify-between gap-4">
         <div>
+          <p className="text-sm text-[#2BD4FF] font-medium mb-1">
+            Made for Awesome {profile.name || "Creator"}
+          </p>
           <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">
-            {profile.name ? `Welcome back, ${profile.name}!` : "Welcome!"}
+            {profile.name ? `Hey ${profile.name}, let's make magic!` : "Welcome, Creator!"}
           </h1>
           <p className="text-zinc-400 mt-1">
-            {allComplete ? "Amazing work! Ready for another video?" : "Let's create your next hit video"}
+            {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
           </p>
         </div>
         <button 
@@ -155,7 +158,7 @@ export default function Dashboard() {
             Video Creation Steps
           </h3>
           
-          <div className="space-y-4">
+          <div className="space-y-5">
             {STEPS.map((step) => {
               const isComplete = completedSteps.includes(step.id);
               const isCurrent = step.id === currentStep.id && !allComplete;
@@ -165,7 +168,7 @@ export default function Dashboard() {
                 <Card 
                   key={step.id}
                   className={cn(
-                    "p-5 transition-all border",
+                    "p-6 transition-all border",
                     isCurrent 
                       ? "bg-[#0f1d32] border-[#2BD4FF]/40 shadow-lg shadow-[#2BD4FF]/10" 
                       : isComplete
