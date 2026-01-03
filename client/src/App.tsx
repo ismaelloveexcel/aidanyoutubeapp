@@ -22,6 +22,7 @@ import Calendar from "@/pages/calendar";
 import MultiPlatform from "@/pages/multi-platform";
 import AIAssistant from "@/pages/ai-assistant";
 import Login from "@/pages/login";
+import Roadmap from "@/pages/roadmap";
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
         <Layout>
           <Switch>
             <Route path="/" component={Dashboard} />
+            <Route path="/roadmap" component={Roadmap} />
             <Route path="/ideas" component={Ideas} />
             <Route path="/script" component={Script} />
             <Route path="/templates" component={Templates} />

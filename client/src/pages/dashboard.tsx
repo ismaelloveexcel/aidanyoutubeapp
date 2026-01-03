@@ -51,7 +51,12 @@ export default function Dashboard() {
           <p className="text-xl text-gray-300 font-medium">
             {profile.channelName ? `Let's create epic content for ${profile.channelName}` : "Your gaming studio awaits - let's level up!"}
           </p>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/roadmap">
+              <Button size="lg" className="bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,45%)] text-gray-900 hover:from-[hsl(45,100%,55%)] hover:to-[hsl(35,100%,50%)] shadow-[0_4px_20px_rgba(255,180,0,0.35)]">
+                🗺️ Start Creating Video
+              </Button>
+            </Link>
             {!isSetup && (
               <Button size="lg" onClick={() => setShowSetup(true)}>
                 🎮 Set Up Your Profile

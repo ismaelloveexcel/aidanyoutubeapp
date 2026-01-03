@@ -11,6 +11,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const navItems = [
     { path: "/", label: "Home", emoji: "🏠" },
+    { path: "/roadmap", label: "Roadmap", emoji: "🗺️" },
     { path: "/progress", label: "Progress", emoji: "🏆" },
     { path: "/ideas", label: "Ideas", emoji: "💡" },
     { path: "/script", label: "Script", emoji: "📝" },
