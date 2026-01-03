@@ -1,0 +1,71 @@
+Step 1: Import to Replit
+Go to Replit
+Click "Create Repl"
+Choose "Import from GitHub"
+Enter repository URL: https://github.com/ismaelloveexcel/aidanyoutubeapp
+Click "Import from GitHub"
+Step 2: Configure Environment Variables (Secrets)
+In Replit, go to the "Secrets" tab (lock icon) and add:
+
+DATABASE_URL=postgresql://user:password@host:5432/dbname
+NODE_ENV=production
+PORT=5000
+Important: Never commit these values to the repository!
+
+Step 3: Set Up Database
+Option A: Using Replit PostgreSQL (Recommended for testing)
+In your Repl, click "Tools" → "Database"
+Enable PostgreSQL
+Copy the connection string to your Secrets as DATABASE_URL
+Option B: Using External PostgreSQL (Recommended for production)
+Services like Neon, Supabase, or Railway offer free PostgreSQL:
+
+Neon - Free tier with 0.5GB storage
+Supabase - Free tier with 500MB database
+Railway - $5 free credit monthly
+Step 4: Install Dependencies
+In the Replit shell:
+
+npm install
+Step 5: Initialize Database
+Run migrations to set up database tables:
+
+npm run db:push
+Step 6: Build and Run (Development)
+Development Mode
+npm run dev
+Click the "Run" button in Replit to start the development server!
+
+Step 7: Deploy to Production with Replit Deployments
+This repository includes a pre-configured .replit file with deployment settings for Replit's autoscale deployment feature.
+
+Using Replit Deployments (Recommended for Production)
+Click the "Deploy" button in the top right corner of your Repl
+Select "Autoscale" deployment type (already configured)
+Review the deployment settings:
+Build command: npm run build
+Run command: npm install --production && npm start
+Add your production environment secrets in the deployment settings
+Click "Deploy" to publish your app
+Deployment Configuration
+The .replit file includes these deployment settings:
+
+[deployment]
+run = ["sh", "-c", "npm install --production && npm start"]
+deploymentTarget = "autoscale"
+build = ["npm", "run", "build"]
+This configuration ensures:
+
+Your app is built before deployment
+Production dependencies are installed
+The app starts with npm start in production mode
+Autoscaling handles traffic automatically
+Step 8: Access Your App
+Development: Click the "Open in new tab" button in Replit
+Production: Your deployed app will have a URL like https://your-repl-name-your-username.replit.app
+Replit Configuration Files
+The repository includes these Replit-specific files:
+
+.replit - Main configuration (run commands, ports)
+replit.nix - Environment dependencies (Node.js, PostgreSQL)
+.replitignore - Files to exclude from the Repl

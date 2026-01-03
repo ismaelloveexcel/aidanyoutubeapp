@@ -8,7 +8,7 @@ hidden = [".config", "tsconfig.json", "tsconfig.node.json", ".gitignore"]
 channel = "stable-25_05"
 
 [deployment]
-run = ["sh", "-c", "npm install --production && npm start"]
+run = ["node", "./dist/index.cjs"]
 deploymentTarget = "autoscale"
 build = ["npm", "run", "build"]
 
@@ -43,10 +43,10 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
-
-[workflows.workflow.metadata]
-outputType = "webview"
