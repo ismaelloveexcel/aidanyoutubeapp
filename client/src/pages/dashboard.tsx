@@ -4,10 +4,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings, Zap, Circle, Triangle, Square, Play } from "lucide-react";
+import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings, Trophy, Target } from "lucide-react";
 
 interface RoadmapStep {
   id: number;
@@ -16,61 +17,14 @@ interface RoadmapStep {
   icon: typeof Lightbulb;
   path: string;
   color: string;
-  glowColor: string;
-  shape: "circle" | "triangle" | "square";
 }
 
 const STEPS: RoadmapStep[] = [
-  {
-    id: 1,
-    title: "Generate Idea",
-    description: "Come up with an awesome video concept",
-    icon: Lightbulb,
-    path: "/ideas",
-    color: "#2BD4FF",
-    glowColor: "rgba(43, 212, 255, 0.5)",
-    shape: "circle",
-  },
-  {
-    id: 2,
-    title: "Write Script",
-    description: "Plan what you'll say and do",
-    icon: FileText,
-    path: "/script",
-    color: "#4E4DFF",
-    glowColor: "rgba(78, 77, 255, 0.5)",
-    shape: "triangle",
-  },
-  {
-    id: 3,
-    title: "Record Video",
-    description: "Lights, camera, action!",
-    icon: Video,
-    path: "/recorder",
-    color: "#6DFF9C",
-    glowColor: "rgba(109, 255, 156, 0.5)",
-    shape: "square",
-  },
-  {
-    id: 4,
-    title: "Edit Video",
-    description: "Add effects and make it awesome",
-    icon: Scissors,
-    path: "/editor",
-    color: "#F3C94C",
-    glowColor: "rgba(243, 201, 76, 0.5)",
-    shape: "circle",
-  },
-  {
-    id: 5,
-    title: "Upload & Share",
-    description: "Share your creation with the world!",
-    icon: Upload,
-    path: "/upload",
-    color: "#2BD4FF",
-    glowColor: "rgba(43, 212, 255, 0.5)",
-    shape: "triangle",
-  },
+  { id: 1, title: "Generate Idea", description: "Brainstorm your video concept", icon: Lightbulb, path: "/ideas", color: "#2BD4FF" },
+  { id: 2, title: "Write Script", description: "Plan what you'll say and do", icon: FileText, path: "/script", color: "#4E4DFF" },
+  { id: 3, title: "Record Video", description: "Lights, camera, action!", icon: Video, path: "/recorder", color: "#6DFF9C" },
+  { id: 4, title: "Edit Video", description: "Add effects and make it awesome", icon: Scissors, path: "/editor", color: "#F3C94C" },
+  { id: 5, title: "Upload & Share", description: "Share with the world!", icon: Upload, path: "/upload", color: "#2BD4FF" },
 ];
 
 const STEP_STORAGE_KEY = "tubestar-completed-steps";
@@ -86,48 +40,6 @@ function getStoredSteps(): number[] {
 
 function storeCompletedSteps(steps: number[]) {
   localStorage.setItem(STEP_STORAGE_KEY, JSON.stringify(steps));
-}
-
-function SquidShape({ shape, color, isComplete }: { shape: "circle" | "triangle" | "square"; color: string; isComplete: boolean }) {
-  const baseClass = "transition-all duration-300";
-  
-  if (shape === "circle") {
-    return (
-      <Circle 
-        className={baseClass} 
-        style={{ 
-          color: isComplete ? color : "rgba(255,255,255,0.3)",
-          filter: isComplete ? `drop-shadow(0 0 8px ${color})` : "none"
-        }} 
-        strokeWidth={3}
-        size={20}
-      />
-    );
-  }
-  if (shape === "triangle") {
-    return (
-      <Triangle 
-        className={baseClass} 
-        style={{ 
-          color: isComplete ? color : "rgba(255,255,255,0.3)",
-          filter: isComplete ? `drop-shadow(0 0 8px ${color})` : "none"
-        }} 
-        strokeWidth={3}
-        size={20}
-      />
-    );
-  }
-  return (
-    <Square 
-      className={baseClass} 
-      style={{ 
-        color: isComplete ? color : "rgba(255,255,255,0.3)",
-        filter: isComplete ? `drop-shadow(0 0 8px ${color})` : "none"
-      }} 
-      strokeWidth={3}
-      size={20}
-    />
-  );
 }
 
 export default function Dashboard() {
@@ -157,10 +69,8 @@ export default function Dashboard() {
       
       if (!prev.includes(stepId)) {
         toast({
-          title: "Level Up!",
-          description: stepId === STEPS.length 
-            ? "VICTORY ROYALE! Video complete!" 
-            : "Nice! Keep going!",
+          title: stepId === STEPS.length ? "Victory!" : "Step Complete!",
+          description: stepId === STEPS.length ? "You finished your video!" : "Keep going!",
         });
       }
       
@@ -171,10 +81,7 @@ export default function Dashboard() {
   const resetProgress = () => {
     setCompletedSteps([]);
     storeCompletedSteps([]);
-    toast({
-      title: "New Game+",
-      description: "Ready to start a new video project!",
-    });
+    toast({ title: "Progress Reset", description: "Ready for a new video!" });
   };
 
   const currentStep = STEPS.find(step => !completedSteps.includes(step.id)) || STEPS[0];
@@ -182,264 +89,126 @@ export default function Dashboard() {
   const allComplete = completedSteps.length === STEPS.length;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      {/* Header Section */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-8">
+      {/* Welcome Header */}
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-display tracking-tight">
-            {profile.name ? (
-              <>
-                <span className="text-white">Hey </span>
-                <span className="text-[#2BD4FF]">{profile.name}</span>
-                <span className="text-white">!</span>
-              </>
-            ) : (
-              <span className="text-white">Welcome!</span>
-            )}
+          <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">
+            {profile.name ? `Welcome back, ${profile.name}!` : "Welcome!"}
           </h1>
-          <p className="text-zinc-400 mt-1 text-lg">
-            {allComplete ? "GG! Ready for another?" : "Let's create your next hit video"}
+          <p className="text-zinc-400 mt-1">
+            {allComplete ? "Amazing work! Ready for another video?" : "Let's create your next hit video"}
           </p>
         </div>
         <button 
           onClick={() => setShowSetup(true)}
-          className="p-3 rounded-xl holo-card hover:neon-border-violet transition-all"
+          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#1a2a4a] transition-colors"
           data-testid="button-edit-profile"
         >
-          <Settings className="h-5 w-5 text-[#4E4DFF]" />
+          <Settings className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Progress Section - Battle Pass Style */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[#F3C94C]" />
-            <span className="text-sm font-bold font-display uppercase tracking-wider text-zinc-400">Progress</span>
-          </div>
+      {/* Progress Overview Card */}
+      <Card className="p-6 bg-[#0f1d32] border-[#1a2a4a]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
-            {STEPS.map((step) => (
-              <SquidShape 
-                key={step.id}
-                shape={step.shape} 
-                color={step.color} 
-                isComplete={completedSteps.includes(step.id)} 
-              />
-            ))}
+            <div className="p-2 rounded-lg bg-[#F3C94C]/10">
+              <Target className="h-5 w-5 text-[#F3C94C]" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-white">Your Progress</h2>
+              <p className="text-sm text-zinc-400">{completedSteps.length} of {STEPS.length} steps complete</p>
+            </div>
           </div>
+          {completedSteps.length > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={resetProgress}
+              className="text-zinc-400 hover:text-white gap-2"
+              data-testid="button-reset-progress"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+          )}
         </div>
         
         {/* Progress Bar */}
-        <div className="relative h-3 bg-[rgba(43,212,255,0.1)] rounded-full overflow-hidden neon-border-cyan">
+        <div className="h-2.5 bg-[#1a2a4a] rounded-full overflow-hidden">
           <div 
-            className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
+            className="h-full rounded-full transition-all duration-500 ease-out"
             style={{ 
               width: `${progressPercent}%`,
-              background: "linear-gradient(90deg, #4E4DFF 0%, #2BD4FF 50%, #6DFF9C 100%)",
-              boxShadow: "0 0 20px rgba(43, 212, 255, 0.5)"
+              background: "linear-gradient(90deg, #2BD4FF 0%, #4E4DFF 50%, #6DFF9C 100%)"
             }}
           />
-          <div className="absolute inset-0 shimmer rounded-full" />
         </div>
-        
-        <div className="text-center">
-          <span className="text-2xl font-bold font-display text-white">{completedSteps.length}</span>
-          <span className="text-zinc-500"> / {STEPS.length} completed</span>
-        </div>
-      </div>
+      </Card>
 
-      {/* Current Step Card - Portal Style */}
-      {!allComplete && (
-        <div 
-          className="relative rounded-2xl overflow-hidden group"
-          style={{ 
-            background: `linear-gradient(135deg, ${currentStep.color}20 0%, transparent 50%)`,
-          }}
-        >
-          {/* Animated border */}
-          <div 
-            className="absolute inset-0 rounded-2xl opacity-50"
-            style={{
-              background: `linear-gradient(135deg, ${currentStep.color} 0%, transparent 50%)`,
-              padding: "1px",
-            }}
-          />
-          
-          <div className="relative holo-card rounded-2xl p-6 m-[1px]">
-            {/* Glow effect */}
-            <div 
-              className="absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl opacity-30"
-              style={{ background: currentStep.color }}
-            />
-            
-            <div className="relative flex items-center gap-5">
-              {/* Icon with glow */}
-              <div 
-                className="relative p-4 rounded-2xl"
-                style={{ 
-                  background: `${currentStep.color}20`,
-                  boxShadow: `0 0 30px ${currentStep.glowColor}`
-                }}
-              >
-                <currentStep.icon 
-                  className="h-8 w-8" 
-                  style={{ color: currentStep.color }}
-                />
-              </div>
-              
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <Play className="h-3 w-3 text-[#6DFF9C]" fill="#6DFF9C" />
-                  <span className="text-xs font-bold font-display text-[#6DFF9C] uppercase tracking-wider">Next Mission</span>
-                </div>
-                <h2 className="text-2xl font-bold font-display text-white">{currentStep.title}</h2>
-                <p className="text-zinc-400 mt-1">{currentStep.description}</p>
-              </div>
-              
-              <Link href={currentStep.path}>
-                <button 
-                  className="px-6 py-3 rounded-xl text-white font-bold font-display uppercase tracking-wide shadow-lg hover:scale-105 transition-all flex items-center gap-2"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${currentStep.color} 0%, ${currentStep.color}99 100%)`,
-                    boxShadow: `0 10px 30px ${currentStep.glowColor}`
-                  }}
-                  data-testid="button-go-to-step"
-                >
-                  Go
-                  <ChevronRight className="h-5 w-5" />
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* All Complete State - Victory */}
-      {allComplete && (
-        <div className="relative rounded-2xl overflow-hidden">
-          <div className="absolute inset-0 portal-gradient" />
-          <div className="relative holo-card rounded-2xl p-8 text-center m-[1px]">
-            <div 
-              className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4"
-              style={{
-                background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
-                boxShadow: "0 0 40px rgba(109, 255, 156, 0.5)"
-              }}
-            >
-              <Check className="h-12 w-12 text-black" strokeWidth={3} />
-            </div>
-            <h2 className="text-3xl font-bold font-display text-white mb-2">VICTORY ROYALE!</h2>
-            <p className="text-zinc-400 mb-6">You completed all steps. Epic gamer moment!</p>
-            <button 
-              onClick={resetProgress} 
-              className="px-8 py-3 rounded-xl holo-card neon-border-violet text-white font-bold font-display uppercase tracking-wide transition-all hover:glow-violet inline-flex items-center gap-2"
-              data-testid="button-start-new"
-            >
-              <RotateCcw className="h-5 w-5" />
-              New Game+
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Block Divider */}
-      <div className="block-divider" />
-
-      {/* Steps List */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-bold font-display text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#2BD4FF] to-transparent" />
-          Your Quest Log
-        </h3>
-        
+      {/* Main Content Grid */}
+      <div className="grid lg:grid-cols-[1fr,320px] gap-6">
+        {/* Left Column - Steps List */}
         <div className="space-y-3">
-          {STEPS.map((step, index) => {
-            const isComplete = completedSteps.includes(step.id);
-            const isCurrent = step.id === currentStep.id && !allComplete;
-            const Icon = step.icon;
+          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider px-1">
+            Video Creation Steps
+          </h3>
+          
+          <div className="space-y-2">
+            {STEPS.map((step) => {
+              const isComplete = completedSteps.includes(step.id);
+              const isCurrent = step.id === currentStep.id && !allComplete;
+              const Icon = step.icon;
 
-            return (
-              <div key={step.id} className="relative">
-                {/* Connector Line */}
-                {index < STEPS.length - 1 && (
-                  <div 
-                    className="absolute left-6 top-[72px] w-0.5 h-4"
-                    style={{
-                      background: isComplete 
-                        ? `linear-gradient(to bottom, ${step.color}, ${STEPS[index + 1].color})`
-                        : "rgba(43, 212, 255, 0.2)"
-                    }}
-                  />
-                )}
-                
-                <div 
+              return (
+                <Card 
+                  key={step.id}
                   className={cn(
-                    "group relative rounded-xl transition-all overflow-visible",
+                    "p-4 transition-all border",
                     isCurrent 
-                      ? "holo-card" 
-                      : isComplete 
-                        ? "bg-[rgba(109,255,156,0.05)]" 
-                        : "bg-[rgba(43,212,255,0.05)] hover:bg-[rgba(43,212,255,0.1)]"
+                      ? "bg-[#0f1d32] border-[#2BD4FF]/40 shadow-lg shadow-[#2BD4FF]/10" 
+                      : isComplete
+                        ? "bg-[#0a1628] border-[#1a2a4a] opacity-60"
+                        : "bg-[#0f1d32] border-[#1a2a4a] hover:border-[#2BD4FF]/30"
                   )}
-                  style={{
-                    border: isCurrent ? `1px solid ${step.color}40` : "1px solid transparent",
-                    boxShadow: isCurrent ? `0 0 20px ${step.glowColor}` : "none"
-                  }}
                   data-testid={`card-step-${step.id}`}
                 >
-                  <div className="p-4 flex items-center gap-4">
-                    {/* Step Number/Check - Squid Game Style */}
+                  <div className="flex items-center gap-4">
+                    {/* Step Number / Check */}
                     <button
                       onClick={() => toggleStepComplete(step.id)}
-                      className="relative w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-110"
-                      style={{
-                        background: isComplete 
-                          ? `linear-gradient(135deg, ${step.color} 0%, ${step.color}99 100%)`
+                      className={cn(
+                        "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold transition-all",
+                        isComplete
+                          ? "bg-[#6DFF9C] text-[#0a1628]"
                           : isCurrent
-                            ? `${step.color}20`
-                            : "rgba(43, 212, 255, 0.1)",
-                        boxShadow: isComplete 
-                          ? `0 0 20px ${step.glowColor}`
-                          : isCurrent 
-                            ? `inset 0 0 0 2px ${step.color}`
-                            : "none"
+                            ? "border-2 text-white"
+                            : "bg-[#1a2a4a] text-zinc-400"
+                      )}
+                      style={{
+                        borderColor: isCurrent ? step.color : undefined,
+                        color: isCurrent && !isComplete ? step.color : undefined
                       }}
                       data-testid={`button-toggle-step-${step.id}`}
                     >
-                      {isComplete ? (
-                        <Check className="h-6 w-6 text-black" strokeWidth={3} />
-                      ) : (
-                        <span 
-                          className="text-lg font-bold font-display"
-                          style={{ color: isCurrent ? step.color : "rgba(255,255,255,0.4)" }}
-                        >
-                          {step.id}
-                        </span>
-                      )}
+                      {isComplete ? <Check className="h-5 w-5" /> : step.id}
                     </button>
 
                     {/* Step Icon */}
                     <div 
-                      className="p-2.5 rounded-xl"
+                      className="flex-shrink-0 p-2 rounded-lg"
                       style={{ background: `${step.color}15` }}
                     >
-                      <Icon 
-                        className="h-5 w-5" 
-                        style={{ 
-                          color: isComplete ? "rgba(255,255,255,0.4)" : step.color,
-                          filter: !isComplete && isCurrent ? `drop-shadow(0 0 6px ${step.color})` : "none"
-                        }} 
-                      />
+                      <Icon className="h-5 w-5" style={{ color: step.color }} />
                     </div>
 
                     {/* Step Info */}
                     <div className="flex-1 min-w-0">
-                      <h4 
-                        className={cn(
-                          "font-semibold font-display",
-                          isComplete ? "text-zinc-500 line-through" : "text-white"
-                        )}
-                      >
+                      <h4 className={cn(
+                        "font-semibold",
+                        isComplete ? "text-zinc-500 line-through" : "text-white"
+                      )}>
                         {step.title}
                       </h4>
                       <p className="text-sm text-zinc-500 truncate">{step.description}</p>
@@ -448,96 +217,147 @@ export default function Dashboard() {
                     {/* Go Button */}
                     <Link href={step.path}>
                       <button 
-                        className="p-2.5 rounded-xl transition-all hover:scale-110"
-                        style={{
-                          background: "rgba(43, 212, 255, 0.1)",
-                          border: "1px solid rgba(43, 212, 255, 0.2)"
-                        }}
+                        className={cn(
+                          "flex-shrink-0 p-2 rounded-lg transition-colors hover:bg-[#1a2a4a]",
+                          isCurrent ? "text-[#2BD4FF]" : "text-zinc-500 hover:text-white"
+                        )}
                         data-testid={`button-step-${step.id}`}
                       >
-                        <ChevronRight 
-                          className="h-5 w-5" 
-                          style={{ color: isCurrent ? step.color : "rgba(255,255,255,0.4)" }}
-                        />
+                        <ChevronRight className="h-5 w-5" />
                       </button>
                     </Link>
                   </div>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Right Column - Current Mission / Victory */}
+        <div className="lg:sticky lg:top-24 space-y-4">
+          {!allComplete ? (
+            <Card className="p-6 bg-gradient-to-br from-[#0f1d32] to-[#1a2a4a] border-[#2BD4FF]/30">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-[#6DFF9C]">
+                  <div className="w-2 h-2 rounded-full bg-[#6DFF9C] animate-pulse" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Next Step</span>
                 </div>
+                
+                <div className="flex items-center gap-3">
+                  {(() => {
+                    const CurrentIcon = currentStep.icon;
+                    return (
+                      <div 
+                        className="p-3 rounded-xl"
+                        style={{ background: `${currentStep.color}20` }}
+                      >
+                        <CurrentIcon className="h-6 w-6" style={{ color: currentStep.color }} />
+                      </div>
+                    );
+                  })()}
+                  <div>
+                    <h3 className="text-lg font-bold text-white">{currentStep.title}</h3>
+                    <p className="text-sm text-zinc-400">{currentStep.description}</p>
+                  </div>
+                </div>
+
+                <Link href={currentStep.path}>
+                  <Button 
+                    className="w-full gap-2 font-semibold"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${currentStep.color} 0%, ${currentStep.color}cc 100%)`,
+                      color: "#0a1628"
+                    }}
+                    data-testid="button-go-to-step"
+                  >
+                    Get Started
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
-            );
-          })}
+            </Card>
+          ) : (
+            <Card className="p-6 bg-gradient-to-br from-[#6DFF9C]/20 to-[#4BCC7A]/10 border-[#6DFF9C]/30">
+              <div className="text-center space-y-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#6DFF9C]">
+                  <Trophy className="h-8 w-8 text-[#0a1628]" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Victory!</h3>
+                  <p className="text-sm text-zinc-400 mt-1">You completed all steps!</p>
+                </div>
+                <button
+                  onClick={resetProgress}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#6DFF9C]/50 text-[#6DFF9C] hover:bg-[#6DFF9C]/10 transition-colors font-medium"
+                  data-testid="button-start-new"
+                >
+                  <RotateCcw className="h-4 w-4" />
+                  Start New Video
+                </button>
+              </div>
+            </Card>
+          )}
+
+          {/* Quick Tips */}
+          <Card className="p-4 bg-[#0f1d32] border-[#1a2a4a]">
+            <h4 className="text-sm font-semibold text-zinc-300 mb-2">Quick Tip</h4>
+            <p className="text-sm text-zinc-500">
+              Click the step numbers to mark them as complete. You can go in any order!
+            </p>
+          </Card>
         </div>
       </div>
 
-      {/* Reset Button */}
-      {completedSteps.length > 0 && !allComplete && (
-        <div className="text-center pt-2">
-          <button 
-            onClick={resetProgress}
-            className="text-sm text-zinc-500 hover:text-[#2BD4FF] transition-colors inline-flex items-center gap-2 font-display"
-            data-testid="button-reset-progress"
-          >
-            <RotateCcw className="h-4 w-4" />
-            Reset Progress
-          </button>
-        </div>
-      )}
-
       {/* Profile Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
-        <DialogContent className="holo-card border-[rgba(43,212,255,0.3)]">
+        <DialogContent className="bg-[#0f1d32] border-[#1a2a4a] max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold font-display text-white">
+            <DialogTitle className="text-xl font-bold text-white">
               Player Setup
             </DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Enter your gamer tag and pick your avatar!
+              Enter your name and pick your avatar!
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-5 mt-4">
-            <div>
+          
+          <div className="space-y-5 mt-2">
+            <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium text-zinc-300">Your Name</Label>
               <Input
                 id="name"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Enter your name"
-                className="mt-2 bg-[rgba(43,212,255,0.1)] border-[rgba(43,212,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus:ring-[#2BD4FF]"
+                className="bg-[#0a1628] border-[#1a2a4a] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]"
                 data-testid="input-name"
               />
             </div>
-            <div>
+            
+            <div className="space-y-2">
               <Label htmlFor="channel" className="text-sm font-medium text-zinc-300">Channel Name (optional)</Label>
               <Input
                 id="channel"
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
                 placeholder="Enter your channel name"
-                className="mt-2 bg-[rgba(43,212,255,0.1)] border-[rgba(43,212,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus:ring-[#2BD4FF]"
+                className="bg-[#0a1628] border-[#1a2a4a] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]"
                 data-testid="input-channel"
               />
             </div>
-            <div>
+            
+            <div className="space-y-2">
               <Label className="text-sm font-medium text-zinc-300">Choose Your Avatar</Label>
-              <div className="grid grid-cols-6 gap-2 mt-3">
+              <div className="grid grid-cols-5 gap-2">
                 {AVATARS.map((avatar) => (
                   <button
                     key={avatar}
                     onClick={() => setSelectedAvatar(avatar)}
                     className={cn(
-                      "text-3xl p-2.5 rounded-xl transition-all",
+                      "text-2xl p-2.5 rounded-lg transition-all",
                       selectedAvatar === avatar
-                        ? "scale-110"
-                        : "bg-[rgba(43,212,255,0.1)] hover:bg-[rgba(43,212,255,0.2)]"
+                        ? "bg-gradient-to-r from-[#2BD4FF] to-[#4E4DFF] scale-110 shadow-lg shadow-[#2BD4FF]/30"
+                        : "bg-[#1a2a4a] hover:bg-[#2a3a5a]"
                     )}
-                    style={{
-                      background: selectedAvatar === avatar 
-                        ? "linear-gradient(135deg, #4E4DFF 0%, #2BD4FF 100%)"
-                        : undefined,
-                      boxShadow: selectedAvatar === avatar 
-                        ? "0 0 20px rgba(43, 212, 255, 0.5)"
-                        : undefined
-                    }}
                     data-testid={`button-avatar-${avatar}`}
                   >
                     {avatar}
@@ -545,17 +365,18 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-            <button 
+            
+            <Button 
               onClick={handleSaveProfile} 
-              className="w-full py-3 rounded-xl text-black font-bold font-display uppercase tracking-wide transition-all hover:scale-[1.02]"
+              className="w-full font-semibold"
               style={{
-                background: "linear-gradient(135deg, #F3C94C 0%, #6DFF9C 100%)",
-                boxShadow: "0 10px 30px rgba(243, 201, 76, 0.3)"
+                background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
+                color: "#0a1628"
               }}
               data-testid="button-save-profile"
             >
               Let's Go!
-            </button>
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3, Zap } from "lucide-react";
+import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3, Zap, ChevronDown } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,102 +27,105 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col relative z-10">
-      {/* Header - Holographic Nav */}
-      <header className="border-b border-[rgba(43,212,255,0.2)] bg-[rgba(5,11,31,0.9)] backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Logo */}
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer group">
-                <div className="relative">
-                  <Zap className="h-7 w-7 text-[#F3C94C] group-hover:text-[#2BD4FF] transition-colors" />
-                  <div className="absolute inset-0 blur-md bg-[#F3C94C] opacity-50 group-hover:bg-[#2BD4FF] transition-colors" />
-                </div>
-                <span className="text-xl font-bold font-display tracking-tight">
-                  <span className="text-[#F3C94C]">Tube</span>
-                  <span className="text-[#2BD4FF]">Star</span>
-                </span>
+    <div className="min-h-screen flex flex-col">
+      {/* Header - Clean Professional Design */}
+      <header className="sticky top-0 z-50 w-full border-b border-[#1a2a4a] bg-[#0a1628]/95 backdrop-blur-xl">
+        <div className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
+          {/* Logo - Left */}
+          <Link href="/">
+            <div className="flex items-center gap-2.5 cursor-pointer group" data-testid="link-home-logo">
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[#F3C94C] to-[#ff9500]">
+                <Zap className="h-5 w-5 text-[#0a1628]" strokeWidth={2.5} />
               </div>
-            </Link>
+              <span className="text-xl font-bold font-display tracking-tight">
+                <span className="text-white">Tube</span>
+                <span className="text-[#2BD4FF]">Star</span>
+              </span>
+            </div>
+          </Link>
+          
+          {/* Navigation - Center */}
+          <nav className="hidden md:flex items-center gap-1 bg-[#0f1d32] rounded-full px-2 py-1.5 border border-[#1a2a4a]">
+            {mainNavItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.path;
+              return (
+                <Link key={item.path} href={item.path}>
+                  <span
+                    className={cn(
+                      "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer",
+                      isActive
+                        ? "text-white bg-gradient-to-r from-[#2BD4FF] to-[#4E4DFF] shadow-lg shadow-[#2BD4FF]/25"
+                        : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
+                    )}
+                    data-testid={`nav-${item.label.toLowerCase()}`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </span>
+                </Link>
+              );
+            })}
             
-            {/* Desktop Navigation - Holographic Pills */}
-            <nav className="hidden md:flex items-center gap-1 holo-card rounded-2xl p-1.5">
-              {mainNavItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location === item.path;
-                return (
-                  <Link key={item.path} href={item.path}>
-                    <span
-                      className={cn(
-                        "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer overflow-visible",
-                        isActive
-                          ? "text-white"
-                          : "text-zinc-400 hover:text-white"
-                      )}
-                      data-testid={`nav-${item.label.toLowerCase()}`}
-                    >
-                      {isActive && (
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#4E4DFF] to-[#2BD4FF] opacity-90" />
-                      )}
-                      {isActive && (
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#4E4DFF] to-[#2BD4FF] blur-md opacity-50" />
-                      )}
-                      <Icon className="h-4 w-4 relative z-10" />
-                      <span className="relative z-10">{item.label}</span>
-                    </span>
-                  </Link>
-                );
-              })}
-              
-              {/* More dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowMore(!showMore)}
-                  className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
-                    showMore
-                      ? "bg-[rgba(43,212,255,0.2)] text-white"
-                      : "text-zinc-400 hover:text-white"
-                  )}
-                  data-testid="nav-more"
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  More
-                </button>
-                {showMore && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
-                    <div className="absolute right-0 top-full mt-2 holo-card rounded-xl shadow-2xl min-w-[180px] py-2 z-50 neon-border-cyan">
-                      {moreNavItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Link key={item.path} href={item.path}>
-                            <span
-                              onClick={() => setShowMore(false)}
-                              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-zinc-300 hover:text-white hover:bg-[rgba(43,212,255,0.15)] transition-colors cursor-pointer"
-                              data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
-                            >
-                              <Icon className="h-4 w-4 text-[#2BD4FF]" />
-                              {item.label}
-                            </span>
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </>
+            {/* More dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className={cn(
+                  "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all",
+                  showMore
+                    ? "bg-[#1a2a4a] text-white"
+                    : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
                 )}
-              </div>
-            </nav>
+                data-testid="nav-more"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span>More</span>
+                <ChevronDown className={cn("h-3 w-3 transition-transform", showMore && "rotate-180")} />
+              </button>
+              {showMore && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
+                  <div className="absolute right-0 top-full mt-2 bg-[#0f1d32] rounded-xl border border-[#1a2a4a] shadow-2xl shadow-black/50 min-w-[180px] py-2 z-50">
+                    {moreNavItems.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = location === item.path;
+                      return (
+                        <Link key={item.path} href={item.path}>
+                          <span
+                            onClick={() => setShowMore(false)}
+                            className={cn(
+                              "flex items-center gap-3 w-full px-4 py-2.5 text-sm transition-colors cursor-pointer",
+                              isActive
+                                ? "text-[#2BD4FF] bg-[#2BD4FF]/10"
+                                : "text-zinc-300 hover:text-white hover:bg-[#1a2a4a]"
+                            )}
+                            data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+                          >
+                            <Icon className="h-4 w-4" />
+                            {item.label}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+          </nav>
+
+          {/* Right side - Placeholder for future profile/actions */}
+          <div className="w-[140px] flex justify-end">
+            <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500">
+              <span>Made for</span>
+              <span className="text-[#F3C94C] font-semibold">Aidan</span>
+            </div>
           </div>
         </div>
-        
-        {/* Bottom glow line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2BD4FF] to-transparent opacity-50" />
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgba(5,11,31,0.95)] backdrop-blur-xl border-t border-[rgba(43,212,255,0.2)] z-50 safe-area-inset-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0a1628]/95 backdrop-blur-xl border-t border-[#1a2a4a] z-50 pb-safe">
         <div className="flex justify-around py-2 px-2">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
@@ -131,44 +134,28 @@ export default function Layout({ children }: LayoutProps) {
               <Link key={item.path} href={item.path}>
                 <span
                   className={cn(
-                    "relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
                     isActive
                       ? "text-[#2BD4FF]"
                       : "text-zinc-500"
                   )}
                   data-testid={`mobile-nav-${item.label.toLowerCase()}`}
                 >
-                  {isActive && (
-                    <div className="absolute inset-0 rounded-xl bg-[rgba(43,212,255,0.1)]" />
-                  )}
-                  <Icon className={cn(
-                    "h-5 w-5 relative z-10", 
-                    isActive && "drop-shadow-[0_0_8px_rgba(43,212,255,0.8)]"
-                  )} />
-                  <span className="text-[10px] font-medium relative z-10">{item.label}</span>
+                  <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_6px_rgba(43,212,255,0.8)]")} />
+                  <span className="text-[10px] font-medium">{item.label}</span>
                 </span>
               </Link>
             );
           })}
         </div>
-        
-        {/* Top glow line */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#2BD4FF] to-transparent opacity-50" />
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-8 pb-28 md:pb-8 relative z-10">
-        {children}
-      </main>
-
-      {/* Footer - Desktop only */}
-      <footer className="hidden md:block border-t border-[rgba(43,212,255,0.15)] py-6 bg-[rgba(5,11,31,0.5)] relative z-10">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-zinc-600">
-            Made for Awesome <span className="text-[#F3C94C]">Aidan</span>
-          </p>
+      <main className="flex-1 pb-24 md:pb-0">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {children}
         </div>
-      </footer>
+      </main>
     </div>
   );
 }
