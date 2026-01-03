@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3 } from "lucide-react";
+import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3, Zap } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,19 +27,27 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="border-b border-zinc-800/50 bg-zinc-900/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
+    <div className="min-h-screen flex flex-col relative z-10">
+      {/* Header - Holographic Nav */}
+      <header className="border-b border-[rgba(124,77,255,0.2)] bg-[rgba(10,5,25,0.8)] backdrop-blur-xl sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
+            {/* Logo */}
             <Link href="/">
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-violet-500 bg-clip-text text-transparent cursor-pointer">
-                TubeStar
-              </span>
+              <div className="flex items-center gap-2 cursor-pointer group">
+                <div className="relative">
+                  <Zap className="h-7 w-7 text-[#FF2D95] group-hover:text-[#40F5FF] transition-colors" />
+                  <div className="absolute inset-0 blur-md bg-[#FF2D95] opacity-50 group-hover:bg-[#40F5FF] transition-colors" />
+                </div>
+                <span className="text-xl font-bold font-display tracking-tight">
+                  <span className="text-[#FF2D95]">Tube</span>
+                  <span className="text-[#40F5FF]">Star</span>
+                </span>
+              </div>
             </Link>
             
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1 bg-zinc-800/50 rounded-xl p-1">
+            {/* Desktop Navigation - Holographic Pills */}
+            <nav className="hidden md:flex items-center gap-1 holo-card rounded-2xl p-1.5">
               {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location === item.path;
@@ -47,29 +55,35 @@ export default function Layout({ children }: LayoutProps) {
                   <Link key={item.path} href={item.path}>
                     <span
                       className={cn(
-                        "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer",
+                        "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all cursor-pointer overflow-visible",
                         isActive
-                          ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/20"
-                          : "text-zinc-400 hover:text-white hover:bg-zinc-700/50"
+                          ? "text-white"
+                          : "text-zinc-400 hover:text-white"
                       )}
                       data-testid={`nav-${item.label.toLowerCase()}`}
                     >
-                      <Icon className="h-4 w-4" />
-                      {item.label}
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FF2D95] to-[#7C4DFF] opacity-90" />
+                      )}
+                      {isActive && (
+                        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#FF2D95] to-[#7C4DFF] blur-md opacity-50" />
+                      )}
+                      <Icon className="h-4 w-4 relative z-10" />
+                      <span className="relative z-10">{item.label}</span>
                     </span>
                   </Link>
                 );
               })}
               
-              {/* More dropdown - click based */}
+              {/* More dropdown */}
               <div className="relative">
                 <button
                   onClick={() => setShowMore(!showMore)}
                   className={cn(
-                    "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all",
+                    "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                     showMore
-                      ? "bg-zinc-700/50 text-white"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-700/50"
+                      ? "bg-[rgba(124,77,255,0.2)] text-white"
+                      : "text-zinc-400 hover:text-white"
                   )}
                   data-testid="nav-more"
                 >
@@ -79,17 +93,17 @@ export default function Layout({ children }: LayoutProps) {
                 {showMore && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
-                    <div className="absolute right-0 top-full mt-2 bg-zinc-800 border border-zinc-700/50 rounded-xl shadow-xl min-w-[160px] py-2 z-50">
+                    <div className="absolute right-0 top-full mt-2 holo-card rounded-xl shadow-2xl min-w-[180px] py-2 z-50 neon-border-violet">
                       {moreNavItems.map((item) => {
                         const Icon = item.icon;
                         return (
                           <Link key={item.path} href={item.path}>
                             <span
                               onClick={() => setShowMore(false)}
-                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700/50 transition-colors cursor-pointer"
+                              className="flex items-center gap-3 w-full px-4 py-3 text-sm text-zinc-300 hover:text-white hover:bg-[rgba(124,77,255,0.15)] transition-colors cursor-pointer"
                               data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
                             >
-                              <Icon className="h-4 w-4" />
+                              <Icon className="h-4 w-4 text-[#7C4DFF]" />
                               {item.label}
                             </span>
                           </Link>
@@ -102,10 +116,13 @@ export default function Layout({ children }: LayoutProps) {
             </nav>
           </div>
         </div>
+        
+        {/* Bottom glow line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#7C4DFF] to-transparent opacity-50" />
       </header>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 z-50 safe-area-inset-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[rgba(10,5,25,0.95)] backdrop-blur-xl border-t border-[rgba(124,77,255,0.2)] z-50 safe-area-inset-bottom">
         <div className="flex justify-around py-2 px-2">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
@@ -114,32 +131,41 @@ export default function Layout({ children }: LayoutProps) {
               <Link key={item.path} href={item.path}>
                 <span
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
+                    "relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
                     isActive
-                      ? "text-purple-400"
+                      ? "text-[#FF2D95]"
                       : "text-zinc-500"
                   )}
                   data-testid={`mobile-nav-${item.label.toLowerCase()}`}
                 >
-                  <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]")} />
-                  <span className="text-[10px] font-medium">{item.label}</span>
+                  {isActive && (
+                    <div className="absolute inset-0 rounded-xl bg-[rgba(255,45,149,0.1)]" />
+                  )}
+                  <Icon className={cn(
+                    "h-5 w-5 relative z-10", 
+                    isActive && "drop-shadow-[0_0_8px_rgba(255,45,149,0.8)]"
+                  )} />
+                  <span className="text-[10px] font-medium relative z-10">{item.label}</span>
                 </span>
               </Link>
             );
           })}
         </div>
+        
+        {/* Top glow line */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#FF2D95] to-transparent opacity-50" />
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-8 pb-28 md:pb-8">
+      <main className="flex-1 container mx-auto px-4 py-8 pb-28 md:pb-8 relative z-10">
         {children}
       </main>
 
       {/* Footer - Desktop only */}
-      <footer className="hidden md:block border-t border-zinc-800/50 py-6 bg-zinc-900/50">
+      <footer className="hidden md:block border-t border-[rgba(124,77,255,0.15)] py-6 bg-[rgba(10,5,25,0.5)] relative z-10">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-zinc-500">
-            Made for Awesome Aidan
+          <p className="text-sm text-zinc-600">
+            Made for Awesome <span className="text-[#40F5FF]">Aidan</span>
           </p>
         </div>
       </footer>
