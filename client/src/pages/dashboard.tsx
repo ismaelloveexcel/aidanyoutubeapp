@@ -92,17 +92,17 @@ export default function Dashboard() {
   const displayName = profile.name?.trim() || "";
 
   return (
-    <div className="space-y-10 pb-8">
+    <div className="space-y-8 sm:space-y-12 pb-12">
       {/* Welcome Header */}
-      <div className="flex items-start justify-between gap-4 pt-2">
-        <div className="space-y-2">
-          <p className="text-sm text-[#2BD4FF] font-medium tracking-wide">
+      <div className="flex items-start justify-between gap-4 pt-4">
+        <div className="space-y-3">
+          <p className="text-sm sm:text-base text-[#2BD4FF] font-medium tracking-wide">
             {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold font-display text-white leading-tight">
+          <h1 className="text-2xl sm:text-4xl font-bold font-display text-white leading-tight">
             {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
           </h1>
-          <p className="text-zinc-400 text-lg">
+          <p className="text-zinc-400 text-base sm:text-lg">
             {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function Dashboard() {
       </div>
 
       {/* Progress Overview Card */}
-      <Card className="p-8 bg-[#0f1d32] border-[#1a2a4a]">
+      <Card className="p-5 sm:p-8 bg-[#0f1d32] border-[#1a2a4a]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[#F3C94C]/10">
@@ -154,7 +154,7 @@ export default function Dashboard() {
       </Card>
 
       {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-[1fr,360px] gap-10">
+      <div className="grid lg:grid-cols-[1fr,360px] gap-8 lg:gap-12">
         {/* Left Column - Timeline Roadmap */}
         <div className="space-y-6">
           <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-widest px-1 flex items-center gap-3">
@@ -163,10 +163,10 @@ export default function Dashboard() {
           </h3>
           
           {/* Timeline Container */}
-          <div className="relative pl-2">
+          <div className="relative pl-1 sm:pl-2">
             {/* Vertical Timeline Line */}
             <div 
-              className="absolute left-7 top-10 bottom-10 w-1.5 rounded-full"
+              className="absolute left-5 sm:left-7 top-10 bottom-10 w-1 sm:w-1.5 rounded-full"
               style={{ 
                 background: `linear-gradient(180deg, 
                   ${STEPS[0].color} 0%, 
@@ -179,14 +179,14 @@ export default function Dashboard() {
             
             {/* Progress overlay on timeline */}
             <div 
-              className="absolute left-7 top-10 w-1.5 rounded-full bg-[#0a1628]/80 transition-all duration-500"
+              className="absolute left-5 sm:left-7 top-10 w-1 sm:w-1.5 rounded-full bg-[#0a1628]/80 transition-all duration-500"
               style={{ 
                 height: `calc(${100 - progressPercent}% - 80px)`,
                 bottom: '40px'
               }}
             />
 
-            <div className="space-y-6">
+            <div className="space-y-8 sm:space-y-6">
               {STEPS.map((step, index) => {
                 const isComplete = completedSteps.includes(step.id);
                 const isCurrent = step.id === currentStep.id && !allComplete;
@@ -195,7 +195,7 @@ export default function Dashboard() {
                 return (
                   <div 
                     key={step.id}
-                    className="relative flex items-start gap-5"
+                    className="relative flex items-start gap-4 sm:gap-5"
                     data-testid={`timeline-step-${step.id}`}
                   >
                     {/* Timeline Node */}
@@ -207,7 +207,7 @@ export default function Dashboard() {
                           toggleStepComplete(step.id);
                         }}
                         className={cn(
-                          "w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl transition-all border-4",
+                          "w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold text-lg sm:text-xl transition-all border-3 sm:border-4",
                           isComplete
                             ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628] shadow-lg shadow-[#6DFF9C]/30"
                             : isCurrent
@@ -221,15 +221,15 @@ export default function Dashboard() {
                         }}
                         data-testid={`button-toggle-step-${step.id}`}
                       >
-                        {isComplete ? <Check className="h-7 w-7" /> : step.id}
+                        {isComplete ? <Check className="h-5 w-5 sm:h-7 sm:w-7" /> : step.id}
                       </button>
                     </div>
 
                     {/* Step Content Card */}
-                    <Link href={step.path} className="flex-1 pt-1">
+                    <Link href={step.path} className="flex-1">
                       <Card 
                         className={cn(
-                          "p-6 transition-all border cursor-pointer group",
+                          "p-4 sm:p-6 transition-all border cursor-pointer group",
                           isCurrent 
                             ? "bg-gradient-to-r from-[#0f1d32] to-[#1a2a4a] border-l-4 shadow-xl" 
                             : isComplete
@@ -241,45 +241,45 @@ export default function Dashboard() {
                         }}
                         data-testid={`card-step-${step.id}`}
                       >
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-center gap-3 sm:gap-5">
                           {/* Step Icon */}
                           <div 
                             className={cn(
-                              "flex-shrink-0 p-4 rounded-2xl transition-transform",
+                              "flex-shrink-0 p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-transform",
                               isCurrent && "scale-105"
                             )}
                             style={{ background: `${step.color}20` }}
                           >
-                            <Icon className="h-7 w-7" style={{ color: step.color }} />
+                            <Icon className="h-5 w-5 sm:h-7 sm:w-7" style={{ color: step.color }} />
                           </div>
 
                           {/* Step Info */}
-                          <div className="flex-1 min-w-0 space-y-1">
-                            <div className="flex items-center gap-3 flex-wrap">
+                          <div className="flex-1 min-w-0 space-y-0.5 sm:space-y-1">
+                            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                               <h4 className={cn(
-                                "font-bold text-xl",
+                                "font-bold text-base sm:text-xl",
                                 isComplete ? "text-zinc-500 line-through" : "text-white"
                               )}>
                                 {step.title}
                               </h4>
                               {isCurrent && (
-                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#F3C94C]/20 text-[#F3C94C] uppercase tracking-wide">
+                                <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-[#F3C94C]/20 text-[#F3C94C] uppercase tracking-wide">
                                   Now
                                 </span>
                               )}
                               {isComplete && (
-                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#6DFF9C]/20 text-[#6DFF9C] uppercase tracking-wide">
+                                <span className="px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold bg-[#6DFF9C]/20 text-[#6DFF9C] uppercase tracking-wide">
                                   Done
                                 </span>
                               )}
                             </div>
-                            <p className="text-base text-zinc-400">{step.description}</p>
+                            <p className="text-sm sm:text-base text-zinc-400">{step.description}</p>
                           </div>
 
                           {/* Arrow */}
                           <ChevronRight 
                             className={cn(
-                              "flex-shrink-0 h-7 w-7 transition-transform group-hover:translate-x-1",
+                              "flex-shrink-0 h-5 w-5 sm:h-7 sm:w-7 transition-transform group-hover:translate-x-1",
                               isCurrent ? "text-white" : "text-zinc-500"
                             )} 
                           />
