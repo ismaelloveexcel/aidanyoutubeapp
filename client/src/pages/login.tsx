@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { AVATARS } from "@/lib/creator-profile";
 import "./login.css";
+
+// Default avatar for new users
+const DEFAULT_AVATAR = AVATARS[0];
 
 export default function Login() {
   const [creatorName, setCreatorName] = useState("");
@@ -10,7 +14,7 @@ export default function Login() {
     e.preventDefault();
     if (creatorName.trim()) {
       // Store the creator name in localStorage for the profile
-      const profile = { name: creatorName.trim(), channelName: '', avatar: '🎮' };
+      const profile = { name: creatorName.trim(), channelName: '', avatar: DEFAULT_AVATAR };
       localStorage.setItem('tubestar-profile', JSON.stringify(profile));
       // Navigate to dashboard
       setLocation("/");
