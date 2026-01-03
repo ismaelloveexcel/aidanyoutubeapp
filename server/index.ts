@@ -113,6 +113,14 @@ app.use((req, res, next) => {
   const PORT = process.env.PORT || 5000;
 
   if (process.env.NODE_ENV !== "production") {
+    // Disable caching in development to ensure users always see latest changes
+    app.use((req, res, next) => {
+      res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.set('Pragma', 'no-cache');
+      res.set('Expires', '0');
+      next();
+    });
+    
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
