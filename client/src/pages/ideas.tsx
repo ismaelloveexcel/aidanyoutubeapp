@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Loader } from "@/components/ui/loader";
 import type { Idea } from "@shared/schema";
 
 const VIDEO_IDEAS = {
@@ -41,7 +42,7 @@ export default function Ideas() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: savedIdeas = [] } = useQuery<Idea[]>({
+  const { data: savedIdeas = [], isLoading } = useQuery<Idea[]>({
     queryKey: ["/api/ideas?saved=true"],
   });
 
@@ -86,6 +87,10 @@ export default function Ideas() {
     const randomIdea = ideas[Math.floor(Math.random() * ideas.length)];
     setCurrentIdea({ ...randomIdea, category: randomCategory });
   };
+
+  if (isLoading) {
+    return <Loader text="Loading your ideas..." />;
+  }
 
   return (
     <div className="space-y-8">

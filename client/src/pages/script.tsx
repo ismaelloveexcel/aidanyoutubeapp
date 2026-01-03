@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Loader } from "@/components/ui/loader";
 import type { Script } from "@shared/schema";
 
 const SCRIPT_TEMPLATES = {
@@ -58,7 +59,7 @@ export default function Script() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: savedScripts = [] } = useQuery<Script[]>({
+  const { data: savedScripts = [], isLoading } = useQuery<Script[]>({
     queryKey: ["/api/scripts"],
   });
 
@@ -137,6 +138,10 @@ export default function Script() {
   const updateStep = (stepId: number, content: string) => {
     setSteps(steps.map(step => step.stepId === stepId ? { ...step, content } : step));
   };
+
+  if (isLoading) {
+    return <Loader text="Loading your scripts..." />;
+  }
 
   return (
     <div className="space-y-8">

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Loader } from "@/components/ui/loader";
 import type { Thumbnail } from "@shared/schema";
 
 const COLORS = [
@@ -34,7 +35,7 @@ export default function Thumbnail() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: savedThumbnails = [] } = useQuery<Thumbnail[]>({
+  const { data: savedThumbnails = [], isLoading } = useQuery<Thumbnail[]>({
     queryKey: ["/api/thumbnails"],
   });
 
@@ -134,6 +135,10 @@ export default function Thumbnail() {
       }
     });
   };
+
+  if (isLoading) {
+    return <Loader text="Loading your thumbnails..." />;
+  }
 
   return (
     <div className="space-y-8">
