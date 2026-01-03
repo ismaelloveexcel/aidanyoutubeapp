@@ -155,7 +155,7 @@ export default function Dashboard() {
             Video Creation Steps
           </h3>
           
-          <div className="space-y-2">
+          <div className="space-y-4">
             {STEPS.map((step) => {
               const isComplete = completedSteps.includes(step.id);
               const isCurrent = step.id === currentStep.id && !allComplete;
@@ -165,7 +165,7 @@ export default function Dashboard() {
                 <Card 
                   key={step.id}
                   className={cn(
-                    "p-4 transition-all border",
+                    "p-5 transition-all border",
                     isCurrent 
                       ? "bg-[#0f1d32] border-[#2BD4FF]/40 shadow-lg shadow-[#2BD4FF]/10" 
                       : isComplete
