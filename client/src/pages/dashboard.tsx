@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings, Trophy, Target } from "lucide-react";
+import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings, Trophy, Target, Sparkles } from "lucide-react";
 
 interface RoadmapStep {
   id: number;
@@ -152,87 +152,142 @@ export default function Dashboard() {
 
       {/* Main Content Grid */}
       <div className="grid lg:grid-cols-[1fr,320px] gap-6">
-        {/* Left Column - Steps List */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider px-1">
-            Video Creation Steps
+        {/* Left Column - Timeline Roadmap */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider px-1 flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-[#F3C94C]" />
+            Your Quest Path
           </h3>
           
-          <div className="space-y-5">
-            {STEPS.map((step) => {
-              const isComplete = completedSteps.includes(step.id);
-              const isCurrent = step.id === currentStep.id && !allComplete;
-              const Icon = step.icon;
+          {/* Timeline Container */}
+          <div className="relative">
+            {/* Vertical Timeline Line */}
+            <div 
+              className="absolute left-6 top-8 bottom-8 w-1 rounded-full"
+              style={{ 
+                background: `linear-gradient(180deg, 
+                  ${STEPS[0].color} 0%, 
+                  ${STEPS[1].color} 25%, 
+                  ${STEPS[2].color} 50%, 
+                  ${STEPS[3].color} 75%, 
+                  ${STEPS[4].color} 100%)`
+              }}
+            />
+            
+            {/* Progress overlay on timeline */}
+            <div 
+              className="absolute left-6 top-8 w-1 rounded-full bg-[#0a1628]/80 transition-all duration-500"
+              style={{ 
+                height: `calc(${100 - progressPercent}% - 64px)`,
+                bottom: '32px'
+              }}
+            />
 
-              return (
-                <Card 
-                  key={step.id}
-                  className={cn(
-                    "p-6 transition-all border",
-                    isCurrent 
-                      ? "bg-[#0f1d32] border-[#2BD4FF]/40 shadow-lg shadow-[#2BD4FF]/10" 
-                      : isComplete
-                        ? "bg-[#0a1628] border-[#1a2a4a] opacity-60"
-                        : "bg-[#0f1d32] border-[#1a2a4a] hover:border-[#2BD4FF]/30"
-                  )}
-                  data-testid={`card-step-${step.id}`}
-                >
-                  <div className="flex items-center gap-4">
-                    {/* Step Number / Check */}
-                    <button
-                      onClick={() => toggleStepComplete(step.id)}
-                      className={cn(
-                        "flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center font-bold transition-all",
-                        isComplete
-                          ? "bg-[#6DFF9C] text-[#0a1628]"
-                          : isCurrent
-                            ? "border-2 text-white"
-                            : "bg-[#1a2a4a] text-zinc-400"
-                      )}
-                      style={{
-                        borderColor: isCurrent ? step.color : undefined,
-                        color: isCurrent && !isComplete ? step.color : undefined
-                      }}
-                      data-testid={`button-toggle-step-${step.id}`}
-                    >
-                      {isComplete ? <Check className="h-5 w-5" /> : step.id}
-                    </button>
+            <div className="space-y-0">
+              {STEPS.map((step, index) => {
+                const isComplete = completedSteps.includes(step.id);
+                const isCurrent = step.id === currentStep.id && !allComplete;
+                const Icon = step.icon;
+                const isLast = index === STEPS.length - 1;
 
-                    {/* Step Icon */}
-                    <div 
-                      className="flex-shrink-0 p-2 rounded-lg"
-                      style={{ background: `${step.color}15` }}
-                    >
-                      <Icon className="h-5 w-5" style={{ color: step.color }} />
-                    </div>
-
-                    {/* Step Info */}
-                    <div className="flex-1 min-w-0">
-                      <h4 className={cn(
-                        "font-semibold",
-                        isComplete ? "text-zinc-500 line-through" : "text-white"
-                      )}>
-                        {step.title}
-                      </h4>
-                      <p className="text-sm text-zinc-500 truncate">{step.description}</p>
-                    </div>
-
-                    {/* Go Button */}
-                    <Link href={step.path}>
-                      <button 
+                return (
+                  <div 
+                    key={step.id}
+                    className="relative flex items-stretch"
+                    data-testid={`timeline-step-${step.id}`}
+                  >
+                    {/* Timeline Node */}
+                    <div className="flex flex-col items-center z-10">
+                      <button
+                        onClick={() => toggleStepComplete(step.id)}
                         className={cn(
-                          "flex-shrink-0 p-2 rounded-lg transition-colors hover:bg-[#1a2a4a]",
-                          isCurrent ? "text-[#2BD4FF]" : "text-zinc-500 hover:text-white"
+                          "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all border-4",
+                          isComplete
+                            ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628] shadow-lg shadow-[#6DFF9C]/30"
+                            : isCurrent
+                              ? "bg-[#0a1628] border-current text-current animate-pulse shadow-lg"
+                              : "bg-[#1a2a4a] border-[#1a2a4a] text-zinc-500"
                         )}
-                        data-testid={`button-step-${step.id}`}
+                        style={{
+                          borderColor: isCurrent ? step.color : undefined,
+                          color: isCurrent ? step.color : undefined,
+                          boxShadow: isCurrent ? `0 0 20px ${step.color}40` : undefined
+                        }}
+                        data-testid={`button-toggle-step-${step.id}`}
                       >
-                        <ChevronRight className="h-5 w-5" />
+                        {isComplete ? <Check className="h-6 w-6" /> : step.id}
                       </button>
+                      {/* Connector line segment */}
+                      {!isLast && (
+                        <div className="w-1 flex-1 min-h-[24px]" />
+                      )}
+                    </div>
+
+                    {/* Step Content Card */}
+                    <Link href={step.path} className="flex-1 ml-4 mb-6">
+                      <Card 
+                        className={cn(
+                          "p-5 transition-all border cursor-pointer group",
+                          isCurrent 
+                            ? "bg-gradient-to-r from-[#0f1d32] to-[#1a2a4a] border-l-4 shadow-lg" 
+                            : isComplete
+                              ? "bg-[#0a1628]/50 border-[#1a2a4a] opacity-70"
+                              : "bg-[#0f1d32] border-[#1a2a4a] hover:border-[#2BD4FF]/30 hover:bg-[#0f1d32]/80"
+                        )}
+                        style={{
+                          borderLeftColor: isCurrent ? step.color : undefined
+                        }}
+                        data-testid={`card-step-${step.id}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          {/* Step Icon */}
+                          <div 
+                            className={cn(
+                              "flex-shrink-0 p-3 rounded-xl transition-transform",
+                              isCurrent && "scale-110"
+                            )}
+                            style={{ background: `${step.color}20` }}
+                          >
+                            <Icon className="h-6 w-6" style={{ color: step.color }} />
+                          </div>
+
+                          {/* Step Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h4 className={cn(
+                                "font-bold text-lg",
+                                isComplete ? "text-zinc-500 line-through" : "text-white"
+                              )}>
+                                {step.title}
+                              </h4>
+                              {isCurrent && (
+                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F3C94C]/20 text-[#F3C94C]">
+                                  NOW
+                                </span>
+                              )}
+                              {isComplete && (
+                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#6DFF9C]/20 text-[#6DFF9C]">
+                                  DONE
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-zinc-400 mt-1">{step.description}</p>
+                          </div>
+
+                          {/* Arrow */}
+                          <ChevronRight 
+                            className={cn(
+                              "flex-shrink-0 h-6 w-6 transition-transform group-hover:translate-x-1",
+                              isCurrent ? "text-white" : "text-zinc-500"
+                            )} 
+                          />
+                        </div>
+                      </Card>
                     </Link>
                   </div>
-                </Card>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
