@@ -10,7 +10,7 @@ channel = "stable-25_05"
 [deployment]
 run = ["node", "./dist/index.cjs"]
 deploymentTarget = "autoscale"
-build = "npm install && npm run build"
+build = ["npm", "run", "build"]
 
 [[ports]]
 localPort = 3001
