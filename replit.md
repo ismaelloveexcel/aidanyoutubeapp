@@ -6,11 +6,14 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 
 ## Recent Changes (January 2026)
 
-- **Redesigned UI to roadmap-focused layout**: The home page now shows a clear 5-step workflow (Generate Idea → Write Script → Record Video → Edit Video → Upload & Share)
-- **Polished visual design**: Modern dark theme with purple/violet gradient accents, glass-like effects, and professional typography (Plus Jakarta Sans)
-- **Simplified navigation**: Clean header with pill-style nav + "More" dropdown for secondary tools
-- **Progress tracking**: Users can mark steps as complete by clicking the numbered circles
-- **Mobile-friendly**: All workflow steps accessible on mobile bottom navigation with safe area support
+- **Futuristic Neon Synthwave Theme**: Complete redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents
+- **Gaming-Inspired Visual Language**: References to Stranger Things (portal gradients), Squid Game (circle/triangle/square progress indicators), and Fortnite (holographic card effects)
+- **Neon Color Palette**: Magenta (#FF2D95), Violet (#7C4DFF), Cyan (#40F5FF), and Lime (#8BFF4A) on cosmic dark base
+- **Typography**: Space Grotesk display font for headings, Plus Jakarta Sans for body text
+- **Gaming Terminology**: "Victory Royale", "Quest Log", "Player Setup", "Next Mission" throughout the UX
+- **5-Step Workflow**: Generate Idea, Write Script, Record Video, Edit Video, Upload & Share
+- **Progress Tracking**: Users can mark steps as complete by clicking the step numbers
+- **Holographic Nav Bar**: Glassmorphism header with glow effects and neon borders
 
 ## User Preferences
 
@@ -24,7 +27,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query for server state, React Context for local state (creator profile)
 - **Styling**: Tailwind CSS v4 with custom theme variables, Framer Motion for animations
 - **UI Components**: Custom shadcn/ui-inspired component library in `client/src/components/ui/`
-- **Design System**: "Sticker Pop" aesthetic with gradient backgrounds, rounded corners, bold shadows, and neon accent colors (cyan, pink, yellow, purple)
+- **Design System**: Futuristic neon synthwave with cosmic backgrounds, holographic card effects (glassmorphism), and gaming-inspired UI elements (Squid Game shapes, Stranger Things gradients)
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript
