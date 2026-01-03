@@ -15,7 +15,7 @@ interface CreatorProfileContextType {
 }
 
 const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: '🎮' };
-const AVATARS = ['🎮', '🎬', '🎤', '🎨', '🚀', '⭐', '🔥', '💜', '🦄', '🐱', '🐶', '🦊'];
+const AVATARS = ['🎮', '🎬', '🎤', '🎨', '🚀', '⭐', '🔥', '💜', '🦄', '🐱', '🐶', '🦊', '👹'];
 const CreatorProfileContext = createContext<CreatorProfileContextType | null>(null);
 
 export function CreatorProfileProvider({ children }: { children: ReactNode }) {
