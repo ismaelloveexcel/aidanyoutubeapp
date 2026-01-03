@@ -15,9 +15,16 @@ interface CalendarEvent {
 }
 
 export default function Calendar() {
+  // Create dates relative to today for the default events
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const nextWeek = new Date(today);
+  nextWeek.setDate(nextWeek.getDate() + 7);
+  
   const [events, setEvents] = useState<CalendarEvent[]>([
-    { id: "1", title: "Film Gaming Video", date: new Date(2025, 11, 23), type: "filming", status: "pending" },
-    { id: "2", title: "Upload Top 10 Video", date: new Date(2025, 11, 25), type: "upload", status: "pending" },
+    { id: "1", title: "Film Gaming Video", date: tomorrow, type: "filming", status: "pending" },
+    { id: "2", title: "Upload Top 10 Video", date: nextWeek, type: "upload", status: "pending" },
   ]);
   const [showDialog, setShowDialog] = useState(false);
   const [newEventTitle, setNewEventTitle] = useState("");
