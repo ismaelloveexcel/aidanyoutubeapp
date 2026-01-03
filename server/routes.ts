@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { type Server } from "http";
 import { storage } from "./storage";
+import { pool } from "./db";
 import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema } from "@shared/schema";
 import { z } from "zod";
 import { moderateObject } from "./moderation";
@@ -15,12 +16,36 @@ function parseIdParam(idParam: string): number | null {
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   // Health check endpoint for monitoring
-  app.get("/health", (req, res) => {
-    res.status(200).json({ 
+  // Includes database connectivity check for proper health verification
+  app.get("/health", async (req, res) => {
+    const healthStatus: {
+      status: string;
+      timestamp: string;
+      uptime: number;
+      database?: string;
+      error?: string;
+    } = { 
       status: "ok", 
       timestamp: new Date().toISOString(),
       uptime: process.uptime()
-    });
+    };
+
+    // Check database connectivity
+    try {
+      const client = await pool.connect();
+      await client.query('SELECT 1');
+      client.release();
+      healthStatus.database = "connected";
+    } catch (dbError) {
+      healthStatus.status = "degraded";
+      healthStatus.database = "disconnected";
+      healthStatus.error = dbError instanceof Error ? dbError.message : "Database connection failed";
+      // Return 503 if database is not available
+      res.status(503).json(healthStatus);
+      return;
+    }
+
+    res.status(200).json(healthStatus);
   });
 
   // API routes

@@ -8,6 +8,9 @@ primary_region = 'ams'
 
 [build]
 
+[env]
+  NODE_ENV = "production"
+
 [http_service]
   internal_port = 5000
   force_https = true
@@ -15,6 +18,19 @@ primary_region = 'ams'
   auto_start_machines = true
   min_machines_running = 0
   processes = ['app']
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 200
+    hard_limit = 250
+
+# Health check configuration to properly detect app issues
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  timeout = "5s"
+  path = "/health"
 
 [[vm]]
   memory = '1gb'
