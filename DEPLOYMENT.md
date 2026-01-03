@@ -1,242 +1,668 @@
 # Deployment Guide for TubeStar Creator Studio
 
-## Deploying to Replit
+## Deploying to Fly.io (Recommended) ⭐
 
-This project is fully configured for Replit deployment with autoscaling support.
+Fly.io is the recommended platform for deploying TubeStar Creator Studio. It offers a generous free tier with always-on availability, included PostgreSQL database, and automatic HTTPS.
+
+### Why Fly.io?
+
+**Free Tier Benefits:**
+- 3 shared-cpu VMs with 256MB RAM each
+- Included PostgreSQL with 3GB persistent storage
+- No auto-sleep - your app stays online 24/7
+- Automatic HTTPS with custom domain support
+- 160GB outbound data transfer per month
+- Built-in health checks and monitoring
+- Deploy from anywhere with the Fly CLI
 
 ### Prerequisites
-- A Replit account
-- A PostgreSQL database (Replit PostgreSQL or external like Neon, Supabase)
 
-### Step 1: Import to Replit
+1. **Create a Fly.io account**: Sign up at [fly.io](https://fly.io)
+2. **Install Fly CLI**:
+   ```bash
+   # macOS/Linux
+   curl -L https://fly.io/install.sh | sh
+   
+   # Windows (PowerShell)
+   pwsh -Command "iwr https://fly.io/install.ps1 -useb | iex"
+   ```
+3. **Login to Fly.io**:
+   ```bash
+   fly auth login
+   ```
 
-1. Go to [Replit](https://replit.com)
-2. Click "Create Repl"
-3. Choose "Import from GitHub"
-4. Enter repository URL: `https://github.com/ismaelloveexcel/aidanyoutubeapp`
-5. Click "Import from GitHub"
+### Step 1: Initialize Your Fly.io App
 
-### Step 2: Configure Environment Variables (Secrets)
+From the project root directory:
 
-In Replit, go to the "Secrets" tab (lock icon) and add:
-
-```
-DATABASE_URL=postgresql://user:password@host:5432/dbname
-NODE_ENV=production
-PORT=5000
-```
-
-**Important**: Never commit these values to the repository!
-
-### Step 3: Set Up Database
-
-#### Option A: Using Replit PostgreSQL (Recommended for testing)
-1. In your Repl, click "Tools" → "Database"
-2. Enable PostgreSQL
-3. Copy the connection string to your Secrets as `DATABASE_URL`
-
-#### Option B: Using External PostgreSQL (Recommended for production)
-Services like Neon, Supabase, or Railway offer free PostgreSQL:
-- [Neon](https://neon.tech) - Free tier with 0.5GB storage
-- [Supabase](https://supabase.com) - Free tier with 500MB database
-- [Railway](https://railway.app) - $5 free credit monthly
-
-### Step 4: Install Dependencies
-
-In the Replit shell:
 ```bash
-npm install
+fly launch
 ```
 
-### Step 5: Initialize Database
+This command will:
+- Detect your Node.js application automatically
+- Generate a `fly.toml` configuration file (already included in this repo)
+- Prompt you to choose an app name (must be globally unique)
+- Ask which region to deploy to (choose one closest to your users)
+- Offer to set up a PostgreSQL database
 
-Run migrations to set up database tables:
+**Important**: When prompted about the app name, you can:
+- Accept the suggested name
+- Or choose your own unique name (e.g., `tubestar-yourname-2024`)
+
+### Step 2: Create and Attach PostgreSQL Database
+
+Create a PostgreSQL database:
+
 ```bash
+fly postgres create
+```
+
+When prompted:
+- Choose an app name for your database (e.g., `tubestar-db`)
+- Select the same region as your app
+- Choose the "Development" configuration for free tier
+
+Attach the database to your app:
+
+```bash
+fly postgres attach <your-postgres-app-name>
+```
+
+This automatically sets the `DATABASE_URL` secret for your app.
+
+### Step 3: Configure Environment Variables
+
+Set any additional environment variables as secrets:
+
+```bash
+# NODE_ENV is already set in fly.toml, but you can override if needed
+fly secrets set NODE_ENV=production
+
+# If you need ALLOWED_ORIGINS for CORS (comma-separated domains)
+fly secrets set ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+```
+
+View your secrets:
+```bash
+fly secrets list
+```
+
+### Step 4: Deploy Your Application
+
+Deploy to Fly.io:
+
+```bash
+fly deploy
+```
+
+This will:
+1. Build your Docker image
+2. Push it to Fly.io's registry
+3. Create and start your VM
+4. Run health checks
+5. Make your app available at `https://your-app-name.fly.dev`
+
+**First deployment takes 2-5 minutes.** Subsequent deployments are faster.
+
+### Step 5: Initialize Database Schema
+
+After successful deployment, run database migrations:
+
+```bash
+# Connect to your Fly.io app's shell
+fly ssh console
+
+# Once connected, run migrations
 npm run db:push
+
+# Exit the shell
+exit
 ```
 
-### Step 6: Build and Run (Development)
-
-#### Development Mode
+**Note**: If this is your first deployment and you need to force schema synchronization, use:
 ```bash
-npm run dev
+npm run db:push -- --force-sync
 ```
 
-Click the "Run" button in Replit to start the development server!
-
-### Step 7: Deploy to Production with Replit Deployments
-
-This repository includes a pre-configured `.replit` file with deployment settings for Replit's autoscale deployment feature.
-
-#### Using Replit Deployments (Recommended for Production)
-
-1. Click the "Deploy" button in the top right corner of your Repl
-2. Select "Autoscale" deployment type (already configured)
-3. Review the deployment settings:
-   - **Build command**: `npm run build`
-   - **Run command**: `npm install --production && npm start`
-4. Add your production environment secrets in the deployment settings
-5. Click "Deploy" to publish your app
-
-#### Deployment Configuration
-
-The `.replit` file includes these deployment settings:
-
-```toml
-[deployment]
-run = ["sh", "-c", "npm install --production && npm start"]
-deploymentTarget = "autoscale"
-build = ["npm", "run", "build"]
-```
-
-This configuration ensures:
-- Your app is built before deployment
-- Production dependencies are installed
-- The app starts with `npm start` in production mode
-- Autoscaling handles traffic automatically
-
-### Step 8: Access Your App
-
-- **Development**: Click the "Open in new tab" button in Replit
-- **Production**: Your deployed app will have a URL like `https://your-repl-name-your-username.replit.app`
-
-## Replit Configuration Files
-
-The repository includes these Replit-specific files:
-- `.replit` - Main configuration (run commands, ports)
-- `replit.nix` - Environment dependencies (Node.js, PostgreSQL)
-- `.replitignore` - Files to exclude from the Repl
-
-## Common Issues and Solutions
-
-### Issue: "Cannot connect to database"
-**Solution**: Check that DATABASE_URL is set correctly in Secrets
-
-### Issue: "Module not found"
-**Solution**: Run `npm install` in the shell
-
-### Issue: "Port already in use"
-**Solution**: Restart the Repl or change PORT in Secrets
-
-### Issue: "Build fails"
-**Solution**: Ensure all dependencies are installed and TypeScript compiles
-
-## Environment Variables Reference
-
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string | `postgresql://user:pass@host:5432/db` |
-| `NODE_ENV` | No | Environment mode | `development` or `production` |
-| `PORT` | No | Server port (default: 5000) | `5000` |
-
-## Security Checklist for Production
-
-Before making your Repl public, review [SECURITY.md](./SECURITY.md) and ensure:
-
-- [ ] DATABASE_URL is stored in Replit Secrets (not hardcoded)
-- [ ] User passwords are hashed (currently NOT implemented - see SECURITY.md)
-- [ ] Authentication is implemented (currently NOT implemented - see SECURITY.md)
-- [ ] Rate limiting is configured
-- [ ] CORS is properly configured
-- [ ] Security headers are added
-- [ ] Error messages don't leak sensitive info
-
-**⚠️ CRITICAL**: This app currently stores passwords in plain text and has no authentication. See [SECURITY.md](./SECURITY.md) for required security fixes before production use.
-
-## Database Backups
-
-### Backup Your Database
+**Alternative approach** (if you prefer to run migrations locally):
 ```bash
-pg_dump $DATABASE_URL > backup.sql
+# Get your database connection string
+fly secrets list | grep DATABASE_URL
+
+# Run migrations locally with the production database URL
+DATABASE_URL="postgresql://..." npm run db:push
 ```
 
-### Restore from Backup
+### Step 6: Verify Deployment
+
+Check your app status:
+
 ```bash
-psql $DATABASE_URL < backup.sql
+fly status
 ```
 
-## Monitoring and Logs
+View logs:
 
-In Replit:
-1. Check "Console" tab for application logs
-2. Use "Resources" tab to monitor CPU/memory usage
-3. Use Replit's built-in monitoring tools
-
-## Scaling Considerations
-
-### Replit Development (Free Tier)
-- Limited CPU and memory
-- Repls may sleep after inactivity
-- Great for development and testing
-
-### Replit Deployments (Production)
-This app is configured for Replit's Autoscale deployment:
-- **Always-on**: Your deployed app stays running 24/7
-- **Auto-scaling**: Handles traffic spikes automatically
-- **Custom domains**: Connect your own domain
-- **Production-ready**: Optimized for performance
-
-To upgrade your deployment:
-1. Go to your Repl's Deploy settings
-2. Choose a deployment plan that fits your needs
-3. Configure scaling options if needed
-
-### Alternative Platforms
-For heavy production use, consider:
-- Deploying to Vercel, Railway, or Render
-- Using a dedicated server
-- Implementing caching (Redis)
-- Setting up CDN for static assets
-
-## Alternative Deployment Platforms
-
-### Vercel
 ```bash
-npm install -g vercel
-vercel
+fly logs
 ```
 
-### Railway
+Open your app in a browser:
+
 ```bash
-npm install -g railway
-railway up
+fly open
 ```
+
+Test the health check endpoint:
+
+```bash
+curl https://your-app-name.fly.dev/health
+```
+
+### Custom Domain Setup (Optional)
+
+To use your own domain:
+
+1. **Add your domain to Fly.io**:
+   ```bash
+   fly certs add yourdomain.com
+   fly certs add www.yourdomain.com
+   ```
+
+2. **Update DNS records** (at your domain registrar):
+   - Add an `A` record pointing to Fly.io's IP addresses (shown after running `fly certs add`)
+   - Add an `AAAA` record for IPv6 (also shown in cert command output)
+
+3. **Wait for DNS propagation** (usually 5-60 minutes)
+
+4. **Verify certificate**:
+   ```bash
+   fly certs show yourdomain.com
+   ```
+
+### Monitoring and Logs
+
+**View real-time logs**:
+```bash
+fly logs
+```
+
+**View app status and metrics**:
+```bash
+fly status
+fly vm status
+```
+
+**Check database status**:
+```bash
+fly postgres db list -a <your-postgres-app-name>
+```
+
+**Monitor resource usage**:
+```bash
+fly dashboard
+```
+
+This opens the Fly.io web dashboard where you can see:
+- CPU and memory usage
+- Request metrics
+- Error rates
+- Health check status
+
+### Scaling Your App
+
+The free tier includes 3 shared-cpu VMs. To scale:
+
+**Scale up resources** (requires upgrading from free tier):
+```bash
+fly scale vm shared-cpu-2x --memory 512
+```
+
+**Add more instances** (use your 3 free VMs):
+```bash
+fly scale count 2
+```
+
+**Scale down**:
+```bash
+fly scale count 1
+```
+
+### Updating Your App
+
+When you make code changes:
+
+1. Commit your changes to git
+2. Deploy the update:
+   ```bash
+   fly deploy
+   ```
+
+Fly.io performs **zero-downtime deployments** by default.
+
+### Managing Secrets
+
+**Add/update a secret**:
+```bash
+fly secrets set KEY=value
+```
+
+**Remove a secret**:
+```bash
+fly secrets unset KEY
+```
+
+**List secrets** (values are hidden):
+```bash
+fly secrets list
+```
+
+**Import secrets from file**:
+```bash
+fly secrets import < .env.production
+```
+
+## Alternative Free Deployment Platforms
+
+While Fly.io is recommended, here are other free options:
 
 ### Render
-Create `render.yaml`:
+
+**Free Tier**: 750 hours/month, auto-sleep after 15 min inactivity
+
+Create `render.yaml` in your repo root:
 ```yaml
 services:
   - type: web
-    name: tubestar
+    name: tubestar-creator-studio
     env: node
     buildCommand: npm install && npm run build
     startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tubestar-db
+          property: connectionString
+
+databases:
+  - name: tubestar-db
+    databaseName: tubestar
+    user: tubestar
 ```
+
+Deploy:
+1. Connect your GitHub repo to Render
+2. Render auto-deploys on git push
+3. Free PostgreSQL included (90-day expiry, but data is preserved)
+
+**Pros**: Simple, good free tier, auto-deploy from GitHub
+**Cons**: Apps sleep after inactivity, limited to 750 hours/month
+
+### Railway
+
+**Free Tier**: $5 credit/month (depletes with usage)
+
+Deploy via CLI:
+```bash
+npm install -g railway
+railway login
+railway init
+railway up
+```
+
+Or connect your GitHub repo via the Railway dashboard.
+
+Add PostgreSQL:
+```bash
+railway add --plugin postgresql
+```
+
+**Pros**: Great developer experience, generous resource limits
+**Cons**: Credit-based free tier (not truly unlimited)
+
+### Vercel + Neon (Serverless)
+
+For a serverless approach with separate database:
+
+1. **Deploy to Vercel**:
+   ```bash
+   npm install -g vercel
+   vercel
+   ```
+
+2. **Database on Neon**:
+   - Sign up at [neon.tech](https://neon.tech)
+   - Create a PostgreSQL database (0.5GB free)
+   - Copy connection string to Vercel environment variables
+
+**Pros**: Excellent for frontend, unlimited bandwidth
+**Cons**: Not ideal for stateful apps, cold starts, complex backend setup
+
+### Replit (Original Setup)
+
+This app was originally configured for Replit. You can still use Replit as an alternative:
+
+**Free Tier**: Limited resources, auto-sleep after inactivity
+
+1. Import repo to Replit
+2. Add `DATABASE_URL` to Secrets
+3. Run `npm install && npm run db:push`
+4. Click "Run" to start
+
+**Pros**: Easy for beginners, built-in IDE
+**Cons**: Auto-sleep, limited resources, less reliable than Fly.io
+
+## Database Options Comparison
+
+| Provider | Free Storage | Auto-Sleep | Regions | Notes |
+|----------|--------------|------------|---------|-------|
+| **Fly.io Postgres** | 3GB | No ⭐ | Global | Included with Fly.io app |
+| **Neon** | 0.5GB | Yes (14 days) | US, EU | Good for serverless |
+| **Supabase** | 500MB | No | Global | Includes auth, storage |
+| **CockroachDB** | 5GB | No | Global | Best for scale |
+| **Railway** | Unlimited* | No | Global | *Uses $5 monthly credit |
+
+**Recommendation**: Use Fly.io Postgres when deploying to Fly.io for best performance and no additional setup.
+
+## Environment Variables Reference
+
+| Variable | Required | Description | Default | Example |
+|----------|----------|-------------|---------|---------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string | None | `postgresql://user:pass@host:5432/db` |
+| `NODE_ENV` | Yes | Environment mode | `production` | `production` |
+| `PORT` | No | Server port | `5000` | `5000` |
+| `ALLOWED_ORIGINS` | No* | CORS allowed origins (comma-separated) | Same-origin only | `https://yourdomain.com` |
+
+*Required in production if you need to allow cross-origin requests. If not set, only same-origin requests are allowed.
+
+**Security Note**: Never commit these values to git. Use secrets management:
+- Fly.io: `fly secrets set`
+- Render: Environment variables in dashboard
+- Railway: Environment variables in dashboard
+- Replit: Secrets tab
+
+## Security Checklist for Deployment
+
+Before deploying to production, review [SECURITY.md](./SECURITY.md) and ensure:
+
+- [ ] `DATABASE_URL` is stored as a secret (never in code)
+- [ ] `NODE_ENV=production` is set
+- [ ] Rate limiting is enabled (already configured in code)
+- [ ] Helmet security headers are active (already configured in code)
+- [ ] CORS is properly configured with `ALLOWED_ORIGINS`
+- [ ] HTTPS is enforced (automatic on Fly.io)
+- [ ] Error messages don't leak sensitive information
+- [ ] Database connection strings use SSL in production
+
+**⚠️ CRITICAL**: Review [SECURITY.md](./SECURITY.md) for important security considerations before production use.
 
 ## Troubleshooting
 
-### Enable Detailed Logging
-Set environment variable:
-```
-DEBUG=express:*
-```
+### Common Fly.io Issues
 
-### Check Database Connection
+#### Build Failures
+
+**Error**: "npm ci failed"
 ```bash
-node -e "require('./server/db.ts')"
+# Check your package-lock.json is committed
+git status
+
+# Rebuild without cache
+fly deploy --remote-only
 ```
 
-### Verify Build
+**Error**: "Build exceeds memory limit"
+```bash
+# Use larger build resources temporarily
+fly deploy --vm-memory 1024
+```
+
+#### Database Connection Issues
+
+**Error**: "Cannot connect to database"
+```bash
+# Check DATABASE_URL is set
+fly secrets list
+
+# Verify database is running
+fly status -a <your-postgres-app-name>
+
+# Check connection from your app
+fly ssh console
+echo $DATABASE_URL
+exit
+```
+
+**Error**: "too many clients"
+- PostgreSQL has connection limits
+- Ensure your app properly closes connections
+- Consider connection pooling with PgBouncer
+
+#### Port Binding Issues
+
+**Error**: "App not responding on port 5000"
+- Check `fly.toml` has `internal_port = 5000`
+- Verify your app listens on `process.env.PORT`
+- Check logs: `fly logs`
+
+#### Health Check Failures
+
+**Error**: "Health checks failing"
+```bash
+# Test health endpoint locally
+curl https://your-app-name.fly.dev/health
+
+# Check logs for errors
+fly logs
+
+# Increase health check timeout in fly.toml
+# Change timeout from "2s" to "5s"
+```
+
+#### Memory/Resource Limits
+
+**Error**: "Out of memory" or "Process killed"
+```bash
+# Check current resources
+fly vm status
+
+# Scale up memory (requires paid plan)
+fly scale vm shared-cpu-1x --memory 512
+
+# Or optimize your app to use less memory
+```
+
+### General Troubleshooting
+
+**Enable detailed logging**:
+```javascript
+// In your app code
+DEBUG=express:* npm start
+```
+
+**Check build output**:
 ```bash
 npm run build
 ls -la dist/
 ```
 
+**Verify dependencies**:
+```bash
+npm ci
+npm run build
+npm start
+```
+
+**Test locally with production settings**:
+```bash
+NODE_ENV=production npm run build && npm start
+```
+
+## Database Backups
+
+### Backup Your Fly.io Database
+
+```bash
+# Create a backup
+fly postgres backup create -a <your-postgres-app-name>
+
+# List backups
+fly postgres backup list -a <your-postgres-app-name>
+
+# Download a backup
+fly ssh console -a <your-postgres-app-name>
+pg_dump <database-name> > backup.sql
+exit
+```
+
+### Restore from Backup
+
+```bash
+# Upload backup file
+fly ssh console -a <your-postgres-app-name>
+psql <database-name> < backup.sql
+exit
+```
+
+### Automated Backups
+
+Fly.io PostgreSQL automatically creates backups:
+- Daily backups retained for 7 days (free tier)
+- Point-in-time recovery available (paid tiers)
+
+## Performance Optimization
+
+### Caching
+
+Add Redis for caching (available on Fly.io):
+```bash
+fly redis create
+fly redis attach <redis-app-name>
+```
+
+### CDN for Static Assets
+
+Use Fly.io's built-in CDN or integrate with Cloudflare:
+1. Point your domain to Fly.io
+2. Enable Cloudflare proxy (orange cloud)
+3. Configure caching rules for `/public/*`
+
+### Database Optimization
+
+- Add indexes to frequently queried columns
+- Use connection pooling
+- Enable query caching
+- Monitor slow queries with `fly pg logs`
+
+## Cost Management
+
+### Staying in Free Tier
+
+To stay within Fly.io's free tier:
+- Keep `min_machines_running = 1` (current config)
+- Use `shared-cpu-1x` VMs (current config)
+- Limit memory to 256MB per VM (current config)
+- Stay under 3 VMs total
+- Monitor outbound bandwidth (160GB/month limit)
+
+### Monitoring Usage
+
+```bash
+# View current usage
+fly dashboard
+
+# Check billing
+fly dashboard billing
+```
+
+### Cost Optimization Tips
+
+1. Use a single VM for low-traffic apps
+2. Enable auto-stop for development environments
+3. Use Fly.io Postgres instead of external databases
+4. Compress static assets
+5. Implement caching to reduce database queries
+
 ## Getting Help
 
-- Check [Issues](https://github.com/ismaelloveexcel/aidanyoutubeapp/issues)
-- Read [README.md](./README.md)
-- Review [SECURITY.md](./SECURITY.md)
+### Documentation
+- [Fly.io Docs](https://fly.io/docs/)
+- [Fly.io Community](https://community.fly.io/)
+- [Project Issues](https://github.com/ismaelloveexcel/aidanyoutubeapp/issues)
+
+### Support Channels
+- Fly.io Community Forum
+- Fly.io Discord
+- GitHub Issues (for app-specific problems)
+
+### Useful Commands
+
+```bash
+# Get help for any command
+fly help <command>
+
+# SSH into your app
+fly ssh console
+
+# Restart your app
+fly restart
+
+# Destroy your app (careful!)
+fly destroy
+
+# View all apps
+fly apps list
+
+# View app info
+fly info
+```
+
+## Continuous Deployment
+
+### GitHub Actions
+
+Create `.github/workflows/deploy.yml`:
+
+```yaml
+name: Deploy to Fly.io
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+```
+
+Get your `FLY_API_TOKEN`:
+```bash
+fly auth token
+```
+
+Add it to GitHub repository secrets.
+
+## Next Steps
+
+After successful deployment:
+
+1. ✅ Test all features in production
+2. ✅ Set up monitoring and alerts
+3. ✅ Configure custom domain (optional)
+4. ✅ Set up automated backups
+5. ✅ Review and implement [SECURITY.md](./SECURITY.md) recommendations
+6. ✅ Configure CI/CD for automatic deployments
+7. ✅ Add error tracking (e.g., Sentry)
+8. ✅ Set up uptime monitoring (e.g., UptimeRobot)
 
 ## License
 

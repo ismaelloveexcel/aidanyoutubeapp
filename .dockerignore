@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log
+.env
+.env.local
+.git
+.gitignore
+.vscode
+.idea
+*.md
+!README.md
+.DS_Store
+dist
+.replit
+replit.nix
+.replitignore
+coverage
+.nyc_output
