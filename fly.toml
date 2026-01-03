@@ -1,8 +1,6 @@
 app = "tubestar-creator-studio"
 primary_region = "iad"
 
-[build]
-
 [http_service]
   internal_port = 5000
   force_https = true

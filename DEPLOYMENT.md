@@ -120,6 +120,11 @@ npm run db:push
 exit
 ```
 
+**Note**: If this is your first deployment and you need to force schema synchronization, use:
+```bash
+npm run db:push -- --force-sync
+```
+
 **Alternative approach** (if you prefer to run migrations locally):
 ```bash
 # Get your database connection string
@@ -405,8 +410,8 @@ Before deploying to production, review [SECURITY.md](./SECURITY.md) and ensure:
 # Check your package-lock.json is committed
 git status
 
-# Clear cache and rebuild
-fly deploy --no-cache
+# Rebuild without cache
+fly deploy --remote-only
 ```
 
 **Error**: "Build exceeds memory limit"

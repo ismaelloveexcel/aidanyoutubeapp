@@ -23,7 +23,7 @@ COPY . .
 # Build the application
 RUN npm run build
 
-# Remove dev dependencies
+# Remove dev dependencies to reduce image size
 RUN npm prune --production
 
 # Expose port
