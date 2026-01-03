@@ -74,7 +74,7 @@ export default function Layout({ children }: LayoutProps) {
       <footer className="mt-16 bg-gradient-to-r from-[hsl(220,40%,10%)] via-[hsl(210,50%,12%)] to-[hsl(220,40%,10%)] border-t-2 border-[hsl(210,60%,25%)] py-8">
         <div className="container mx-auto px-4 text-center">
           <p className="text-lg font-semibold bg-gradient-to-r from-[hsl(45,100%,60%)] via-[hsl(180,100%,60%)] to-[hsl(210,100%,60%)] bg-clip-text text-transparent">
-            Made with 💙 for young creators
+            Made with {"<3"} for Awesome Aidan
           </p>
           <p className="text-sm text-gray-500 mt-2">Level up your content game! 🎮</p>
         </div>
