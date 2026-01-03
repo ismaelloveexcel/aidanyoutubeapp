@@ -1,6 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
+import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3, X } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,122 +9,138 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
-  const [showMoreNav, setShowMoreNav] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
-  // Primary navigation - most important items
-  const primaryNavItems = [
-    { path: "/", label: "Home", emoji: "🏠" },
-    { path: "/roadmap", label: "Roadmap", emoji: "🗺️" },
-    { path: "/ideas", label: "Ideas", emoji: "💡" },
-    { path: "/script", label: "Script", emoji: "📝" },
-    { path: "/recorder", label: "Record", emoji: "🎬" },
-    { path: "/editor", label: "Edit", emoji: "✂️" },
+  const mainNavItems = [
+    { path: "/", label: "Home", icon: Home },
+    { path: "/ideas", label: "Ideas", icon: Lightbulb },
+    { path: "/script", label: "Script", icon: FileText },
+    { path: "/recorder", label: "Record", icon: Video },
+    { path: "/editor", label: "Edit", icon: Scissors },
+    { path: "/upload", label: "Upload", icon: Upload },
   ];
 
-  // Secondary navigation - additional tools
-  const secondaryNavItems = [
-    { path: "/thumbnail", label: "Thumbnail", emoji: "🎨" },
-    { path: "/ai-assistant", label: "AI Help", emoji: "🤖" },
-    { path: "/viral", label: "Go Viral", emoji: "🚀" },
-    { path: "/multi-platform", label: "Export", emoji: "📱" },
-    { path: "/upload", label: "Upload", emoji: "📤" },
-    { path: "/progress", label: "Progress", emoji: "🏆" },
-    { path: "/analytics", label: "Analytics", emoji: "📊" },
-    { path: "/calendar", label: "Calendar", emoji: "📅" },
+  const moreNavItems = [
+    { path: "/thumbnail", label: "Thumbnail", icon: Palette },
+    { path: "/ai-assistant", label: "AI Help", icon: Sparkles },
+    { path: "/analytics", label: "Stats", icon: BarChart3 },
   ];
 
   return (
-    <div className="min-h-screen text-white">
-      {/* Header with cool blue gradient */}
-      <header className="bg-gradient-to-r from-[hsl(220,40%,12%)] via-[hsl(210,50%,15%)] to-[hsl(220,40%,12%)] border-b-2 border-[hsl(210,60%,30%)] shadow-[0_4px_30px_rgba(0,120,255,0.15)]">
-        <div className="container mx-auto px-4 py-5">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Header */}
+      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-4">
             <Link href="/">
-              <h1 className="font-display text-4xl bg-gradient-to-r from-[hsl(45,100%,60%)] via-[hsl(180,100%,50%)] to-[hsl(210,100%,60%)] bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,150,255,0.5)] cursor-pointer hover:scale-105 transition-transform">
-                ⭐ TubeStar
-              </h1>
+              <span className="text-xl font-bold text-primary cursor-pointer">
+                TubeStar
+              </span>
             </Link>
-            <div className="text-sm font-semibold text-[hsl(180,100%,70%)] bg-[hsl(210,50%,15%)] px-4 py-2 rounded-full border border-[hsl(210,60%,40%)]">
-              🎮 Creator Studio
-            </div>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-1">
+              {mainNavItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = location === item.path;
+                return (
+                  <Link key={item.path} href={item.path}>
+                    <span
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      )}
+                      data-testid={`nav-${item.label.toLowerCase()}`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </span>
+                  </Link>
+                );
+              })}
+              
+              {/* More dropdown - click based */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowMore(!showMore)}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    showMore
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                  data-testid="nav-more"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                  More
+                </button>
+                {showMore && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
+                    <div className="absolute right-0 top-full mt-1 bg-card border rounded-lg shadow-lg min-w-[140px] py-1 z-50">
+                      {moreNavItems.map((item) => {
+                        const Icon = item.icon;
+                        return (
+                          <Link key={item.path} href={item.path}>
+                            <span
+                              onClick={() => setShowMore(false)}
+                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                              data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
+                            >
+                              <Icon className="h-4 w-4" />
+                              {item.label}
+                            </span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+            </nav>
           </div>
         </div>
       </header>
 
-      {/* Simplified Navigation */}
-      <nav className="bg-gradient-to-r from-[hsl(220,30%,10%)] via-[hsl(210,35%,12%)] to-[hsl(220,30%,10%)] border-b-2 border-[hsl(210,40%,22%)] shadow-lg">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-3 py-4">
-            {/* Primary nav items */}
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-              {primaryNavItems.map((item) => (
-                <Link key={item.path} href={item.path}>
-                  <a
-                    className={cn(
-                      "px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap text-sm",
-                      location === item.path
-                        ? "bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)] text-white shadow-[0_4px_20px_rgba(0,120,255,0.4)] border-2 border-white/20"
-                        : "bg-[hsl(220,25%,15%)] text-gray-300 hover:bg-[hsl(210,30%,20%)] hover:text-white border-2 border-transparent hover:border-[hsl(210,60%,40%)]"
-                    )}
-                  >
-                    <span className="mr-1.5">{item.emoji}</span>
-                    {item.label}
-                  </a>
-                </Link>
-              ))}
-            </div>
-            
-            {/* More button */}
-            <button
-              onClick={() => setShowMoreNav(!showMoreNav)}
-              className={cn(
-                "px-4 py-2.5 rounded-xl font-bold transition-all whitespace-nowrap text-sm ml-auto",
-                showMoreNav
-                  ? "bg-[hsl(210,50%,25%)] text-white border-2 border-[hsl(210,60%,40%)]"
-                  : "bg-[hsl(220,25%,15%)] text-gray-300 hover:bg-[hsl(210,30%,20%)] hover:text-white border-2 border-transparent"
-              )}
-            >
-              <span className="mr-1.5">✨</span>
-              More
-              <span className="ml-1.5">{showMoreNav ? "▲" : "▼"}</span>
-            </button>
-          </div>
-          
-          {/* Expandable secondary nav */}
-          {showMoreNav && (
-            <div className="pb-4 flex flex-wrap gap-2 border-t border-[hsl(210,30%,20%)] pt-4">
-              {secondaryNavItems.map((item) => (
-                <Link key={item.path} href={item.path}>
-                  <a
-                    className={cn(
-                      "px-4 py-2 rounded-xl font-bold transition-all whitespace-nowrap text-sm",
-                      location === item.path
-                        ? "bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)] text-white shadow-[0_4px_20px_rgba(0,120,255,0.4)] border-2 border-white/20"
-                        : "bg-[hsl(220,25%,18%)] text-gray-300 hover:bg-[hsl(210,30%,22%)] hover:text-white border-2 border-transparent hover:border-[hsl(210,60%,40%)]"
-                    )}
-                  >
-                    <span className="mr-1.5">{item.emoji}</span>
-                    {item.label}
-                  </a>
-                </Link>
-              ))}
-            </div>
-          )}
+      {/* Mobile Bottom Navigation - all main items */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-50">
+        <div className="flex justify-around py-2">
+          {mainNavItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.path;
+            return (
+              <Link key={item.path} href={item.path}>
+                <span
+                  className={cn(
+                    "flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors cursor-pointer",
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                  data-testid={`mobile-nav-${item.label.toLowerCase()}`}
+                >
+                  <Icon className="h-5 w-5" />
+                  <span className="text-[10px]">{item.label}</span>
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </nav>
 
-      {/* Main Content with more padding for breathing room */}
-      <main className="container mx-auto px-6 py-12">
+      {/* Main Content */}
+      <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6">
         {children}
       </main>
 
-      {/* Enhanced Footer */}
-      <footer className="mt-20 bg-gradient-to-r from-[hsl(220,40%,10%)] via-[hsl(210,50%,12%)] to-[hsl(220,40%,10%)] border-t-2 border-[hsl(210,60%,25%)] py-8">
+      {/* Footer - Desktop only */}
+      <footer className="hidden md:block border-t py-4">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-lg font-semibold bg-gradient-to-r from-[hsl(45,100%,60%)] via-[hsl(180,100%,60%)] to-[hsl(210,100%,60%)] bg-clip-text text-transparent">
-            Made with {"<3"} for Awesome Aidan
+          <p className="text-sm text-muted-foreground">
+            Made for Awesome Aidan
           </p>
-          <p className="text-sm text-gray-500 mt-2">Level up your content game! 🎮</p>
         </div>
       </footer>
     </div>

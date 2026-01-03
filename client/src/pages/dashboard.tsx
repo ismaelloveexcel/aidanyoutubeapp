@@ -1,18 +1,95 @@
 import { useState } from "react";
 import { useCreatorProfile, AVATARS } from "@/lib/creator-profile";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings } from "lucide-react";
+
+interface RoadmapStep {
+  id: number;
+  title: string;
+  description: string;
+  icon: typeof Lightbulb;
+  path: string;
+  color: string;
+  bgColor: string;
+}
+
+const STEPS: RoadmapStep[] = [
+  {
+    id: 1,
+    title: "Generate Idea",
+    description: "Come up with an awesome video concept",
+    icon: Lightbulb,
+    path: "/ideas",
+    color: "text-amber-400",
+    bgColor: "bg-amber-500/20",
+  },
+  {
+    id: 2,
+    title: "Write Script",
+    description: "Plan what you'll say and do",
+    icon: FileText,
+    path: "/script",
+    color: "text-purple-400",
+    bgColor: "bg-purple-500/20",
+  },
+  {
+    id: 3,
+    title: "Record Video",
+    description: "Lights, camera, action!",
+    icon: Video,
+    path: "/recorder",
+    color: "text-red-400",
+    bgColor: "bg-red-500/20",
+  },
+  {
+    id: 4,
+    title: "Edit Video",
+    description: "Add effects and make it awesome",
+    icon: Scissors,
+    path: "/editor",
+    color: "text-cyan-400",
+    bgColor: "bg-cyan-500/20",
+  },
+  {
+    id: 5,
+    title: "Upload & Share",
+    description: "Share your creation with the world!",
+    icon: Upload,
+    path: "/upload",
+    color: "text-green-400",
+    bgColor: "bg-green-500/20",
+  },
+];
+
+const STEP_STORAGE_KEY = "tubestar-completed-steps";
+
+function getStoredSteps(): number[] {
+  try {
+    const stored = localStorage.getItem(STEP_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+function storeCompletedSteps(steps: number[]) {
+  localStorage.setItem(STEP_STORAGE_KEY, JSON.stringify(steps));
+}
 
 export default function Dashboard() {
   const { profile, setName, setChannelName, setAvatar, isSetup } = useCreatorProfile();
+  const { toast } = useToast();
   const [showSetup, setShowSetup] = useState(!isSetup);
   const [tempName, setTempName] = useState(profile.name);
   const [tempChannel, setTempChannel] = useState(profile.channelName);
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
+  const [completedSteps, setCompletedSteps] = useState<number[]>(getStoredSteps);
 
   const handleSaveProfile = () => {
     if (tempName.trim()) {
@@ -23,171 +100,269 @@ export default function Dashboard() {
     }
   };
 
-  const quickActions = [
-    { title: "Generate Idea", emoji: "💡", path: "/ideas", gradient: "from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)]" },
-    { title: "Write Script", emoji: "📝", path: "/script", gradient: "from-[hsl(270,100%,55%)] to-[hsl(290,100%,50%)]" },
-    { title: "Record Video", emoji: "🎬", path: "/recorder", gradient: "from-[hsl(0,100%,50%)] to-[hsl(15,100%,45%)]" },
-    { title: "Edit Video", emoji: "✂️", path: "/editor", gradient: "from-[hsl(180,100%,45%)] to-[hsl(170,100%,40%)]" },
-  ];
+  const toggleStepComplete = (stepId: number) => {
+    setCompletedSteps(prev => {
+      const updated = prev.includes(stepId) 
+        ? prev.filter(id => id !== stepId)
+        : [...prev, stepId];
+      storeCompletedSteps(updated);
+      
+      if (!prev.includes(stepId)) {
+        toast({
+          title: "Step Complete!",
+          description: stepId === STEPS.length 
+            ? "Amazing! You've completed your video!" 
+            : "Great job! Keep going!",
+        });
+      }
+      
+      return updated;
+    });
+  };
+
+  const resetProgress = () => {
+    setCompletedSteps([]);
+    storeCompletedSteps([]);
+    toast({
+      title: "Progress Reset",
+      description: "Ready to start a new video project!",
+    });
+  };
+
+  const currentStep = STEPS.find(step => !completedSteps.includes(step.id)) || STEPS[0];
+  const progressPercent = (completedSteps.length / STEPS.length) * 100;
+  const allComplete = completedSteps.length === STEPS.length;
 
   return (
-    <div className="space-y-16">
-      {/* Welcome Section with enhanced visuals */}
-      <div className="text-center py-12 relative">
-        {/* Decorative background glow */}
-        <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-          <div className="w-80 h-80 bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(180,100%,50%)] rounded-full opacity-10 blur-3xl"></div>
-        </div>
-        
-        <div className="relative z-10">
-          <div className="text-8xl mb-8 animate-bounce">{profile.avatar}</div>
-          <h1 className="font-display text-5xl mb-4 bg-gradient-to-r from-white via-[hsl(180,100%,80%)] to-white bg-clip-text text-transparent">
-            {profile.name ? `Hey ${profile.name}! 🎮` : "Welcome to TubeStar! 🚀"}
+    <div className="max-w-3xl mx-auto space-y-8">
+      {/* Header Section */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-foreground">
+            {profile.name ? `Hey ${profile.name}!` : "Welcome!"}
           </h1>
-          <p className="text-xl text-gray-300 font-medium max-w-lg mx-auto">
-            {profile.channelName ? `Let's create epic content for ${profile.channelName}` : "Your gaming studio awaits - let's level up!"}
+          <p className="text-muted-foreground mt-1">
+            {allComplete ? "All done! Start a new video?" : "Let's create your next video"}
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/roadmap">
-              <Button size="lg" className="bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,45%)] text-gray-900 hover:from-[hsl(45,100%,55%)] hover:to-[hsl(35,100%,50%)] shadow-[0_4px_20px_rgba(255,180,0,0.35)] text-lg px-8">
-                🗺️ Start Creating Video
-              </Button>
-            </Link>
-            {!isSetup && (
-              <Button size="lg" onClick={() => setShowSetup(true)} className="text-lg px-8">
-                🎮 Set Up Your Profile
-              </Button>
-            )}
-            {isSetup && (
-              <Button variant="ghost" onClick={() => setShowSetup(true)} className="text-lg">
-                ⚙️ Edit Profile
-              </Button>
-            )}
-          </div>
+        </div>
+        <Button 
+          variant="ghost" 
+          size="sm"
+          onClick={() => setShowSetup(true)}
+          className="p-2"
+          data-testid="button-edit-profile"
+        >
+          <Settings className="h-5 w-5" />
+        </Button>
+      </div>
+
+      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Progress</span>
+          <span className="font-medium">{completedSteps.length} of {STEPS.length} steps</span>
+        </div>
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-primary transition-all duration-500 ease-out"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
 
-      {/* Quick Actions - Reduced to 4 main actions */}
-      <div>
-        <h2 className="font-display text-3xl mb-8 text-center">
-          <span className="bg-gradient-to-r from-[hsl(45,100%,60%)] to-[hsl(35,100%,50%)] bg-clip-text text-transparent">⚡ Quick Start</span>
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          {quickActions.map((action) => (
-            <Link key={action.path} href={action.path}>
-              <div className={`bg-gradient-to-br ${action.gradient} p-1 rounded-2xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgba(0,150,255,0.3)] group`}>
-                <div className="bg-[hsl(220,30%,10%)] rounded-xl p-8 text-center h-full group-hover:bg-[hsl(220,30%,13%)] transition-colors">
-                  <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform">{action.emoji}</div>
-                  <h3 className="font-display text-lg text-white">{action.title}</h3>
-                </div>
+      {/* Current Step Highlight */}
+      {!allComplete && (
+        <Card className="border-primary/50 bg-primary/5">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-4">
+              <div className={`p-4 rounded-xl ${currentStep.bgColor}`}>
+                <currentStep.icon className={`h-8 w-8 ${currentStep.color}`} />
               </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Stats Cards with enhanced styling */}
-      <div>
-        <h2 className="font-display text-3xl mb-8 text-center">
-          <span className="bg-gradient-to-r from-[hsl(180,100%,60%)] to-[hsl(170,100%,50%)] bg-clip-text text-transparent">📈 Your Stats</span>
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-          <Card className="text-center border-[hsl(210,60%,40%)]">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(210,100%,60%)] to-[hsl(200,100%,50%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base mt-2">📝 Scripts Created</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="text-center border-[hsl(180,60%,40%)]">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(180,100%,50%)] to-[hsl(170,100%,45%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base mt-2">💡 Ideas Saved</CardDescription>
-            </CardHeader>
-          </Card>
-          <Card className="text-center border-[hsl(45,60%,40%)]">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,50%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base mt-2">🎨 Thumbnails Made</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
-      </div>
-
-      {/* Filming Checklist - Collapsed by default with show/hide */}
-      <div className="max-w-4xl mx-auto">
-        <Card className="border-[hsl(140,50%,35%)]">
-          <CardHeader>
-            <CardTitle className="text-2xl">📋 Filming Checklist</CardTitle>
-            <CardDescription>Quick reminders before you start recording</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[
-                { text: "Camera is clean and focused", emoji: "📸" },
-                { text: "Microphone and audio ready", emoji: "🎤" },
-                { text: "Good lighting set up", emoji: "💡" },
-                { text: "Script reviewed", emoji: "📝" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3 p-4 bg-gradient-to-r from-[hsl(140,40%,15%)] to-[hsl(160,40%,12%)] rounded-xl border border-[hsl(140,40%,25%)]">
-                  <span className="text-2xl">{item.emoji}</span>
-                  <span className="text-green-300 font-semibold">✓ {item.text}</span>
-                </div>
-              ))}
+              <div className="flex-1">
+                <p className="text-xs font-medium text-primary uppercase tracking-wide mb-1">
+                  Next Step
+                </p>
+                <h2 className="text-xl font-semibold">{currentStep.title}</h2>
+                <p className="text-muted-foreground text-sm mt-0.5">{currentStep.description}</p>
+              </div>
+              <Link href={currentStep.path}>
+                <Button data-testid="button-go-to-step">
+                  Start
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* All Complete State */}
+      {allComplete && (
+        <Card className="border-green-500/50 bg-green-500/5">
+          <CardContent className="p-6 text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/20 mb-4">
+              <Check className="h-8 w-8 text-green-400" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2">Video Complete!</h2>
+            <p className="text-muted-foreground mb-4">Great job finishing all the steps!</p>
+            <Button onClick={resetProgress} variant="secondary" data-testid="button-start-new">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Start New Video
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Steps List */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">
+          Your Roadmap
+        </h3>
+        
+        {STEPS.map((step, index) => {
+          const isComplete = completedSteps.includes(step.id);
+          const isCurrent = step.id === currentStep.id && !allComplete;
+          const Icon = step.icon;
+
+          return (
+            <div key={step.id} className="relative">
+              {/* Connector Line */}
+              {index < STEPS.length - 1 && (
+                <div 
+                  className={`absolute left-7 top-16 w-0.5 h-6 ${
+                    isComplete ? 'bg-primary' : 'bg-muted'
+                  }`}
+                />
+              )}
+              
+              <Card 
+                className={`transition-all ${
+                  isCurrent ? 'border-primary/50 shadow-sm' : ''
+                } ${isComplete ? 'bg-muted/30' : ''}`}
+                data-testid={`card-step-${step.id}`}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-4">
+                    {/* Clickable Step Number/Check - Toggle completion */}
+                    <button
+                      onClick={() => toggleStepComplete(step.id)}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all hover:scale-110 ${
+                        isComplete
+                          ? "bg-primary text-primary-foreground"
+                          : isCurrent
+                            ? "bg-primary/20 text-primary border-2 border-primary hover:bg-primary/30"
+                            : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                      data-testid={`button-toggle-step-${step.id}`}
+                    >
+                      {isComplete ? <Check className="h-5 w-5" /> : step.id}
+                    </button>
+
+                    {/* Step Icon */}
+                    <div className={`p-2 rounded-lg ${step.bgColor}`}>
+                      <Icon className={`h-5 w-5 ${step.color}`} />
+                    </div>
+
+                    {/* Step Info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className={`font-medium ${isComplete ? 'text-muted-foreground line-through' : ''}`}>
+                        {step.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground truncate">{step.description}</p>
+                    </div>
+
+                    {/* Go Button */}
+                    <Link href={step.path}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        className="p-2"
+                        data-testid={`button-step-${step.id}`}
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          );
+        })}
       </div>
+
+      {/* Reset Button */}
+      {completedSteps.length > 0 && !allComplete && (
+        <div className="text-center pt-4">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={resetProgress}
+            className="text-muted-foreground"
+            data-testid="button-reset-progress"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset Progress
+          </Button>
+        </div>
+      )}
 
       {/* Profile Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl">🎮 Set Up Your Profile</DialogTitle>
-            <DialogDescription className="text-base">
+            <DialogTitle>Set Up Your Profile</DialogTitle>
+            <DialogDescription>
               Tell us about yourself and your channel!
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-5">
             <div>
-              <Label htmlFor="name" className="text-base font-semibold">Your Name</Label>
+              <Label htmlFor="name">Your Name</Label>
               <Input
                 id="name"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Enter your name"
                 className="mt-2"
+                data-testid="input-name"
               />
             </div>
             <div>
-              <Label htmlFor="channel" className="text-base font-semibold">Channel Name (optional)</Label>
+              <Label htmlFor="channel">Channel Name (optional)</Label>
               <Input
                 id="channel"
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
                 placeholder="Enter your channel name"
                 className="mt-2"
+                data-testid="input-channel"
               />
             </div>
             <div>
-              <Label className="text-base font-semibold">Choose Your Avatar</Label>
-              <div className="grid grid-cols-6 gap-3 mt-3">
+              <Label>Choose Your Avatar</Label>
+              <div className="grid grid-cols-6 gap-2 mt-3">
                 {AVATARS.map((avatar) => (
                   <button
                     key={avatar}
                     onClick={() => setSelectedAvatar(avatar)}
-                    className={`text-4xl p-3 rounded-xl transition-all transform hover:scale-110 ${
+                    className={`text-3xl p-2 rounded-lg transition-all ${
                       selectedAvatar === avatar
-                        ? "bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)] scale-110 shadow-[0_0_20px_rgba(0,150,255,0.4)]"
-                        : "bg-[hsl(220,25%,15%)] hover:bg-[hsl(210,30%,20%)] border border-[hsl(210,30%,28%)]"
+                        ? "bg-primary scale-110"
+                        : "bg-muted hover:bg-muted/80"
                     }`}
+                    data-testid={`button-avatar-${avatar}`}
                   >
                     {avatar}
                   </button>
                 ))}
               </div>
             </div>
-            <Button onClick={handleSaveProfile} className="w-full" size="lg">
-              🚀 Save Profile
+            <Button 
+              onClick={handleSaveProfile} 
+              className="w-full"
+              data-testid="button-save-profile"
+            >
+              Save Profile
             </Button>
           </div>
         </DialogContent>
