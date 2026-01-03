@@ -8,7 +8,7 @@ const Card = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      "bg-gradient-to-br from-[hsl(250,25%,20%)] to-[hsl(280,25%,16%)] border-2 border-[hsl(280,40%,35%)] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.05)_inset] transition-all duration-300 hover:shadow-[0_12px_48px_rgba(0,0,0,0.5),0_0_20px_rgba(255,0,128,0.15)] hover:border-[hsl(320,60%,45%)] hover:translate-y-[-2px]",
+      "bg-gradient-to-br from-[hsl(220,25%,18%)] to-[hsl(210,25%,14%)] border-2 border-[hsl(210,40%,30%)] rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.05)_inset] transition-all duration-300 hover:shadow-[0_12px_48px_rgba(0,0,0,0.5),0_0_20px_rgba(0,150,255,0.15)] hover:border-[hsl(210,60%,45%)] hover:translate-y-[-2px]",
       className
     )}
     {...props}
@@ -66,7 +66,7 @@ const CardFooter = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center pt-4 border-t border-[hsl(280,30%,25%)] mt-4", className)}
+    className={cn("flex items-center pt-4 border-t border-[hsl(210,30%,22%)] mt-4", className)}
     {...props}
   />
 ));
