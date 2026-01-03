@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y \
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
+# Install all dependencies (needed for build and runtime)
 RUN npm ci
 
 # Copy source code
@@ -22,9 +22,6 @@ COPY . .
 
 # Build the application
 RUN npm run build
-
-# Remove dev dependencies to reduce image size
-RUN npm prune --production
 
 # Expose port
 EXPOSE 5000
