@@ -24,46 +24,42 @@ export default function Dashboard() {
   };
 
   const quickActions = [
-    { title: "View Progress", emoji: "🏆", path: "/progress", gradient: "from-[hsl(45,100%,45%)] to-[hsl(35,100%,50%)]" },
     { title: "Generate Idea", emoji: "💡", path: "/ideas", gradient: "from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)]" },
+    { title: "Write Script", emoji: "📝", path: "/script", gradient: "from-[hsl(270,100%,55%)] to-[hsl(290,100%,50%)]" },
     { title: "Record Video", emoji: "🎬", path: "/recorder", gradient: "from-[hsl(0,100%,50%)] to-[hsl(15,100%,45%)]" },
     { title: "Edit Video", emoji: "✂️", path: "/editor", gradient: "from-[hsl(180,100%,45%)] to-[hsl(170,100%,40%)]" },
-    { title: "AI Assistant", emoji: "🤖", path: "/ai-assistant", gradient: "from-[hsl(220,100%,55%)] to-[hsl(240,100%,50%)]" },
-    { title: "Go Viral", emoji: "🚀", path: "/viral", gradient: "from-[hsl(140,100%,45%)] to-[hsl(160,100%,40%)]" },
-    { title: "Analytics", emoji: "📊", path: "/analytics", gradient: "from-[hsl(270,100%,55%)] to-[hsl(290,100%,50%)]" },
-    { title: "Content Calendar", emoji: "📅", path: "/calendar", gradient: "from-[hsl(30,100%,50%)] to-[hsl(20,100%,45%)]" },
   ];
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-16">
       {/* Welcome Section with enhanced visuals */}
-      <div className="text-center py-10 relative">
+      <div className="text-center py-12 relative">
         {/* Decorative background glow */}
         <div className="absolute inset-0 flex justify-center items-center pointer-events-none">
-          <div className="w-64 h-64 bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(180,100%,50%)] rounded-full opacity-10 blur-3xl"></div>
+          <div className="w-80 h-80 bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(180,100%,50%)] rounded-full opacity-10 blur-3xl"></div>
         </div>
         
         <div className="relative z-10">
-          <div className="text-8xl mb-6 animate-bounce">{profile.avatar}</div>
-          <h1 className="font-display text-5xl mb-3 bg-gradient-to-r from-white via-[hsl(180,100%,80%)] to-white bg-clip-text text-transparent">
+          <div className="text-8xl mb-8 animate-bounce">{profile.avatar}</div>
+          <h1 className="font-display text-5xl mb-4 bg-gradient-to-r from-white via-[hsl(180,100%,80%)] to-white bg-clip-text text-transparent">
             {profile.name ? `Hey ${profile.name}! 🎮` : "Welcome to TubeStar! 🚀"}
           </h1>
-          <p className="text-xl text-gray-300 font-medium">
+          <p className="text-xl text-gray-300 font-medium max-w-lg mx-auto">
             {profile.channelName ? `Let's create epic content for ${profile.channelName}` : "Your gaming studio awaits - let's level up!"}
           </p>
-          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/roadmap">
-              <Button size="lg" className="bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,45%)] text-gray-900 hover:from-[hsl(45,100%,55%)] hover:to-[hsl(35,100%,50%)] shadow-[0_4px_20px_rgba(255,180,0,0.35)]">
+              <Button size="lg" className="bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,45%)] text-gray-900 hover:from-[hsl(45,100%,55%)] hover:to-[hsl(35,100%,50%)] shadow-[0_4px_20px_rgba(255,180,0,0.35)] text-lg px-8">
                 🗺️ Start Creating Video
               </Button>
             </Link>
             {!isSetup && (
-              <Button size="lg" onClick={() => setShowSetup(true)}>
+              <Button size="lg" onClick={() => setShowSetup(true)} className="text-lg px-8">
                 🎮 Set Up Your Profile
               </Button>
             )}
             {isSetup && (
-              <Button variant="ghost" onClick={() => setShowSetup(true)}>
+              <Button variant="ghost" onClick={() => setShowSetup(true)} className="text-lg">
                 ⚙️ Edit Profile
               </Button>
             )}
@@ -71,17 +67,17 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Actions with gradient cards */}
+      {/* Quick Actions - Reduced to 4 main actions */}
       <div>
-        <h2 className="font-display text-3xl mb-6 text-center">
-          <span className="bg-gradient-to-r from-[hsl(45,100%,60%)] to-[hsl(35,100%,50%)] bg-clip-text text-transparent">⚡ Quick Actions</span>
+        <h2 className="font-display text-3xl mb-8 text-center">
+          <span className="bg-gradient-to-r from-[hsl(45,100%,60%)] to-[hsl(35,100%,50%)] bg-clip-text text-transparent">⚡ Quick Start</span>
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
           {quickActions.map((action) => (
             <Link key={action.path} href={action.path}>
-              <div className={`bg-gradient-to-br ${action.gradient} p-1 rounded-2xl cursor-pointer transform transition-all duration-300 hover:scale-110 hover:shadow-[0_8px_30px_rgba(0,150,255,0.3)] group`}>
-                <div className="bg-[hsl(220,30%,10%)] rounded-xl p-6 text-center h-full group-hover:bg-[hsl(220,30%,13%)] transition-colors">
-                  <div className="text-5xl mb-3 transform group-hover:scale-125 transition-transform">{action.emoji}</div>
+              <div className={`bg-gradient-to-br ${action.gradient} p-1 rounded-2xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_30px_rgba(0,150,255,0.3)] group`}>
+                <div className="bg-[hsl(220,30%,10%)] rounded-xl p-8 text-center h-full group-hover:bg-[hsl(220,30%,13%)] transition-colors">
+                  <div className="text-5xl mb-4 transform group-hover:scale-110 transition-transform">{action.emoji}</div>
                   <h3 className="font-display text-lg text-white">{action.title}</h3>
                 </div>
               </div>
@@ -92,55 +88,55 @@ export default function Dashboard() {
 
       {/* Stats Cards with enhanced styling */}
       <div>
-        <h2 className="font-display text-3xl mb-6 text-center">
+        <h2 className="font-display text-3xl mb-8 text-center">
           <span className="bg-gradient-to-r from-[hsl(180,100%,60%)] to-[hsl(170,100%,50%)] bg-clip-text text-transparent">📈 Your Stats</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
           <Card className="text-center border-[hsl(210,60%,40%)]">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(210,100%,60%)] to-[hsl(200,100%,50%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base">📝 Scripts Created</CardDescription>
+              <CardDescription className="text-base mt-2">📝 Scripts Created</CardDescription>
             </CardHeader>
           </Card>
           <Card className="text-center border-[hsl(180,60%,40%)]">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(180,100%,50%)] to-[hsl(170,100%,45%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base">💡 Ideas Saved</CardDescription>
+              <CardDescription className="text-base mt-2">💡 Ideas Saved</CardDescription>
             </CardHeader>
           </Card>
           <Card className="text-center border-[hsl(45,60%,40%)]">
-            <CardHeader>
+            <CardHeader className="pb-4">
               <CardTitle className="text-5xl bg-gradient-to-r from-[hsl(45,100%,50%)] to-[hsl(35,100%,50%)] bg-clip-text text-transparent">0</CardTitle>
-              <CardDescription className="text-base">🎨 Thumbnails Made</CardDescription>
+              <CardDescription className="text-base mt-2">🎨 Thumbnails Made</CardDescription>
             </CardHeader>
           </Card>
         </div>
       </div>
 
-      {/* Filming Checklist with enhanced styling */}
-      <Card className="border-[hsl(140,50%,35%)]">
-        <CardHeader>
-          <CardTitle className="text-2xl">📋 Filming Checklist</CardTitle>
-          <CardDescription>Don't forget these before recording!</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {[
-              { text: "Check camera is clean and focused", emoji: "📸" },
-              { text: "Test microphone and audio levels", emoji: "🎤" },
-              { text: "Set up good lighting", emoji: "💡" },
-              { text: "Review script one more time", emoji: "📝" },
-              { text: "Clear background of clutter", emoji: "🧹" },
-              { text: "Turn off notifications on devices", emoji: "🔕" }
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 p-4 bg-gradient-to-r from-[hsl(140,40%,15%)] to-[hsl(160,40%,12%)] rounded-xl border border-[hsl(140,40%,25%)]">
-                <span className="text-2xl">{item.emoji}</span>
-                <span className="text-green-300 font-semibold">✓ {item.text}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Filming Checklist - Collapsed by default with show/hide */}
+      <div className="max-w-4xl mx-auto">
+        <Card className="border-[hsl(140,50%,35%)]">
+          <CardHeader>
+            <CardTitle className="text-2xl">📋 Filming Checklist</CardTitle>
+            <CardDescription>Quick reminders before you start recording</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { text: "Camera is clean and focused", emoji: "📸" },
+                { text: "Microphone and audio ready", emoji: "🎤" },
+                { text: "Good lighting set up", emoji: "💡" },
+                { text: "Script reviewed", emoji: "📝" },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-3 p-4 bg-gradient-to-r from-[hsl(140,40%,15%)] to-[hsl(160,40%,12%)] rounded-xl border border-[hsl(140,40%,25%)]">
+                  <span className="text-2xl">{item.emoji}</span>
+                  <span className="text-green-300 font-semibold">✓ {item.text}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Profile Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
