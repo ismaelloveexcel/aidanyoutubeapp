@@ -1,0 +1,76 @@
+Step 1: Import the Repository to Replit
+Go to replit.com and click "Create Repl"
+Select "Import from GitHub"
+Paste the repository URL: https://github.com/ismaelloveexcel/aidanyoutubeapp
+Click "Import from GitHub"
+Replit will automatically detect the Node.js project and use the .replit configuration file.
+
+Step 2: Set Up the Database
+In your Repl, click on the "Tools" panel (left sidebar)
+Find and click "Database" (or search for "PostgreSQL")
+Click "Create Database" to create a PostgreSQL database
+Replit will automatically set the DATABASE_URL environment variable
+Alternative - Use Secrets for External Database: If you prefer an external database:
+
+Click on the "Secrets" tool (🔒 icon in Tools)
+Add a new secret:
+Key: DATABASE_URL
+Value: Your PostgreSQL connection string (e.g., postgresql://user:password@host:5432/dbname)
+Step 3: Initialize the Database Schema
+Open the Shell tab in Replit
+Run the database migration:
+npm run db:push
+This creates all the necessary database tables.
+
+Step 4: Run the Application (Development)
+Click the "Run" button (▶️) at the top
+Replit will run npm run dev and start the development server
+A webview will open showing your application at the Replit URL
+Step 5: Deploy to Production
+Click the "Deploy" button (rocket icon 🚀) at the top right
+Choose "Autoscale" or "Reserved VM" deployment type:
+Autoscale: Scales automatically, pay per use
+Reserved VM: Always on, fixed monthly cost (recommended for demos)
+Click "Deploy"
+Replit will automatically:
+
+Run npm run build to build the production bundle
+Deploy using node ./dist/index.cjs
+Provide you with a production URL
+Step 6: Verify Deployment
+Visit your deployed URL (shown in the deployment panel)
+Check the health endpoint: https://your-app.replit.app/health
+Test all features to ensure everything works
+Managing Environment Variables
+Add any additional environment variables in Secrets:
+
+Key	Description	Example
+DATABASE_URL	PostgreSQL connection string	postgresql://user:pass@host:5432/db
+NODE_ENV	Environment mode	production (auto-set on deploy)
+ALLOWED_ORIGINS	CORS allowed origins	https://your-app.replit.app
+Updating Your Deployed App
+Option 1 - Manual Update:
+
+Make changes in the Replit editor
+Click "Deploy" → "Redeploy"
+Option 2 - Sync from GitHub:
+
+Click "Version Control" (Git icon in Tools)
+Pull latest changes from GitHub
+Click "Deploy" → "Redeploy"
+Troubleshooting Replit Deployment
+App Not Starting
+Check the Console for error messages
+Verify DATABASE_URL is set in Secrets
+Try running npm install in the Shell
+Database Connection Issues
+Ensure the database is created in Tools → Database
+Check that DATABASE_URL secret is correct
+Run npm run db:push to sync the schema
+Build Failures
+Clear the cache: In Shell, run rm -rf node_modules && npm install
+Check for TypeScript errors: npx tsc --noEmit
+Port Issues
+The app runs on port 5000 internally
+Replit automatically routes external traffic (port 80/443) to port 5000
+No changes needed - the .replit file handles this

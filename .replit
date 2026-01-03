@@ -1,6 +1,6 @@
 run = "npm run dev"
 entrypoint = "server/index.ts"
-modules = ["nodejs-20", "web", "nix"]
+modules = ["nodejs-20", "web"]
 
 hidden = [".config", "tsconfig.json", "tsconfig.node.json", ".gitignore"]
 
