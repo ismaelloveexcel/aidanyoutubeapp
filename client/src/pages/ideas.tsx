@@ -39,10 +39,10 @@ const VIDEO_IDEAS = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Gaming: "#FF2D95",
-  Tech: "#7C4DFF",
-  Vlog: "#40F5FF",
-  React: "#8BFF4A",
+  Gaming: "#2BD4FF",
+  Tech: "#4E4DFF",
+  Vlog: "#F3C94C",
+  React: "#6DFF9C",
 };
 
 export default function Ideas() {
@@ -108,11 +108,11 @@ export default function Ideas() {
           <div 
             className="p-3 rounded-xl"
             style={{ 
-              background: "rgba(255, 45, 149, 0.2)",
-              boxShadow: "0 0 30px rgba(255, 45, 149, 0.3)"
+              background: "rgba(43, 212, 255, 0.2)",
+              boxShadow: "0 0 30px rgba(43, 212, 255, 0.3)"
             }}
           >
-            <Lightbulb className="h-8 w-8 text-[#FF2D95]" />
+            <Lightbulb className="h-8 w-8 text-[#2BD4FF]" />
           </div>
         </div>
         <h1 className="text-4xl font-bold font-display text-white mb-2">Idea Generator</h1>
@@ -146,7 +146,7 @@ export default function Ideas() {
                   onClick={() => saveIdeaMutation.mutate(currentIdea)}
                   className="gap-2"
                   style={{ 
-                    background: "linear-gradient(135deg, #8BFF4A 0%, #00E676 100%)",
+                    background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
                     color: "#000"
                   }}
                 >
@@ -165,14 +165,14 @@ export default function Ideas() {
             </div>
           ) : (
             <div className="py-12">
-              <Sparkles className="h-16 w-16 text-[#7C4DFF] mx-auto mb-4 opacity-50" />
+              <Sparkles className="h-16 w-16 text-[#4E4DFF] mx-auto mb-4 opacity-50" />
               <Button 
                 size="lg" 
                 onClick={generateIdea}
                 className="font-display uppercase tracking-wide"
                 style={{ 
-                  background: "linear-gradient(135deg, #FF2D95 0%, #7C4DFF 100%)",
-                  boxShadow: "0 10px 30px rgba(255, 45, 149, 0.3)"
+                  background: "linear-gradient(135deg, #4E4DFF 0%, #2BD4FF 100%)",
+                  boxShadow: "0 10px 30px rgba(43, 212, 255, 0.3)"
                 }}
               >
                 Generate Idea
@@ -185,7 +185,7 @@ export default function Ideas() {
       {/* Category Buttons */}
       <div>
         <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#7C4DFF] to-transparent" />
+          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#4E4DFF] to-transparent" />
           Browse by Category
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -218,7 +218,7 @@ export default function Ideas() {
       {/* Saved Ideas */}
       <div>
         <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#40F5FF] to-transparent" />
+          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#2BD4FF] to-transparent" />
           Your Saved Ideas
         </h2>
         {savedIdeas.length === 0 ? (
@@ -238,7 +238,7 @@ export default function Ideas() {
                     <div 
                       className="inline-block px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider mb-2"
                       style={{ 
-                        background: CATEGORY_COLORS[idea.category] || "#7C4DFF",
+                        background: CATEGORY_COLORS[idea.category] || "#4E4DFF",
                         color: idea.category === "Vlog" || idea.category === "React" ? "#000" : "#fff"
                       }}
                     >
@@ -249,10 +249,10 @@ export default function Ideas() {
                   </div>
                   <button
                     onClick={() => deleteIdeaMutation.mutate(idea.id)}
-                    className="p-2 rounded-lg hover:bg-[rgba(255,45,149,0.2)] transition-colors"
+                    className="p-2 rounded-lg hover:bg-[rgba(78,77,255,0.2)] transition-colors"
                     data-testid={`button-delete-idea-${idea.id}`}
                   >
-                    <Trash2 className="h-4 w-4 text-zinc-500 hover:text-[#FF2D95]" />
+                    <Trash2 className="h-4 w-4 text-zinc-500 hover:text-[#4E4DFF]" />
                   </button>
                 </div>
               </div>

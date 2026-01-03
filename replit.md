@@ -6,10 +6,16 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 
 ## Recent Changes (January 2026)
 
-- **Futuristic Neon Synthwave Theme**: Complete redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents
+- **Aurora Nexus Arcade Theme**: Premium gaming aesthetic redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents (NO PINK - per user preference)
 - **Gaming-Inspired Visual Language**: References to Stranger Things (portal gradients), Squid Game (circle/triangle/square progress indicators), and Fortnite (holographic card effects)
-- **Neon Color Palette**: Magenta (#FF2D95), Violet (#7C4DFF), Cyan (#40F5FF), and Lime (#8BFF4A) on cosmic dark base
-- **Typography**: Space Grotesk display font for headings, Plus Jakarta Sans for body text
+- **Aurora Nexus Color Palette**:
+  - Plasma Cyan (#2BD4FF) - Primary accent
+  - Reactor Gold (#F3C94C) - Secondary accent
+  - Nebula Violet (#4E4DFF) - Tertiary accent
+  - Luminous Lime (#6DFF9C / #4BCC7A for gradients) - Success/completion
+  - Eclipse Base (#050B1F) - Dark background
+  - Warp Grid (#122046) - Card backgrounds
+- **Typography**: Rajdhani display font for headings (geometric futurism), Plus Jakarta Sans for body text
 - **Gaming Terminology**: "Victory Royale", "Quest Log", "Player Setup", "Next Mission" throughout the UX
 - **5-Step Workflow**: Generate Idea, Write Script, Record Video, Edit Video, Upload & Share
 - **Progress Tracking**: Users can mark steps as complete by clicking the step numbers
@@ -27,7 +33,7 @@ Preferred communication style: Simple, everyday language.
 - **State Management**: TanStack Query for server state, React Context for local state (creator profile)
 - **Styling**: Tailwind CSS v4 with custom theme variables, Framer Motion for animations
 - **UI Components**: Custom shadcn/ui-inspired component library in `client/src/components/ui/`
-- **Design System**: Futuristic neon synthwave with cosmic backgrounds, holographic card effects (glassmorphism), and gaming-inspired UI elements (Squid Game shapes, Stranger Things gradients)
+- **Design System**: Aurora Nexus Arcade with cosmic backgrounds (Eclipse Base/Warp Grid), holographic card effects (glassmorphism), and gaming-inspired UI elements (Squid Game shapes, Stranger Things portal gradients)
 
 ### Backend Architecture
 - **Framework**: Express.js with TypeScript

@@ -27,8 +27,8 @@ const STEPS: RoadmapStep[] = [
     description: "Come up with an awesome video concept",
     icon: Lightbulb,
     path: "/ideas",
-    color: "#FF2D95",
-    glowColor: "rgba(255, 45, 149, 0.5)",
+    color: "#2BD4FF",
+    glowColor: "rgba(43, 212, 255, 0.5)",
     shape: "circle",
   },
   {
@@ -37,8 +37,8 @@ const STEPS: RoadmapStep[] = [
     description: "Plan what you'll say and do",
     icon: FileText,
     path: "/script",
-    color: "#7C4DFF",
-    glowColor: "rgba(124, 77, 255, 0.5)",
+    color: "#4E4DFF",
+    glowColor: "rgba(78, 77, 255, 0.5)",
     shape: "triangle",
   },
   {
@@ -47,8 +47,8 @@ const STEPS: RoadmapStep[] = [
     description: "Lights, camera, action!",
     icon: Video,
     path: "/recorder",
-    color: "#40F5FF",
-    glowColor: "rgba(64, 245, 255, 0.5)",
+    color: "#6DFF9C",
+    glowColor: "rgba(109, 255, 156, 0.5)",
     shape: "square",
   },
   {
@@ -57,8 +57,8 @@ const STEPS: RoadmapStep[] = [
     description: "Add effects and make it awesome",
     icon: Scissors,
     path: "/editor",
-    color: "#8BFF4A",
-    glowColor: "rgba(139, 255, 74, 0.5)",
+    color: "#F3C94C",
+    glowColor: "rgba(243, 201, 76, 0.5)",
     shape: "circle",
   },
   {
@@ -67,8 +67,8 @@ const STEPS: RoadmapStep[] = [
     description: "Share your creation with the world!",
     icon: Upload,
     path: "/upload",
-    color: "#FF2D95",
-    glowColor: "rgba(255, 45, 149, 0.5)",
+    color: "#2BD4FF",
+    glowColor: "rgba(43, 212, 255, 0.5)",
     shape: "triangle",
   },
 ];
@@ -190,7 +190,7 @@ export default function Dashboard() {
             {profile.name ? (
               <>
                 <span className="text-white">Hey </span>
-                <span className="text-[#40F5FF]">{profile.name}</span>
+                <span className="text-[#2BD4FF]">{profile.name}</span>
                 <span className="text-white">!</span>
               </>
             ) : (
@@ -206,7 +206,7 @@ export default function Dashboard() {
           className="p-3 rounded-xl holo-card hover:neon-border-violet transition-all"
           data-testid="button-edit-profile"
         >
-          <Settings className="h-5 w-5 text-[#7C4DFF]" />
+          <Settings className="h-5 w-5 text-[#4E4DFF]" />
         </button>
       </div>
 
@@ -214,7 +214,7 @@ export default function Dashboard() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[#FF2D95]" />
+            <Zap className="h-5 w-5 text-[#F3C94C]" />
             <span className="text-sm font-bold font-display uppercase tracking-wider text-zinc-400">Progress</span>
           </div>
           <div className="flex items-center gap-3">
@@ -230,13 +230,13 @@ export default function Dashboard() {
         </div>
         
         {/* Progress Bar */}
-        <div className="relative h-3 bg-[rgba(124,77,255,0.1)] rounded-full overflow-hidden neon-border-violet">
+        <div className="relative h-3 bg-[rgba(43,212,255,0.1)] rounded-full overflow-hidden neon-border-cyan">
           <div 
             className="absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out"
             style={{ 
               width: `${progressPercent}%`,
-              background: "linear-gradient(90deg, #FF2D95 0%, #7C4DFF 50%, #40F5FF 100%)",
-              boxShadow: "0 0 20px rgba(124, 77, 255, 0.5)"
+              background: "linear-gradient(90deg, #4E4DFF 0%, #2BD4FF 50%, #6DFF9C 100%)",
+              boxShadow: "0 0 20px rgba(43, 212, 255, 0.5)"
             }}
           />
           <div className="absolute inset-0 shimmer rounded-full" />
@@ -289,8 +289,8 @@ export default function Dashboard() {
               
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <Play className="h-3 w-3 text-[#8BFF4A]" fill="#8BFF4A" />
-                  <span className="text-xs font-bold font-display text-[#8BFF4A] uppercase tracking-wider">Next Mission</span>
+                  <Play className="h-3 w-3 text-[#6DFF9C]" fill="#6DFF9C" />
+                  <span className="text-xs font-bold font-display text-[#6DFF9C] uppercase tracking-wider">Next Mission</span>
                 </div>
                 <h2 className="text-2xl font-bold font-display text-white">{currentStep.title}</h2>
                 <p className="text-zinc-400 mt-1">{currentStep.description}</p>
@@ -322,8 +322,8 @@ export default function Dashboard() {
             <div 
               className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4"
               style={{
-                background: "linear-gradient(135deg, #8BFF4A 0%, #00E676 100%)",
-                boxShadow: "0 0 40px rgba(139, 255, 74, 0.5)"
+                background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
+                boxShadow: "0 0 40px rgba(109, 255, 156, 0.5)"
               }}
             >
               <Check className="h-12 w-12 text-black" strokeWidth={3} />
@@ -348,7 +348,7 @@ export default function Dashboard() {
       {/* Steps List */}
       <div className="space-y-4">
         <h3 className="text-sm font-bold font-display text-zinc-500 uppercase tracking-wider flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#7C4DFF] to-transparent" />
+          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#2BD4FF] to-transparent" />
           Your Quest Log
         </h3>
         
@@ -367,7 +367,7 @@ export default function Dashboard() {
                     style={{
                       background: isComplete 
                         ? `linear-gradient(to bottom, ${step.color}, ${STEPS[index + 1].color})`
-                        : "rgba(124, 77, 255, 0.2)"
+                        : "rgba(43, 212, 255, 0.2)"
                     }}
                   />
                 )}
@@ -378,8 +378,8 @@ export default function Dashboard() {
                     isCurrent 
                       ? "holo-card" 
                       : isComplete 
-                        ? "bg-[rgba(139,255,74,0.05)]" 
-                        : "bg-[rgba(124,77,255,0.05)] hover:bg-[rgba(124,77,255,0.1)]"
+                        ? "bg-[rgba(109,255,156,0.05)]" 
+                        : "bg-[rgba(43,212,255,0.05)] hover:bg-[rgba(43,212,255,0.1)]"
                   )}
                   style={{
                     border: isCurrent ? `1px solid ${step.color}40` : "1px solid transparent",
@@ -397,7 +397,7 @@ export default function Dashboard() {
                           ? `linear-gradient(135deg, ${step.color} 0%, ${step.color}99 100%)`
                           : isCurrent
                             ? `${step.color}20`
-                            : "rgba(124, 77, 255, 0.1)",
+                            : "rgba(43, 212, 255, 0.1)",
                         boxShadow: isComplete 
                           ? `0 0 20px ${step.glowColor}`
                           : isCurrent 
@@ -450,8 +450,8 @@ export default function Dashboard() {
                       <button 
                         className="p-2.5 rounded-xl transition-all hover:scale-110"
                         style={{
-                          background: "rgba(124, 77, 255, 0.1)",
-                          border: "1px solid rgba(124, 77, 255, 0.2)"
+                          background: "rgba(43, 212, 255, 0.1)",
+                          border: "1px solid rgba(43, 212, 255, 0.2)"
                         }}
                         data-testid={`button-step-${step.id}`}
                       >
@@ -474,7 +474,7 @@ export default function Dashboard() {
         <div className="text-center pt-2">
           <button 
             onClick={resetProgress}
-            className="text-sm text-zinc-500 hover:text-[#FF2D95] transition-colors inline-flex items-center gap-2 font-display"
+            className="text-sm text-zinc-500 hover:text-[#2BD4FF] transition-colors inline-flex items-center gap-2 font-display"
             data-testid="button-reset-progress"
           >
             <RotateCcw className="h-4 w-4" />
@@ -485,7 +485,7 @@ export default function Dashboard() {
 
       {/* Profile Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
-        <DialogContent className="holo-card border-[rgba(124,77,255,0.3)]">
+        <DialogContent className="holo-card border-[rgba(43,212,255,0.3)]">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold font-display text-white">
               Player Setup
@@ -502,7 +502,7 @@ export default function Dashboard() {
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Enter your name"
-                className="mt-2 bg-[rgba(124,77,255,0.1)] border-[rgba(124,77,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#FF2D95] focus:ring-[#FF2D95]"
+                className="mt-2 bg-[rgba(43,212,255,0.1)] border-[rgba(43,212,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus:ring-[#2BD4FF]"
                 data-testid="input-name"
               />
             </div>
@@ -513,7 +513,7 @@ export default function Dashboard() {
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
                 placeholder="Enter your channel name"
-                className="mt-2 bg-[rgba(124,77,255,0.1)] border-[rgba(124,77,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#FF2D95] focus:ring-[#FF2D95]"
+                className="mt-2 bg-[rgba(43,212,255,0.1)] border-[rgba(43,212,255,0.3)] text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus:ring-[#2BD4FF]"
                 data-testid="input-channel"
               />
             </div>
@@ -528,14 +528,14 @@ export default function Dashboard() {
                       "text-3xl p-2.5 rounded-xl transition-all",
                       selectedAvatar === avatar
                         ? "scale-110"
-                        : "bg-[rgba(124,77,255,0.1)] hover:bg-[rgba(124,77,255,0.2)]"
+                        : "bg-[rgba(43,212,255,0.1)] hover:bg-[rgba(43,212,255,0.2)]"
                     )}
                     style={{
                       background: selectedAvatar === avatar 
-                        ? "linear-gradient(135deg, #FF2D95 0%, #7C4DFF 100%)"
+                        ? "linear-gradient(135deg, #4E4DFF 0%, #2BD4FF 100%)"
                         : undefined,
                       boxShadow: selectedAvatar === avatar 
-                        ? "0 0 20px rgba(255, 45, 149, 0.5)"
+                        ? "0 0 20px rgba(43, 212, 255, 0.5)"
                         : undefined
                     }}
                     data-testid={`button-avatar-${avatar}`}
@@ -547,10 +547,10 @@ export default function Dashboard() {
             </div>
             <button 
               onClick={handleSaveProfile} 
-              className="w-full py-3 rounded-xl text-white font-bold font-display uppercase tracking-wide transition-all hover:scale-[1.02]"
+              className="w-full py-3 rounded-xl text-black font-bold font-display uppercase tracking-wide transition-all hover:scale-[1.02]"
               style={{
-                background: "linear-gradient(135deg, #FF2D95 0%, #7C4DFF 100%)",
-                boxShadow: "0 10px 30px rgba(255, 45, 149, 0.3)"
+                background: "linear-gradient(135deg, #F3C94C 0%, #6DFF9C 100%)",
+                boxShadow: "0 10px 30px rgba(243, 201, 76, 0.3)"
               }}
               data-testid="button-save-profile"
             >
