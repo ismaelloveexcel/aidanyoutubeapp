@@ -114,13 +114,13 @@ After successful deployment, run database migrations:
 fly ssh console
 
 # Once connected, run migrations
-node -e "require('./dist/index.cjs')" & sleep 5 && npm run db:push
+npm run db:push
 
 # Exit the shell
 exit
 ```
 
-**Alternative approach** (if the above doesn't work):
+**Alternative approach** (if you prefer to run migrations locally):
 ```bash
 # Get your database connection string
 fly secrets list | grep DATABASE_URL
@@ -349,8 +349,6 @@ This app was originally configured for Replit. You can still use Replit as an al
 
 **Pros**: Easy for beginners, built-in IDE
 **Cons**: Auto-sleep, limited resources, less reliable than Fly.io
-
-See the [legacy Replit documentation](./attached_assets/REPLIT_DEPLOYMENT.md) for detailed Replit setup.
 
 ## Database Options Comparison
 

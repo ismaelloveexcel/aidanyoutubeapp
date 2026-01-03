@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --production=false
+RUN npm ci
 
 # Copy source code
 COPY . .
