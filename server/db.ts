@@ -8,7 +8,7 @@ const { Pool } = pg;
 function validateDatabaseUrl(): string {
   const databaseUrl = process.env.DATABASE_URL;
   if (!databaseUrl) {
-    console.error('❌ FATAL: DATABASE_URL environment variable is not set.');
+    console.error('FATAL ERROR: DATABASE_URL environment variable is not set.');
     console.error('');
     console.error('To fix this issue:');
     console.error('1. Set the DATABASE_URL environment variable with your PostgreSQL connection string');

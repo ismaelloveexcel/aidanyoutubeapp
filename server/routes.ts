@@ -31,10 +31,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
     };
 
     // Check database connectivity
+    let client;
     try {
-      const client = await pool.connect();
+      client = await pool.connect();
       await client.query('SELECT 1');
-      client.release();
       healthStatus.database = "connected";
     } catch (dbError) {
       healthStatus.status = "degraded";
@@ -43,6 +43,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       // Return 503 if database is not available
       res.status(503).json(healthStatus);
       return;
+    } finally {
+      if (client) {
+        client.release();
+      }
     }
 
     res.status(200).json(healthStatus);
