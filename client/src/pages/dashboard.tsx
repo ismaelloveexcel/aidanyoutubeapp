@@ -88,32 +88,35 @@ export default function Dashboard() {
   const progressPercent = (completedSteps.length / STEPS.length) * 100;
   const allComplete = completedSteps.length === STEPS.length;
 
+  // Get display name - use profile name or fallback
+  const displayName = profile.name?.trim() || "";
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 pb-8">
       {/* Welcome Header */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-sm text-[#2BD4FF] font-medium mb-1">
-            Made for Awesome {profile.name || "Creator"}
+      <div className="flex items-start justify-between gap-4 pt-2">
+        <div className="space-y-2">
+          <p className="text-sm text-[#2BD4FF] font-medium tracking-wide">
+            {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
           </p>
-          <h1 className="text-2xl sm:text-3xl font-bold font-display text-white">
-            {profile.name ? `Hey ${profile.name}, let's make magic!` : "Welcome, Creator!"}
+          <h1 className="text-3xl sm:text-4xl font-bold font-display text-white leading-tight">
+            {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
           </h1>
-          <p className="text-zinc-400 mt-1">
+          <p className="text-zinc-400 text-lg">
             {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
           </p>
         </div>
         <button 
           onClick={() => setShowSetup(true)}
-          className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-[#1a2a4a] transition-colors"
+          className="p-3 rounded-xl text-zinc-400 hover:text-white hover:bg-[#1a2a4a] transition-colors"
           data-testid="button-edit-profile"
         >
-          <Settings className="h-5 w-5" />
+          <Settings className="h-6 w-6" />
         </button>
       </div>
 
       {/* Progress Overview Card */}
-      <Card className="p-6 bg-[#0f1d32] border-[#1a2a4a]">
+      <Card className="p-8 bg-[#0f1d32] border-[#1a2a4a]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-[#F3C94C]/10">
@@ -151,19 +154,19 @@ export default function Dashboard() {
       </Card>
 
       {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-[1fr,320px] gap-6">
+      <div className="grid lg:grid-cols-[1fr,360px] gap-10">
         {/* Left Column - Timeline Roadmap */}
-        <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider px-1 flex items-center gap-2">
+        <div className="space-y-6">
+          <h3 className="text-sm font-semibold text-zinc-400 uppercase tracking-widest px-1 flex items-center gap-3">
             <Sparkles className="h-4 w-4 text-[#F3C94C]" />
             Your Quest Path
           </h3>
           
           {/* Timeline Container */}
-          <div className="relative">
+          <div className="relative pl-2">
             {/* Vertical Timeline Line */}
             <div 
-              className="absolute left-6 top-8 bottom-8 w-1 rounded-full"
+              className="absolute left-7 top-10 bottom-10 w-1.5 rounded-full"
               style={{ 
                 background: `linear-gradient(180deg, 
                   ${STEPS[0].color} 0%, 
@@ -176,62 +179,61 @@ export default function Dashboard() {
             
             {/* Progress overlay on timeline */}
             <div 
-              className="absolute left-6 top-8 w-1 rounded-full bg-[#0a1628]/80 transition-all duration-500"
+              className="absolute left-7 top-10 w-1.5 rounded-full bg-[#0a1628]/80 transition-all duration-500"
               style={{ 
-                height: `calc(${100 - progressPercent}% - 64px)`,
-                bottom: '32px'
+                height: `calc(${100 - progressPercent}% - 80px)`,
+                bottom: '40px'
               }}
             />
 
-            <div className="space-y-0">
+            <div className="space-y-6">
               {STEPS.map((step, index) => {
                 const isComplete = completedSteps.includes(step.id);
                 const isCurrent = step.id === currentStep.id && !allComplete;
                 const Icon = step.icon;
-                const isLast = index === STEPS.length - 1;
 
                 return (
                   <div 
                     key={step.id}
-                    className="relative flex items-stretch"
+                    className="relative flex items-start gap-5"
                     data-testid={`timeline-step-${step.id}`}
                   >
                     {/* Timeline Node */}
-                    <div className="flex flex-col items-center z-10">
+                    <div className="flex-shrink-0 z-10">
                       <button
-                        onClick={() => toggleStepComplete(step.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleStepComplete(step.id);
+                        }}
                         className={cn(
-                          "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all border-4",
+                          "w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl transition-all border-4",
                           isComplete
                             ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628] shadow-lg shadow-[#6DFF9C]/30"
                             : isCurrent
-                              ? "bg-[#0a1628] border-current text-current animate-pulse shadow-lg"
+                              ? "bg-[#0a1628] border-current text-current shadow-lg"
                               : "bg-[#1a2a4a] border-[#1a2a4a] text-zinc-500"
                         )}
                         style={{
                           borderColor: isCurrent ? step.color : undefined,
                           color: isCurrent ? step.color : undefined,
-                          boxShadow: isCurrent ? `0 0 20px ${step.color}40` : undefined
+                          boxShadow: isCurrent ? `0 0 24px ${step.color}50` : undefined
                         }}
                         data-testid={`button-toggle-step-${step.id}`}
                       >
-                        {isComplete ? <Check className="h-6 w-6" /> : step.id}
+                        {isComplete ? <Check className="h-7 w-7" /> : step.id}
                       </button>
-                      {/* Connector line segment */}
-                      {!isLast && (
-                        <div className="w-1 flex-1 min-h-[24px]" />
-                      )}
                     </div>
 
                     {/* Step Content Card */}
-                    <Link href={step.path} className="flex-1 ml-4 mb-6">
+                    <Link href={step.path} className="flex-1 pt-1">
                       <Card 
                         className={cn(
-                          "p-5 transition-all border cursor-pointer group",
+                          "p-6 transition-all border cursor-pointer group",
                           isCurrent 
-                            ? "bg-gradient-to-r from-[#0f1d32] to-[#1a2a4a] border-l-4 shadow-lg" 
+                            ? "bg-gradient-to-r from-[#0f1d32] to-[#1a2a4a] border-l-4 shadow-xl" 
                             : isComplete
-                              ? "bg-[#0a1628]/50 border-[#1a2a4a] opacity-70"
+                              ? "bg-[#0a1628]/50 border-[#1a2a4a] opacity-60"
                               : "bg-[#0f1d32] border-[#1a2a4a] hover:border-[#2BD4FF]/30 hover:bg-[#0f1d32]/80"
                         )}
                         style={{
@@ -239,45 +241,45 @@ export default function Dashboard() {
                         }}
                         data-testid={`card-step-${step.id}`}
                       >
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-5">
                           {/* Step Icon */}
                           <div 
                             className={cn(
-                              "flex-shrink-0 p-3 rounded-xl transition-transform",
-                              isCurrent && "scale-110"
+                              "flex-shrink-0 p-4 rounded-2xl transition-transform",
+                              isCurrent && "scale-105"
                             )}
                             style={{ background: `${step.color}20` }}
                           >
-                            <Icon className="h-6 w-6" style={{ color: step.color }} />
+                            <Icon className="h-7 w-7" style={{ color: step.color }} />
                           </div>
 
                           {/* Step Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2">
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-center gap-3 flex-wrap">
                               <h4 className={cn(
-                                "font-bold text-lg",
+                                "font-bold text-xl",
                                 isComplete ? "text-zinc-500 line-through" : "text-white"
                               )}>
                                 {step.title}
                               </h4>
                               {isCurrent && (
-                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F3C94C]/20 text-[#F3C94C]">
-                                  NOW
+                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#F3C94C]/20 text-[#F3C94C] uppercase tracking-wide">
+                                  Now
                                 </span>
                               )}
                               {isComplete && (
-                                <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-[#6DFF9C]/20 text-[#6DFF9C]">
-                                  DONE
+                                <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#6DFF9C]/20 text-[#6DFF9C] uppercase tracking-wide">
+                                  Done
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-zinc-400 mt-1">{step.description}</p>
+                            <p className="text-base text-zinc-400">{step.description}</p>
                           </div>
 
                           {/* Arrow */}
                           <ChevronRight 
                             className={cn(
-                              "flex-shrink-0 h-6 w-6 transition-transform group-hover:translate-x-1",
+                              "flex-shrink-0 h-7 w-7 transition-transform group-hover:translate-x-1",
                               isCurrent ? "text-white" : "text-zinc-500"
                             )} 
                           />
@@ -292,36 +294,36 @@ export default function Dashboard() {
         </div>
 
         {/* Right Column - Current Mission / Victory */}
-        <div className="lg:sticky lg:top-24 space-y-4">
+        <div className="lg:sticky lg:top-24 space-y-6">
           {!allComplete ? (
-            <Card className="p-6 bg-gradient-to-br from-[#0f1d32] to-[#1a2a4a] border-[#2BD4FF]/30">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 text-[#6DFF9C]">
-                  <div className="w-2 h-2 rounded-full bg-[#6DFF9C] animate-pulse" />
-                  <span className="text-xs font-semibold uppercase tracking-wider">Next Step</span>
+            <Card className="p-8 bg-gradient-to-br from-[#0f1d32] to-[#1a2a4a] border-[#2BD4FF]/30">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 text-[#6DFF9C]">
+                  <div className="w-3 h-3 rounded-full bg-[#6DFF9C] animate-pulse" />
+                  <span className="text-sm font-bold uppercase tracking-widest">Next Step</span>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   {(() => {
                     const CurrentIcon = currentStep.icon;
                     return (
                       <div 
-                        className="p-3 rounded-xl"
+                        className="p-4 rounded-2xl"
                         style={{ background: `${currentStep.color}20` }}
                       >
-                        <CurrentIcon className="h-6 w-6" style={{ color: currentStep.color }} />
+                        <CurrentIcon className="h-8 w-8" style={{ color: currentStep.color }} />
                       </div>
                     );
                   })()}
-                  <div>
-                    <h3 className="text-lg font-bold text-white">{currentStep.title}</h3>
-                    <p className="text-sm text-zinc-400">{currentStep.description}</p>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-white">{currentStep.title}</h3>
+                    <p className="text-base text-zinc-400">{currentStep.description}</p>
                   </div>
                 </div>
 
                 <Link href={currentStep.path}>
                   <Button 
-                    className="w-full gap-2 font-semibold"
+                    className="w-full gap-2 font-bold text-lg h-14"
                     style={{ 
                       background: `linear-gradient(135deg, ${currentStep.color} 0%, ${currentStep.color}cc 100%)`,
                       color: "#0a1628"
@@ -329,27 +331,27 @@ export default function Dashboard() {
                     data-testid="button-go-to-step"
                   >
                     Get Started
-                    <ChevronRight className="h-4 w-4" />
+                    <ChevronRight className="h-5 w-5" />
                   </Button>
                 </Link>
               </div>
             </Card>
           ) : (
-            <Card className="p-6 bg-gradient-to-br from-[#6DFF9C]/20 to-[#4BCC7A]/10 border-[#6DFF9C]/30">
-              <div className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#6DFF9C]">
-                  <Trophy className="h-8 w-8 text-[#0a1628]" />
+            <Card className="p-8 bg-gradient-to-br from-[#6DFF9C]/20 to-[#4BCC7A]/10 border-[#6DFF9C]/30">
+              <div className="text-center space-y-6">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#6DFF9C]">
+                  <Trophy className="h-10 w-10 text-[#0a1628]" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">Victory!</h3>
-                  <p className="text-sm text-zinc-400 mt-1">You completed all steps!</p>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-bold text-white">Victory!</h3>
+                  <p className="text-base text-zinc-400">You completed all steps!</p>
                 </div>
                 <button
                   onClick={resetProgress}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#6DFF9C]/50 text-[#6DFF9C] hover:bg-[#6DFF9C]/10 transition-colors font-medium"
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-[#6DFF9C]/50 text-[#6DFF9C] hover:bg-[#6DFF9C]/10 transition-colors font-bold"
                   data-testid="button-start-new"
                 >
-                  <RotateCcw className="h-4 w-4" />
+                  <RotateCcw className="h-5 w-5" />
                   Start New Video
                 </button>
               </div>
@@ -357,9 +359,9 @@ export default function Dashboard() {
           )}
 
           {/* Quick Tips */}
-          <Card className="p-4 bg-[#0f1d32] border-[#1a2a4a]">
-            <h4 className="text-sm font-semibold text-zinc-300 mb-2">Quick Tip</h4>
-            <p className="text-sm text-zinc-500">
+          <Card className="p-6 bg-[#0f1d32] border-[#1a2a4a]">
+            <h4 className="text-base font-semibold text-zinc-300 mb-3">Quick Tip</h4>
+            <p className="text-base text-zinc-400 leading-relaxed">
               Click the step numbers to mark them as complete. You can go in any order!
             </p>
           </Card>
