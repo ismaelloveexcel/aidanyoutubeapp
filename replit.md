@@ -7,10 +7,10 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 ## Recent Changes (January 2026)
 
 - **Redesigned UI to roadmap-focused layout**: The home page now shows a clear 5-step workflow (Generate Idea → Write Script → Record Video → Edit Video → Upload & Share)
-- **Simplified navigation**: Clean header with main workflow steps + "More" dropdown for secondary tools
+- **Polished visual design**: Modern dark theme with purple/violet gradient accents, glass-like effects, and professional typography (Plus Jakarta Sans)
+- **Simplified navigation**: Clean header with pill-style nav + "More" dropdown for secondary tools
 - **Progress tracking**: Users can mark steps as complete by clicking the numbered circles
-- **Cleaner visual design**: Reduced clutter, more whitespace, focused layout
-- **Mobile-friendly**: All workflow steps accessible on mobile bottom navigation
+- **Mobile-friendly**: All workflow steps accessible on mobile bottom navigation with safe area support
 
 ## User Preferences
 

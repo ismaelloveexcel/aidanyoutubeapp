@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { ReactNode, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3, X } from "lucide-react";
+import { Home, Lightbulb, FileText, Video, Scissors, Upload, MoreHorizontal, Palette, Sparkles, BarChart3 } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -27,19 +27,19 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3">
+      <header className="border-b border-zinc-800/50 bg-zinc-900/80 backdrop-blur-xl sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4">
             <Link href="/">
-              <span className="text-xl font-bold text-primary cursor-pointer">
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-violet-500 bg-clip-text text-transparent cursor-pointer">
                 TubeStar
               </span>
             </Link>
             
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1 bg-zinc-800/50 rounded-xl p-1">
               {mainNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location === item.path;
@@ -47,10 +47,10 @@ export default function Layout({ children }: LayoutProps) {
                   <Link key={item.path} href={item.path}>
                     <span
                       className={cn(
-                        "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                        "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all cursor-pointer",
                         isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                          ? "bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/20"
+                          : "text-zinc-400 hover:text-white hover:bg-zinc-700/50"
                       )}
                       data-testid={`nav-${item.label.toLowerCase()}`}
                     >
@@ -66,10 +66,10 @@ export default function Layout({ children }: LayoutProps) {
                 <button
                   onClick={() => setShowMore(!showMore)}
                   className={cn(
-                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                    "flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-all",
                     showMore
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                      ? "bg-zinc-700/50 text-white"
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-700/50"
                   )}
                   data-testid="nav-more"
                 >
@@ -79,14 +79,14 @@ export default function Layout({ children }: LayoutProps) {
                 {showMore && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowMore(false)} />
-                    <div className="absolute right-0 top-full mt-1 bg-card border rounded-lg shadow-lg min-w-[140px] py-1 z-50">
+                    <div className="absolute right-0 top-full mt-2 bg-zinc-800 border border-zinc-700/50 rounded-xl shadow-xl min-w-[160px] py-2 z-50">
                       {moreNavItems.map((item) => {
                         const Icon = item.icon;
                         return (
                           <Link key={item.path} href={item.path}>
                             <span
                               onClick={() => setShowMore(false)}
-                              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                              className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-zinc-700/50 transition-colors cursor-pointer"
                               data-testid={`nav-${item.label.toLowerCase().replace(' ', '-')}`}
                             >
                               <Icon className="h-4 w-4" />
@@ -104,9 +104,9 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      {/* Mobile Bottom Navigation - all main items */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t z-50">
-        <div className="flex justify-around py-2">
+      {/* Mobile Bottom Navigation */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-zinc-900/95 backdrop-blur-xl border-t border-zinc-800/50 z-50 safe-area-inset-bottom">
+        <div className="flex justify-around py-2 px-2">
           {mainNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = location === item.path;
@@ -114,15 +114,15 @@ export default function Layout({ children }: LayoutProps) {
               <Link key={item.path} href={item.path}>
                 <span
                   className={cn(
-                    "flex flex-col items-center gap-1 px-2 py-1 rounded-lg transition-colors cursor-pointer",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
                     isActive
-                      ? "text-primary"
-                      : "text-muted-foreground"
+                      ? "text-purple-400"
+                      : "text-zinc-500"
                   )}
                   data-testid={`mobile-nav-${item.label.toLowerCase()}`}
                 >
-                  <Icon className="h-5 w-5" />
-                  <span className="text-[10px]">{item.label}</span>
+                  <Icon className={cn("h-5 w-5", isActive && "drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]")} />
+                  <span className="text-[10px] font-medium">{item.label}</span>
                 </span>
               </Link>
             );
@@ -131,14 +131,14 @@ export default function Layout({ children }: LayoutProps) {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 container mx-auto px-4 py-6 pb-24 md:pb-6">
+      <main className="flex-1 container mx-auto px-4 py-8 pb-28 md:pb-8">
         {children}
       </main>
 
       {/* Footer - Desktop only */}
-      <footer className="hidden md:block border-t py-4">
+      <footer className="hidden md:block border-t border-zinc-800/50 py-6 bg-zinc-900/50">
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-zinc-500">
             Made for Awesome Aidan
           </p>
         </div>

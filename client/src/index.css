@@ -1,30 +1,30 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @theme {
-  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
 
-  --color-background: 15 23 42;
-  --color-foreground: 248 250 252;
-  --color-card: 30 41 59;
-  --color-card-foreground: 248 250 252;
-  --color-primary: 56 189 248;
-  --color-primary-foreground: 15 23 42;
-  --color-secondary: 71 85 105;
-  --color-secondary-foreground: 248 250 252;
-  --color-muted: 51 65 85;
-  --color-muted-foreground: 148 163 184;
-  --color-accent: 99 102 241;
-  --color-accent-foreground: 248 250 252;
-  --color-destructive: 239 68 68;
-  --color-destructive-foreground: 248 250 252;
-  --color-border: 51 65 85;
-  --color-input: 51 65 85;
-  --color-ring: 56 189 248;
+  --color-background: 240 10% 4%;
+  --color-foreground: 0 0% 98%;
+  --color-card: 240 6% 10%;
+  --color-card-foreground: 0 0% 98%;
+  --color-primary: 262 83% 58%;
+  --color-primary-foreground: 0 0% 100%;
+  --color-secondary: 240 5% 15%;
+  --color-secondary-foreground: 0 0% 98%;
+  --color-muted: 240 4% 16%;
+  --color-muted-foreground: 240 5% 65%;
+  --color-accent: 262 83% 58%;
+  --color-accent-foreground: 0 0% 100%;
+  --color-destructive: 0 84% 60%;
+  --color-destructive-foreground: 0 0% 100%;
+  --color-border: 240 4% 16%;
+  --color-input: 240 4% 16%;
+  --color-ring: 262 83% 58%;
 
-  --radius-lg: 0.75rem;
-  --radius-md: 0.5rem;
-  --radius-sm: 0.375rem;
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.5rem;
 }
 
 * {
@@ -35,7 +35,8 @@
 
 body {
   font-family: var(--font-sans);
-  background-color: rgb(var(--color-background));
+  background: linear-gradient(180deg, rgb(9 9 11) 0%, rgb(24 24 27) 100%);
+  background-attachment: fixed;
   color: rgb(var(--color-foreground));
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -43,10 +44,11 @@ body {
 }
 
 .sticker-card {
-  background-color: rgb(var(--color-card));
-  border: 1px solid rgb(var(--color-border));
+  background: linear-gradient(145deg, rgba(39, 39, 42, 0.8) 0%, rgba(24, 24, 27, 0.9) 100%);
+  border: 1px solid rgba(63, 63, 70, 0.5);
   border-radius: var(--radius-lg);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
 }
 
 .hover-elevate {
@@ -55,13 +57,47 @@ body {
 
 .hover-elevate:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-}
-
-.active-elevate-2 {
-  transition: all 0.1s ease;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
 .active-elevate-2:active {
   transform: translateY(0);
+}
+
+.gradient-primary {
+  background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+}
+
+.gradient-amber {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+}
+
+.gradient-red {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.gradient-cyan {
+  background: linear-gradient(135deg, #22d3ee 0%, #06b6d4 100%);
+}
+
+.gradient-green {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
+
+.glass-card {
+  background: rgba(39, 39, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(63, 63, 70, 0.4);
+}
+
+.glow-purple {
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.2), 0 0 60px rgba(168, 85, 247, 0.1);
+}
+
+.glow-amber {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
 }
