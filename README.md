@@ -67,24 +67,26 @@ npm run build
 npm start
 ```
 
-## Deploy to Replit
+## Deploy to Replit ⭐
 
-This app is Replit-ready with autoscale deployment support! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete deployment instructions.
+This app is fully Replit-ready with one-click deployment! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.
 
 **Quick Start on Replit:**
-1. Import this repository to Replit
-2. Add `DATABASE_URL` to Replit Secrets
-3. Run `npm install`
-4. Run `npm run db:push`
-5. Click "Run" to start development
+1. Go to [replit.com](https://replit.com) and click "Create Repl"
+2. Select "Import from GitHub" and paste: `https://github.com/ismaelloveexcel/aidanyoutubeapp`
+3. In Tools → Database, create a PostgreSQL database (auto-configures `DATABASE_URL`)
+4. Open Shell and run `npm run db:push`
+5. Click "Run" ▶️ to start development
+6. Click "Deploy" 🚀 for production deployment
 
-**Production Deployment:**
-1. Click the "Deploy" button in Replit
-2. Select "Autoscale" deployment
-3. Add production secrets
-4. Click "Deploy"
+**Why Replit?**
+- Visual IDE - no command line required
+- Built-in PostgreSQL database
+- One-click deployment
+- Automatic HTTPS
+- Easy environment variable management
 
-**⚠️ Security Note**: Before deploying to production, review [SECURITY.md](./SECURITY.md) for critical security issues that must be addressed.
+**⚠️ Security Note**: Before deploying to production, review [SECURITY.md](./SECURITY.md) for important security considerations.
 
 ## Database Tables
 
