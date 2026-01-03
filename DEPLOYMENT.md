@@ -2,6 +2,8 @@
 
 ## Deploying to Replit
 
+This project is fully configured for Replit deployment with autoscaling support.
+
 ### Prerequisites
 - A Replit account
 - A PostgreSQL database (Replit PostgreSQL or external like Neon, Supabase)
@@ -53,22 +55,50 @@ Run migrations to set up database tables:
 npm run db:push
 ```
 
-### Step 6: Build and Run
+### Step 6: Build and Run (Development)
 
 #### Development Mode
 ```bash
 npm run dev
 ```
 
-#### Production Mode
-```bash
-npm run build
-npm start
+Click the "Run" button in Replit to start the development server!
+
+### Step 7: Deploy to Production with Replit Deployments
+
+This repository includes a pre-configured `.replit` file with deployment settings for Replit's autoscale deployment feature.
+
+#### Using Replit Deployments (Recommended for Production)
+
+1. Click the "Deploy" button in the top right corner of your Repl
+2. Select "Autoscale" deployment type (already configured)
+3. Review the deployment settings:
+   - **Build command**: `npm run build`
+   - **Run command**: `npm install --production && npm start`
+4. Add your production environment secrets in the deployment settings
+5. Click "Deploy" to publish your app
+
+#### Deployment Configuration
+
+The `.replit` file includes these deployment settings:
+
+```toml
+[deployment]
+run = ["sh", "-c", "npm install --production && npm start"]
+deploymentTarget = "autoscale"
+build = ["npm", "run", "build"]
 ```
 
-### Step 7: Access Your App
+This configuration ensures:
+- Your app is built before deployment
+- Production dependencies are installed
+- The app starts with `npm start` in production mode
+- Autoscaling handles traffic automatically
 
-Click the "Open in new tab" button in Replit to see your app running!
+### Step 8: Access Your App
+
+- **Development**: Click the "Open in new tab" button in Replit
+- **Production**: Your deployed app will have a URL like `https://your-repl-name-your-username.replit.app`
 
 ## Replit Configuration Files
 
@@ -134,11 +164,24 @@ In Replit:
 
 ## Scaling Considerations
 
-Replit free tier limitations:
+### Replit Development (Free Tier)
 - Limited CPU and memory
 - Repls may sleep after inactivity
-- Consider upgrading to Replit Hacker plan for always-on
+- Great for development and testing
 
+### Replit Deployments (Production)
+This app is configured for Replit's Autoscale deployment:
+- **Always-on**: Your deployed app stays running 24/7
+- **Auto-scaling**: Handles traffic spikes automatically
+- **Custom domains**: Connect your own domain
+- **Production-ready**: Optimized for performance
+
+To upgrade your deployment:
+1. Go to your Repl's Deploy settings
+2. Choose a deployment plan that fits your needs
+3. Configure scaling options if needed
+
+### Alternative Platforms
 For heavy production use, consider:
 - Deploying to Vercel, Railway, or Render
 - Using a dedicated server
