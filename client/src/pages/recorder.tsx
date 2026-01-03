@@ -5,6 +5,15 @@ import { useToast } from "@/hooks/use-toast";
 
 type RecordingMode = "webcam" | "screen" | null;
 
+// Default MIME type and supported formats for cross-browser compatibility
+const DEFAULT_MIME_TYPE = "video/webm";
+const SUPPORTED_MIME_TYPES = [
+  "video/webm;codecs=vp9",
+  "video/webm;codecs=vp8",
+  "video/webm",
+  "video/mp4",
+];
+
 export default function VideoRecorder() {
   const [mode, setMode] = useState<RecordingMode>(null);
   const [isRecording, setIsRecording] = useState(false);
@@ -12,6 +21,7 @@ export default function VideoRecorder() {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecording, setHasRecording] = useState(false);
+  const [recordedMimeType, setRecordedMimeType] = useState(DEFAULT_MIME_TYPE);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -77,9 +87,29 @@ export default function VideoRecorder() {
   const startRecording = () => {
     if (!streamRef.current) return;
 
-    const options = { mimeType: "video/webm;codecs=vp9" };
+    // Find a supported MIME type for video recording
+    let mimeType = "";
+    for (const type of SUPPORTED_MIME_TYPES) {
+      if (MediaRecorder.isTypeSupported(type)) {
+        mimeType = type;
+        break;
+      }
+    }
+    
+    if (!mimeType) {
+      toast({
+        title: "Recording Error",
+        description: "Your browser doesn't support video recording. Try Chrome or Firefox.",
+      });
+      return;
+    }
+
+    const options = { mimeType };
     const mediaRecorder = new MediaRecorder(streamRef.current, options);
     const chunks: Blob[] = [];
+    
+    // Save the mime type for download
+    setRecordedMimeType(mimeType);
 
     mediaRecorder.ondataavailable = (event) => {
       if (event.data.size > 0) {
@@ -135,11 +165,12 @@ export default function VideoRecorder() {
   const downloadVideo = () => {
     if (recordedChunks.length === 0) return;
 
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const blob = new Blob(recordedChunks, { type: recordedMimeType });
     const url = URL.createObjectURL(blob);
+    const extension = recordedMimeType.includes("mp4") ? "mp4" : "webm";
     const a = document.createElement("a");
     a.href = url;
-    a.download = `tubestar-video-${Date.now()}.webm`;
+    a.download = `tubestar-video-${Date.now()}.${extension}`;
     a.click();
     URL.revokeObjectURL(url);
 
@@ -152,7 +183,7 @@ export default function VideoRecorder() {
   const playback = () => {
     if (recordedChunks.length === 0) return;
 
-    const blob = new Blob(recordedChunks, { type: "video/webm" });
+    const blob = new Blob(recordedChunks, { type: recordedMimeType });
     const url = URL.createObjectURL(blob);
 
     stopStream();
@@ -167,6 +198,7 @@ export default function VideoRecorder() {
   const resetRecording = () => {
     setRecordedChunks([]);
     setHasRecording(false);
+    setRecordedMimeType(DEFAULT_MIME_TYPE);
     setMode(null);
     stopStream();
     if (videoRef.current) {

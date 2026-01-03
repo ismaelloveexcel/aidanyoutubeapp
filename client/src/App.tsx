@@ -22,29 +22,35 @@ import Calendar from "@/pages/calendar";
 import MultiPlatform from "@/pages/multi-platform";
 import AIAssistant from "@/pages/ai-assistant";
 import Login from "@/pages/login";
+import Roadmap from "@/pages/roadmap";
 
 function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
-      <Layout>
-        <Route path="/" component={Dashboard} />
-        <Route path="/ideas" component={Ideas} />
-        <Route path="/script" component={Script} />
-        <Route path="/templates" component={Templates} />
-        <Route path="/thumbnail" component={Thumbnail} />
-        <Route path="/soundboard" component={Soundboard} />
-        <Route path="/recorder" component={VideoRecorder} />
-        <Route path="/editor" component={VideoEditor} />
-        <Route path="/viral" component={ViralOptimizer} />
-        <Route path="/upload" component={YouTubeUpload} />
-        <Route path="/progress" component={Progress} />
-        <Route path="/analytics" component={Analytics} />
-        <Route path="/calendar" component={Calendar} />
-        <Route path="/multi-platform" component={MultiPlatform} />
-        <Route path="/ai-assistant" component={AIAssistant} />
-        <Route component={NotFound} />
-      </Layout>
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/" component={Dashboard} />
+            <Route path="/roadmap" component={Roadmap} />
+            <Route path="/ideas" component={Ideas} />
+            <Route path="/script" component={Script} />
+            <Route path="/templates" component={Templates} />
+            <Route path="/thumbnail" component={Thumbnail} />
+            <Route path="/soundboard" component={Soundboard} />
+            <Route path="/recorder" component={VideoRecorder} />
+            <Route path="/editor" component={VideoEditor} />
+            <Route path="/viral" component={ViralOptimizer} />
+            <Route path="/upload" component={YouTubeUpload} />
+            <Route path="/progress" component={Progress} />
+            <Route path="/analytics" component={Analytics} />
+            <Route path="/calendar" component={Calendar} />
+            <Route path="/multi-platform" component={MultiPlatform} />
+            <Route path="/ai-assistant" component={AIAssistant} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+      </Route>
     </Switch>
   );
 }
