@@ -4,15 +4,31 @@ import * as schema from "@shared/schema";
 
 const { Pool } = pg;
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// Validate DATABASE_URL at startup but log a clear message instead of crashing
+function validateDatabaseUrl(): string {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    console.error('FATAL ERROR: DATABASE_URL environment variable is not set.');
+    console.error('');
+    console.error('To fix this issue:');
+    console.error('1. Set the DATABASE_URL environment variable with your PostgreSQL connection string');
+    console.error('2. For Fly.io: Run "fly secrets set DATABASE_URL=<your-connection-string>"');
+    console.error('3. For local development: Create a .env file with DATABASE_URL=<your-connection-string>');
+    console.error('');
+    console.error('Example: DATABASE_URL=postgresql://user:password@localhost:5432/tubestar');
+    console.error('');
+    // Exit with a clear error code so the process doesn't restart infinitely
+    // Exit code 1 indicates an error, Fly.io will see this and may stop restart attempts
+    process.exit(1);
+  }
+  return databaseUrl;
 }
+
+const databaseUrl = validateDatabaseUrl();
 
 // Configure connection pool with reasonable limits
 export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
+  connectionString: databaseUrl,
   max: 20, // Maximum number of connections in the pool
   idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
   connectionTimeoutMillis: 10000, // Timeout after 10 seconds when connecting
