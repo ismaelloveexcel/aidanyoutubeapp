@@ -164,7 +164,10 @@ function storeCompletedSteps(steps: number[]) {
 export default function Dashboard() {
   const { profile, setName, setChannelName, setAvatar, setRememberMe, isSetup } = useCreatorProfile();
   const { toast } = useToast();
-  const [showSetup, setShowSetup] = useState(!isSetup || !profile.rememberMe);
+  const [showSetup, setShowSetup] = useState(() => {
+    const isSetupDone = localStorage.getItem('tubestar-profile');
+    return !isSetupDone;
+  });
   const [showTour, setShowTour] = useState(false);
   const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem("aidan-welcome"));
   const [firstVisit, setFirstVisit] = useState(() => !localStorage.getItem("aidan-onboarded"));
