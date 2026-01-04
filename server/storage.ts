@@ -35,6 +35,7 @@ export interface IStorage {
   getAllVideoProjects(): Promise<VideoProject[]>;
   deleteVideoProject(id: number): Promise<boolean>;
   getVideoProjectStats(): Promise<{ total: number; draft: number; inProgress: number; published: number }>;
+  getRecentVideoProjects(limit?: number): Promise<VideoProject[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -157,6 +158,9 @@ export class DatabaseStorage implements IStorage {
     const inProgress = projects.filter(p => p.status === "in_progress").length;
     const published = projects.filter(p => p.status === "published").length;
     return { total: projects.length, draft, inProgress, published };
+  }
+  async getRecentVideoProjects(limit: number = 5): Promise<VideoProject[]> {
+    return await db.select().from(videoProjects).orderBy(desc(videoProjects.updatedAt)).limit(limit);
   }
 }
 

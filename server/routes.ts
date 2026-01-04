@@ -278,6 +278,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
   app.get("/api/video-projects/stats", async (req, res) => {
     try { res.json(await storage.getVideoProjectStats()); } catch { res.status(500).json({ error: "Failed to fetch video project stats" }); }
   });
+  app.get("/api/video-projects/recent", async (req, res) => {
+    try { res.json(await storage.getRecentVideoProjects(5)); } catch { res.status(500).json({ error: "Failed to fetch recent video projects" }); }
+  });
   app.get("/api/video-projects/:id", async (req, res) => {
     try {
       const id = parseIdParam(req.params.id);
