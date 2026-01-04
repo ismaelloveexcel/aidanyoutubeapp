@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useCreatorProfile, AVATARS } from "@/lib/creator-profile";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import * as LucideIcons from "lucide-react";
@@ -17,17 +19,19 @@ import {
   Scissors,
   Upload,
   ChevronRight,
+  ChevronDown,
   Check,
   RotateCcw,
   Settings,
   Trophy,
-  Target,
   Sparkles,
   Palette,
   Megaphone,
   Brain,
   PlaySquare,
   CalendarClock,
+  Film,
+  Loader2,
 } from "lucide-react";
 
 interface RoadmapStep {
@@ -47,7 +51,7 @@ const STEPS: RoadmapStep[] = [
   { id: 5, title: "Upload & Share", description: "Share with the world!", icon: Upload, path: "/upload", color: "#2BD4FF" },
 ];
 
-const TOOLKIT_ITEMS = [
+const IDEA_TOOLS = [
   {
     title: "Ideas Lab",
     description: "Instant hooks, headlines, and prompts to spark the episode.",
@@ -65,6 +69,25 @@ const TOOLKIT_ITEMS = [
     label: "Story",
   },
   {
+    title: "Thumbnail Atelier",
+    description: "Design scroll-stopping thumbnails with ready palettes.",
+    path: "/thumbnail",
+    icon: Palette,
+    color: "#A259FF",
+    label: "Design",
+  },
+  {
+    title: "AI Wingman",
+    description: "Ask for fixes, captions, or growth tips while you build.",
+    path: "/ai-assistant",
+    icon: Brain,
+    color: "#6DFF9C",
+    label: "Support",
+  },
+];
+
+const VIDEO_TOOLS = [
+  {
     title: "Record Suite",
     description: "Capture camera, screen, or both with simple audio checks.",
     path: "/recorder",
@@ -81,24 +104,8 @@ const TOOLKIT_ITEMS = [
     label: "Polish",
   },
   {
-    title: "Thumbnail Atelier",
-    description: "Design scroll-stopping thumbnails with ready palettes.",
-    path: "/thumbnail",
-    icon: Palette,
-    color: "#A259FF",
-    label: "Design",
-  },
-  {
-    title: "AI Wingman",
-    description: "Ask for fixes, captions, or growth tips while you build.",
-    path: "/ai-assistant",
-    icon: Brain,
-    color: "#6DFF9C",
-    label: "Support",
-  },
-  {
     title: "Analytics & Pulse",
-    description: "Track what’s resonating and where to improve next upload.",
+    description: "Track what's resonating and where to improve next upload.",
     path: "/analytics",
     icon: PlaySquare,
     color: "#2BD4FF",
@@ -122,30 +129,6 @@ const TOOLKIT_ITEMS = [
   },
 ];
 
-const QUICK_ACTIONS = [
-  {
-    title: "View roadmap",
-    description: "See what's up next and track every milestone.",
-    path: "/roadmap",
-    icon: Target,
-    color: "#2BD4FF",
-  },
-  {
-    title: "Start recording",
-    description: "Jump into camera or screen capture with checks done for you.",
-    path: "/recorder",
-    icon: Video,
-    color: "#6DFF9C",
-  },
-  {
-    title: "Edit your cut",
-    description: "Trim, add reactions, and polish pacing before sharing.",
-    path: "/editor",
-    icon: Scissors,
-    color: "#F3C94C",
-  },
-];
-
 const STEP_STORAGE_KEY = "tubestar-completed-steps";
 
 function getStoredSteps(): number[] {
@@ -161,30 +144,31 @@ function storeCompletedSteps(steps: number[]) {
   localStorage.setItem(STEP_STORAGE_KEY, JSON.stringify(steps));
 }
 
+interface VideoStats {
+  total: number;
+  draft: number;
+  inProgress: number;
+  published: number;
+}
+
 export default function Dashboard() {
-  const { profile, setName, setChannelName, setAvatar, setRememberMe, isSetup } = useCreatorProfile();
+  const { profile, setName, setChannelName, setAvatar, setRememberMe } = useCreatorProfile();
   const { toast } = useToast();
   const [showSetup, setShowSetup] = useState(() => {
     const isSetupDone = localStorage.getItem('tubestar-profile');
     return !isSetupDone;
   });
-  const [showTour, setShowTour] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem("aidan-welcome"));
-  const [firstVisit, setFirstVisit] = useState(() => !localStorage.getItem("aidan-onboarded"));
-  useEffect(() => {
-    if (firstVisit) {
-      setShowTour(true);
-      localStorage.setItem("aidan-onboarded", "true");
-    }
-    if (showWelcome) {
-      localStorage.setItem("aidan-welcome", "true");
-    }
-  }, [firstVisit, showWelcome]);
   const [tempName, setTempName] = useState(profile.name);
   const [tempChannel, setTempChannel] = useState(profile.channelName);
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
   const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe);
   const [completedSteps, setCompletedSteps] = useState<number[]>(getStoredSteps);
+  const [ideaToolsOpen, setIdeaToolsOpen] = useState(true);
+  const [videoToolsOpen, setVideoToolsOpen] = useState(true);
+
+  const { data: videoStats, isLoading: statsLoading } = useQuery<VideoStats>({
+    queryKey: ['/api/video-projects/stats'],
+  });
 
   const handleSaveProfile = () => {
     if (tempName.trim()) {
@@ -228,454 +212,250 @@ export default function Dashboard() {
   const channelTag = profile.channelName?.trim() || "New Channel";
 
   return (
-    <div className="space-y-10 sm:space-y-12 pb-14">
-      {/* Welcome Modal for First-Time Users */}
-      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
-        <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/40 max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white font-display">Welcome to TubeStar!</DialogTitle>
-            <DialogDescription className="text-zinc-300 text-base mt-2">
-              <span className="block mb-2">This app is your all-in-one creative studio to help you become a YouTuber. Plan, record, edit, and share your videos with tools inspired by your favorite creators and apps like CapCut.</span>
-              <span className="block mb-2">Get started with templates, music, effects, and more. Every step is designed to make your journey fun and easy!</span>
-              <span className="block font-semibold text-[#2BD4FF]">Dream big. Create boldly. Shine online.</span>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-4 mt-4">
-            <div className="rounded-lg bg-[#2BD4FF]/10 border border-[#2BD4FF]/20 p-3 text-sm text-zinc-200">
-              <strong className="text-[#2BD4FF]">What can you do?</strong> <br />
-              <ul className="list-disc pl-5 mt-1 space-y-1">
-                <li>Use viral video templates and pro tips</li>
-                <li>Add music, sound effects, and overlays</li>
-                <li>Edit with easy tools and cool transitions</li>
-                <li>Track your progress and unlock achievements</li>
-                <li>Get AI help for ideas, scripts, and more</li>
-              </ul>
-            </div>
-            <div className="rounded-lg bg-[#6DFF9C]/10 border border-[#6DFF9C]/20 p-3 text-sm text-zinc-200">
-              <strong className="text-[#6DFF9C]">Tip:</strong> Explore each tab at your own pace. You can always revisit this welcome from the dashboard.
-            </div>
-          </div>
-          <Button className="w-full mt-6" onClick={() => setShowWelcome(false)} aria-label="Close Welcome">
-            Let's Go!
-          </Button>
-        </DialogContent>
-      </Dialog>
-
-      {/* Feature Tour Dialog */}
-      <Dialog open={showTour} onOpenChange={setShowTour}>
-        <DialogContent className="bg-[#0a1525] border-[#1a2a4a]/60 max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-white">Feature tour</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              A calm walkthrough so every tool feels easy to find.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 mt-4 text-sm text-zinc-300">
-            <div className="p-3 rounded-lg bg-[#2BD4FF]/10 border border-[#2BD4FF]/20">
-              <strong className="text-[#2BD4FF]">Ideas & Script</strong> — start with hooks, outlines, and friendly prompts.
-            </div>
-            <div className="p-3 rounded-lg bg-[#6DFF9C]/10 border border-[#6DFF9C]/15">
-              <strong className="text-[#6DFF9C]">Record & Edit</strong> — capture, trim, and tighten pacing without fuss.
-            </div>
-            <div className="p-3 rounded-lg bg-[#F3C94C]/10 border border-[#F3C94C]/20">
-              <strong className="text-[#F3C94C]">Thumbnail & Upload</strong> — polish the look, then share to YouTube.
-            </div>
-            <div className="p-3 rounded-lg bg-[#4E4DFF]/10 border border-[#4E4DFF]/20">
-              <strong className="text-[#4E4DFF]">AI Wingman</strong> — ask for tips, captions, or fixes while you build.
-            </div>
-          </div>
-          <Button className="w-full mt-6" onClick={() => setShowTour(false)} aria-label="Close Tour">
-            Let's create!
-          </Button>
-        </DialogContent>
-      </Dialog>
-
-      <div className="grid gap-6 lg:grid-cols-[2fr,1fr] items-stretch">
-        <Card className="relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.75)]">
-          <div className="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_18%_18%,rgba(43,212,255,0.22),transparent_42%),radial-gradient(circle_at_80%_0%,rgba(243,201,76,0.16),transparent_35%),linear-gradient(120deg,rgba(255,255,255,0.04),transparent)]" />
-          <div className="relative space-y-4">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Gifted to Aidan • Doodletastic Dusty</p>
-                <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight">
-                  {displayName ? `Hey ${displayName}, ready to ship your next upload?` : "Welcome—let's ship your next upload."}
-                </h1>
-                <p className="text-zinc-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-                  A polished dashboard that keeps the essentials in view: roadmap, toolkit, and next steps without the clutter.
-                </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white">{channelTag}</span>
-                  <span className="px-3 py-1 rounded-full bg-[#2BD4FF]/12 border border-[#2BD4FF]/30 text-xs font-semibold text-[#2BD4FF]">{completedSteps.length} / {STEPS.length} steps</span>
-                  <span className="px-3 py-1 rounded-full bg-[#6DFF9C]/12 border border-[#6DFF9C]/25 text-xs font-semibold text-[#6DFF9C]">Guided mode on</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-zinc-100 border-white/15 hover:border-[#2BD4FF]/40" onClick={() => setShowTour(true)}>
-                  <Sparkles className="h-4 w-4 mr-2" /> Feature tour
-                </Button>
-                <Button variant="ghost" size="sm" className="text-zinc-200 hover:text-white" onClick={() => setShowSetup(true)}>
-                  <Settings className="h-4 w-4 mr-2" /> Personalize
-                </Button>
+    <div className="space-y-8 pb-14">
+      {/* Hero Section with Stats */}
+      <Card className="relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.75)]">
+        <div className="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_18%_18%,rgba(43,212,255,0.22),transparent_42%),radial-gradient(circle_at_80%_0%,rgba(243,201,76,0.16),transparent_35%),linear-gradient(120deg,rgba(255,255,255,0.04),transparent)]" />
+        <div className="relative space-y-5">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div className="space-y-2">
+              <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Gifted to Aidan</p>
+              <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight">
+                {displayName ? `Hey ${displayName}, ready to create?` : "Welcome! Let's make something awesome."}
+              </h1>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white">{channelTag}</span>
               </div>
             </div>
+            <Button variant="ghost" size="sm" className="text-zinc-200 hover:text-white" onClick={() => setShowSetup(true)}>
+              <Settings className="h-4 w-4 mr-2" /> Profile
+            </Button>
+          </div>
 
-            <div className="grid gap-4 sm:grid-cols-3 items-stretch">
-              <div className="sm:col-span-2 p-4 rounded-2xl bg-white/5 border border-white/10 shadow-inner">
-                <div className="flex items-center justify-between text-sm text-zinc-300">
-                  <div className="flex items-center gap-2 font-semibold text-white">
-                    <Target className="h-4 w-4 text-[#6DFF9C]" /> Production progress
-                  </div>
-                  <span className="text-xs text-zinc-400">{progressPercent.toFixed(0)}% complete</span>
-                </div>
-                <div className="mt-3 h-2.5 bg-[#0c1322] rounded-full overflow-hidden border border-[#1a2a4a]/70">
-                  <div
-                    className="h-full rounded-full transition-all duration-700 ease-out"
-                    style={{
-                      width: `${progressPercent}%`,
-                      background: "linear-gradient(90deg, #2BD4FF 0%, #6DFF9C 50%, #F3C94C 100%)"
-                    }}
-                  />
-                </div>
-                <div className="mt-3 flex flex-wrap gap-3 text-xs text-zinc-300">
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#2BD4FF]/10 border border-[#2BD4FF]/20 text-[#2BD4FF]">
-                    <Sparkles className="h-3.5 w-3.5" /> Current: {currentStep.title}
-                  </span>
-                  {completedSteps.length > 0 && (
+          {/* Video Stats Cards */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                <Film className="h-3.5 w-3.5" /> Videos Made
+              </div>
+              <div className="text-2xl font-bold text-white" data-testid="stat-videos-published">
+                {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.published ?? 0}
+              </div>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                <Scissors className="h-3.5 w-3.5" /> In Progress
+              </div>
+              <div className="text-2xl font-bold text-[#F3C94C]" data-testid="stat-videos-in-progress">
+                {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
+              </div>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                <Sparkles className="h-3.5 w-3.5" /> Steps Done
+              </div>
+              <div className="text-2xl font-bold text-[#6DFF9C]" data-testid="stat-steps-done">
+                {completedSteps.length}/{STEPS.length}
+              </div>
+            </div>
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
+                <Trophy className="h-3.5 w-3.5" /> Progress
+              </div>
+              <div className="text-2xl font-bold text-[#2BD4FF]" data-testid="stat-progress">
+                {progressPercent.toFixed(0)}%
+              </div>
+            </div>
+          </div>
+
+          {/* Compact Horizontal Roadmap Strip */}
+          <div className="p-4 rounded-xl bg-[#0c1322] border border-[#1a2a4a]/70">
+            <div className="flex items-center justify-between gap-4 mb-3">
+              <span className="text-xs uppercase tracking-[0.2em] text-zinc-500 font-semibold">Road to Publish</span>
+              {completedSteps.length > 0 && (
+                <button
+                  onClick={resetProgress}
+                  className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs text-zinc-400 hover:text-white transition"
+                  data-testid="button-reset-progress"
+                >
+                  <RotateCcw className="h-3 w-3" /> Reset
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {STEPS.map((step, idx) => {
+                const isComplete = completedSteps.includes(step.id);
+                const isCurrent = step.id === currentStep.id && !allComplete;
+                const Icon = step.icon;
+                return (
+                  <div key={step.id} className="flex items-center gap-2 shrink-0">
                     <button
-                      onClick={resetProgress}
-                      className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition"
-                      data-testid="button-reset-progress"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" /> Reset progress
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              <Card className="relative p-4 bg-[#0f1f3f]/70 border-white/10 h-full overflow-hidden">
-                <div className="absolute -right-8 -bottom-8 w-32 h-32 rounded-full bg-[#2BD4FF]/10" />
-                <div className="relative space-y-2">
-                  <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">Next focus</p>
-                  <h3 className="text-lg font-semibold text-white">{currentStep.title}</h3>
-                  <p className="text-sm text-zinc-300 leading-relaxed">{currentStep.description}</p>
-                  <Link href={currentStep.path}>
-                    <Button
-                      className="mt-3 w-full gap-2 font-semibold text-sm h-11"
+                      onClick={() => toggleStepComplete(step.id)}
+                      className={cn(
+                        "w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all border-2",
+                        isComplete
+                          ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628]"
+                          : isCurrent
+                            ? "bg-[#0a1628] animate-pulse"
+                            : "bg-[#0f1f3f] border-[#1a2a4a]/80 text-zinc-500"
+                      )}
                       style={{
-                        background: currentStep.color,
-                        color: "#0a1628"
+                        borderColor: isCurrent && !isComplete ? step.color : undefined,
+                        color: isCurrent && !isComplete ? step.color : undefined,
                       }}
-                      data-testid="button-go-to-step"
+                      data-testid={`button-step-${step.id}`}
+                      title={`${step.title} - Click to mark ${isComplete ? 'incomplete' : 'complete'}`}
                     >
-                      Resume step
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                      {isComplete ? <Check className="h-4 w-4" /> : step.id}
+                    </button>
+                    <Link href={step.path}>
+                      <div
+                        className={cn(
+                          "flex items-center gap-2 px-3 py-1.5 rounded-lg transition cursor-pointer",
+                          isCurrent ? "bg-white/10" : "hover:bg-white/5"
+                        )}
+                      >
+                        <Icon className="h-4 w-4" style={{ color: step.color }} />
+                        <span className={cn("text-sm font-medium", isComplete ? "text-zinc-500 line-through" : "text-white")}>
+                          {step.title}
+                        </span>
+                      </div>
+                    </Link>
+                    {idx < STEPS.length - 1 && (
+                      <div className="w-6 h-0.5 bg-[#1a2a4a]" />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Current Step CTA */}
+            {!allComplete && (
+              <div className="mt-4 pt-3 border-t border-[#1a2a4a]/50 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-[#6DFF9C] animate-pulse" />
+                  <span className="text-sm text-zinc-300">
+                    <span className="font-semibold text-white">Next:</span> {currentStep.title} - {currentStep.description}
+                  </span>
                 </div>
-              </Card>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6 bg-[#0a1525] border-[#1a2a4a]/60 shadow-[0_20px_50px_-40px_rgba(0,0,0,0.9)]">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-[#2BD4FF]/10 text-[#2BD4FF]">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Session overview</p>
-              <h2 className="text-lg font-semibold text-white">What to explore next</h2>
-            </div>
-          </div>
-          <div className="space-y-3 text-sm text-zinc-300">
-            <p className="leading-relaxed">A tidy hub keeps all your creator tools in reach. Jump back into the roadmap, or skim a feature tour before diving in.</p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <span className="px-3 py-2 rounded-lg bg-white/5 border border-white/5">Roadmap ready</span>
-              <span className="px-3 py-2 rounded-lg bg-white/5 border border-white/5">AI help on call</span>
-              <span className="px-3 py-2 rounded-lg bg-white/5 border border-white/5">Templates stocked</span>
-              <span className="px-3 py-2 rounded-lg bg-white/5 border border-white/5">Uploads guided</span>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Link href="/roadmap">
-                <Button variant="secondary" size="sm" className="bg-[#2BD4FF]/10 text-[#2BD4FF] border border-[#2BD4FF]/30">
-                  <ChevronRight className="h-4 w-4 mr-1" /> View roadmap
-                </Button>
-              </Link>
-              <Button variant="outline" size="sm" className="border-white/10 text-zinc-200" onClick={() => setShowTour(true)}>
-                Take tour
-              </Button>
-            </div>
-          </div>
-        </Card>
-      </div>
-
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Creator toolkit</p>
-            <h2 className="text-xl font-semibold text-white">Quick actions with every feature in reach</h2>
-            <p className="text-sm text-zinc-400">Jump back into your flow with shortcuts, then open any tool when you’re ready.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="ghost" size="sm" className="text-zinc-200" onClick={() => setShowTour(true)}>
-              <Sparkles className="h-4 w-4 mr-2" /> Show me around
-            </Button>
-            <Button variant="outline" size="sm" className="border-white/10 text-zinc-200" onClick={() => setShowSetup(true)}>
-              <Settings className="h-4 w-4 mr-2" /> Update profile
-            </Button>
-          </div>
-        </div>
-
-        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-          {QUICK_ACTIONS.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Link key={action.title} href={action.path}>
-                <Card className="group relative h-full p-4 sm:p-5 bg-gradient-to-br from-[#0e1a2f] via-[#0b1526] to-[#0d1930] border border-[#1a2a4a]/60 hover:border-[#2BD4FF]/40 transition-all shadow-[0_20px_60px_-45px_rgba(0,0,0,0.9)]">
-                  <div className="absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition" />
-                  <div className="relative flex items-start gap-4">
-                    <div className="p-3 rounded-xl" style={{ background: `${action.color}1A`, color: action.color }}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-base font-semibold text-white">{action.title}</h3>
-                        <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 text-zinc-300 uppercase tracking-wide">Shortcut</span>
-                      </div>
-                      <p className="text-sm text-zinc-400 leading-relaxed">{action.description}</p>
-                      <div className="inline-flex items-center gap-1 text-xs font-semibold text-[#2BD4FF] group-hover:translate-x-1 transition">
-                        Go now <ChevronRight className="h-3.5 w-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-
-        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-          {TOOLKIT_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.title} href={item.path}>
-                <Card className="group relative h-full p-4 sm:p-5 bg-[#0a1525] border-[#1a2a4a]/60 hover:border-[#2BD4FF]/30 transition-all">
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition rounded-xl bg-gradient-to-br from-white/5 via-transparent to-transparent" />
-                  <div className="relative flex items-start gap-4">
-                    <div className="p-3 rounded-xl" style={{ background: `${item.color}1A`, color: item.color }}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="space-y-1 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <h3 className="text-base font-semibold text-white">{item.title}</h3>
-                        <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 text-zinc-300 uppercase tracking-wide">{item.label}</span>
-                      </div>
-                      <p className="text-sm text-zinc-400 leading-relaxed">{item.description}</p>
-                      <div className="inline-flex items-center gap-1 text-xs font-semibold text-[#2BD4FF] group-hover:translate-x-1 transition">
-                        Open tool <ChevronRight className="h-3.5 w-3.5" />
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Production timeline</p>
-            <h3 className="text-xl font-semibold text-white">Road to publish</h3>
-            <p className="text-sm text-zinc-400">{completedSteps.length} of {STEPS.length} steps complete. Tap a number to toggle done.</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 text-sm text-zinc-300">
-            <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10">Current: {currentStep.title}</span>
-            {completedSteps.length > 0 && (
-              <Button variant="outline" size="sm" className="border-white/10 text-zinc-200" onClick={resetProgress} data-testid="button-reset-progress">
-                <RotateCcw className="h-4 w-4 mr-2" /> Reset
-              </Button>
+                <Link href={currentStep.path}>
+                  <Button
+                    size="sm"
+                    className="gap-1 font-semibold"
+                    style={{ background: currentStep.color, color: "#0a1628" }}
+                    data-testid="button-go-to-step"
+                  >
+                    Get Started <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            )}
+            {allComplete && (
+              <div className="mt-4 pt-3 border-t border-[#1a2a4a]/50 flex items-center justify-center gap-3">
+                <Trophy className="h-5 w-5 text-[#6DFF9C]" />
+                <span className="text-sm font-semibold text-[#6DFF9C]">Victory! All steps complete!</span>
+                <button
+                  onClick={resetProgress}
+                  className="px-3 py-1 rounded-lg bg-[#6DFF9C]/10 text-[#6DFF9C] text-sm font-medium"
+                  data-testid="button-start-new"
+                >
+                  Start New Video
+                </button>
+              </div>
             )}
           </div>
         </div>
+      </Card>
 
-        <div className="h-2 bg-[#0c1322] rounded-full overflow-hidden border border-[#1a2a4a]/70">
-          <div
-            className="h-full rounded-full transition-all duration-700 ease-out"
-            style={{
-              width: `${progressPercent}%`,
-              background: "linear-gradient(90deg, #2BD4FF 0%, #6DFF9C 50%, #F3C94C 100%)"
-            }}
-          />
+      {/* Creator Toolkit - Collapsible Accordions */}
+      <section className="space-y-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Creator Toolkit</p>
+          <h2 className="text-xl font-semibold text-white">All your tools in one place</h2>
         </div>
 
-        <div className="grid lg:grid-cols-[1fr,320px] gap-8 lg:gap-12">
-          <div className="space-y-6">
-            {STEPS.map((step) => {
-              const isComplete = completedSteps.includes(step.id);
-              const isCurrent = step.id === currentStep.id && !allComplete;
-              const Icon = step.icon;
-
-              return (
-                <div key={step.id} className="flex items-start gap-4" data-testid={`timeline-step-${step.id}`}>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      toggleStepComplete(step.id);
-                    }}
-                    className={cn(
-                      "w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all border-2",
-                      isComplete
-                        ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628]"
-                        : isCurrent
-                          ? "bg-[#0a1628] border-current text-current"
-                          : "bg-[#0f1f3f] border-[#1a2a4a]/80 text-zinc-500"
-                    )}
-                    style={{
-                      borderColor: isCurrent ? step.color : undefined,
-                      color: isCurrent ? step.color : undefined,
-                      boxShadow: isCurrent ? `0 0 14px ${step.color}30` : undefined
-                    }}
-                    data-testid={`button-toggle-step-${step.id}`}
-                  >
-                    {isComplete ? <Check className="h-6 w-6" /> : step.id}
-                  </button>
-
-                  <Link href={step.path} className="flex-1">
-                    <Card
-                      className={cn(
-                        "p-5 transition-all border cursor-pointer group",
-                        isCurrent
-                          ? "bg-[#0a1525] border-l-4"
-                          : isComplete
-                            ? "bg-[#0a1525]/50 border-[#1a2a4a]/40 opacity-80"
-                            : "bg-[#0a1525] border-[#1a2a4a]/60 hover:border-[#2BD4FF]/20"
-                      )}
-                      style={{
-                        borderLeftColor: isCurrent ? step.color : undefined
-                      }}
-                      data-testid={`card-step-${step.id}`}
-                    >
-                      <div className="flex items-center gap-4 sm:gap-5">
-                        <div
-                          className="shrink-0 p-3 rounded-xl"
-                          style={{ background: `${step.color}15` }}
-                        >
-                          <Icon className="h-5 w-5" style={{ color: step.color }} />
+        {/* Idea Tools Accordion */}
+        <Collapsible open={ideaToolsOpen} onOpenChange={setIdeaToolsOpen}>
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 hover:border-[#2BD4FF]/30 transition">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#2BD4FF]/10">
+                  <Lightbulb className="h-5 w-5 text-[#2BD4FF]" />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-semibold text-white">Idea Tools</h3>
+                  <p className="text-xs text-zinc-400">Brainstorm, write scripts, design thumbnails</p>
+                </div>
+              </div>
+              <ChevronDown className={cn("h-5 w-5 text-zinc-400 transition-transform", ideaToolsOpen && "rotate-180")} />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="grid gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-4">
+              {IDEA_TOOLS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.title} href={item.path}>
+                    <Card className="group h-full p-4 bg-[#0a1525] border-[#1a2a4a]/60 hover:border-[#2BD4FF]/30 transition-all">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg shrink-0" style={{ background: `${item.color}1A`, color: item.color }}>
+                          <Icon className="h-4 w-4" />
                         </div>
-
-                        <div className="flex-1 min-w-0 space-y-1.5">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <h4 className={cn(
-                              "font-bold text-base sm:text-lg",
-                              isComplete ? "text-zinc-500 line-through" : "text-white"
-                            )}>
-                              {step.title}
-                            </h4>
-                            {isCurrent && (
-                              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#F3C94C]/15 text-[#F3C94C] uppercase tracking-wide">
-                                In progress
-                              </span>
-                            )}
-                            {isComplete && (
-                              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#6DFF9C]/15 text-[#6DFF9C] uppercase tracking-wide">
-                                Done
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-sm text-zinc-400">{step.description}</p>
+                        <div className="space-y-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                          <p className="text-xs text-zinc-400 leading-relaxed">{item.description}</p>
                         </div>
-
-                        <ChevronRight
-                          className={cn(
-                            "shrink-0 h-5 w-5 transition-transform group-hover:translate-x-1",
-                            isCurrent ? "text-white" : "text-zinc-500"
-                          )}
-                        />
                       </div>
                     </Card>
                   </Link>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Video Tools Accordion */}
+        <Collapsible open={videoToolsOpen} onOpenChange={setVideoToolsOpen}>
+          <CollapsibleTrigger asChild>
+            <button className="w-full flex items-center justify-between gap-3 p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 hover:border-[#6DFF9C]/30 transition">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-[#6DFF9C]/10">
+                  <Video className="h-5 w-5 text-[#6DFF9C]" />
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="space-y-6 lg:sticky lg:top-24">
-            {!allComplete ? (
-              <Card className="p-6 bg-[#0a1525] border-[#1a2a4a]/60">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-[#6DFF9C]">
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#6DFF9C] animate-pulse" />
-                    <span className="text-xs font-semibold uppercase tracking-[0.18em]">Next step</span>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    {(() => {
-                      const CurrentIcon = currentStep.icon;
-                      return (
-                        <div
-                          className="p-3 rounded-xl"
-                          style={{ background: `${currentStep.color}20` }}
-                        >
-                          <CurrentIcon className="h-6 w-6" style={{ color: currentStep.color }} />
+                <div className="text-left">
+                  <h3 className="font-semibold text-white">Video Tools</h3>
+                  <p className="text-xs text-zinc-400">Record, edit, share, and track</p>
+                </div>
+              </div>
+              <ChevronDown className={cn("h-5 w-5 text-zinc-400 transition-transform", videoToolsOpen && "rotate-180")} />
+            </button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="grid gap-3 mt-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {VIDEO_TOOLS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.title} href={item.path}>
+                    <Card className="group h-full p-4 bg-[#0a1525] border-[#1a2a4a]/60 hover:border-[#6DFF9C]/30 transition-all">
+                      <div className="flex items-start gap-3">
+                        <div className="p-2 rounded-lg shrink-0" style={{ background: `${item.color}1A`, color: item.color }}>
+                          <Icon className="h-4 w-4" />
                         </div>
-                      );
-                    })()}
-                    <div className="space-y-1">
-                      <h3 className="text-lg font-bold text-white">{currentStep.title}</h3>
-                      <p className="text-sm text-zinc-400">{currentStep.description}</p>
-                    </div>
-                  </div>
-
-                  <Link href={currentStep.path}>
-                    <Button
-                      className="w-full gap-2 font-semibold text-base h-11"
-                      style={{
-                        background: currentStep.color,
-                        color: "#0a1628"
-                      }}
-                      data-testid="button-go-to-step"
-                    >
-                      Get started
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
+                        <div className="space-y-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                          <p className="text-xs text-zinc-400 leading-relaxed">{item.description}</p>
+                        </div>
+                      </div>
+                    </Card>
                   </Link>
-                </div>
-              </Card>
-            ) : (
-              <Card className="p-6 bg-[#0a1525] border-[#6DFF9C]/20">
-                <div className="text-center space-y-4">
-                  <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#6DFF9C]">
-                    <Trophy className="h-7 w-7 text-[#0a1628]" />
-                  </div>
-                  <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-white">Victory!</h3>
-                    <p className="text-sm text-zinc-400">You completed all steps.</p>
-                  </div>
-                  <button
-                    onClick={resetProgress}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[#6DFF9C]/30 text-[#6DFF9C] hover:bg-[#6DFF9C]/10 transition-colors font-semibold text-sm"
-                    data-testid="button-start-new"
-                  >
-                    <RotateCcw className="h-4 w-4" />
-                    Start new video
-                  </button>
-                </div>
-              </Card>
-            )}
-
-            <Card className="p-5 bg-[#0a1525] border-[#1a2a4a]/60">
-              <h4 className="text-sm font-semibold text-zinc-300 mb-2">Quick tip ✨</h4>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                Click the step numbers to mark them as complete, and jump straight into any tool from the creator toolkit above.
-              </p>
-            </Card>
-          </div>
-        </div>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       </section>
 
+      {/* Player Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
         <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/30 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="text-center pb-2">
