@@ -97,7 +97,7 @@ export default function Dashboard() {
     <div className="space-y-10 sm:space-y-14 pb-16">
       {/* Quick Start Banner */}
       {showQuickStart && (
-        <div className="mb-6 rounded-2xl bg-gradient-to-r from-[#2BD4FF]/80 to-[#4E4DFF]/80 p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+        <div className="mb-6 rounded-2xl bg-linear-to-r from-[#2BD4FF]/80 to-[#4E4DFF]/80 p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
           <div className="flex-1">
             <h2 className="text-xl md:text-2xl font-bold text-white mb-1">🚀 New here? Start with the Roadmap!</h2>
             <p className="text-white/90 text-base md:text-lg">Follow the step-by-step guide to create your first viral video. Each step is interactive and full of tips!</p>
@@ -220,7 +220,7 @@ export default function Dashboard() {
                     data-testid={`timeline-step-${step.id}`}
                   >
                     {/* Timeline Node */}
-                    <div className="flex-shrink-0 z-10">
+                    <div className="shrink-0 z-10">
                       <button
                         onClick={(e) => {
                           e.preventDefault();
@@ -265,7 +265,7 @@ export default function Dashboard() {
                         <div className="flex items-center gap-4 sm:gap-5">
                           {/* Step Icon */}
                           <div 
-                            className="flex-shrink-0 p-3 sm:p-3.5 rounded-xl transition-transform"
+                            className="shrink-0 p-3 sm:p-3.5 rounded-xl transition-transform"
                             style={{ background: `${step.color}15` }}
                           >
                             <Icon className="h-5 w-5 sm:h-6 sm:w-6" style={{ color: step.color }} />
@@ -297,7 +297,7 @@ export default function Dashboard() {
                           {/* Arrow */}
                           <ChevronRight 
                             className={cn(
-                              "flex-shrink-0 h-5 w-5 transition-transform group-hover:translate-x-1",
+                              "shrink-0 h-5 w-5 transition-transform group-hover:translate-x-1",
                               isCurrent ? "text-white" : "text-zinc-500"
                             )} 
                           />

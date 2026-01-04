@@ -202,14 +202,14 @@ export default function Roadmap() {
               <p className="text-gray-400">{completedCount} of {steps.length} steps completed</p>
             </div>
             <div className="text-right">
-              <div className="text-4xl font-display bg-gradient-to-r from-[hsl(210,100%,60%)] to-[hsl(180,100%,50%)] bg-clip-text text-transparent">
+              <div className="text-4xl font-display bg-linear-to-r from-[hsl(210,100%,60%)] to-[hsl(180,100%,50%)] bg-clip-text text-transparent">
                 {Math.round(progressPercent)}%
               </div>
             </div>
           </div>
           <div className="h-4 bg-[hsl(220,25%,15%)] rounded-full overflow-hidden">
             <div 
-              className="h-full bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(180,100%,50%)] transition-all duration-500"
+              className="h-full bg-linear-to-r from-[hsl(210,100%,50%)] to-[hsl(180,100%,50%)] transition-all duration-500"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -225,7 +225,7 @@ export default function Roadmap() {
 
       {/* Current Step Highlight */}
       {completedCount < steps.length && (
-        <Card className="border-[hsl(45,100%,50%)] bg-gradient-to-r from-[hsl(45,50%,15%)] to-[hsl(35,50%,12%)]">
+        <Card className="border-[hsl(45,100%,50%)] bg-linear-to-r from-[hsl(45,50%,15%)] to-[hsl(35,50%,12%)]">
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
               <div className="text-5xl">{steps[currentStep - 1]?.emoji}</div>
@@ -271,7 +271,7 @@ export default function Roadmap() {
                   step.completed
                     ? "bg-[hsl(140,100%,35%)] text-white"
                     : step.id === currentStep
-                      ? "bg-gradient-to-r from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)] text-white"
+                      ? "bg-linear-to-r from-[hsl(210,100%,50%)] to-[hsl(200,100%,45%)] text-white"
                       : "bg-[hsl(220,25%,20%)] text-gray-400"
                 }`}>
                   {step.completed ? "✓" : step.id}

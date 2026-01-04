@@ -35,7 +35,7 @@ export default function Layout({ children }: LayoutProps) {
           {/* Logo - Left */}
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer group" data-testid="link-home-logo">
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[#F3C94C] to-[#ff9500]">
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-linear-to-br from-[#F3C94C] to-[#ff9500]">
                 <Zap className="h-5 w-5 text-[#0a1628]" strokeWidth={2.5} />
               </div>
               <span className="text-2xl md:text-3xl font-bold font-display tracking-tight">
@@ -56,7 +56,7 @@ export default function Layout({ children }: LayoutProps) {
                     className={cn(
                       "relative flex items-center gap-3 px-6 py-3 rounded-full text-base font-semibold transition-all cursor-pointer",
                       isActive
-                        ? "text-white bg-gradient-to-r from-[#2BD4FF] to-[#4E4DFF] shadow-lg shadow-[#2BD4FF]/25"
+                        ? "text-white bg-linear-to-r from-[#2BD4FF] to-[#4E4DFF] shadow-lg shadow-[#2BD4FF]/25"
                         : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
                     )}
                     data-testid={`nav-${item.label.toLowerCase()}`}
@@ -135,7 +135,7 @@ export default function Layout({ children }: LayoutProps) {
               <Link key={item.path} href={item.path}>
                 <span
                   className={cn(
-                    "flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-[48px]",
+                    "flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all cursor-pointer min-w-12",
                     isActive
                       ? "text-[#2BD4FF]"
                       : "text-zinc-500"
