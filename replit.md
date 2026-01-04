@@ -6,6 +6,7 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 
 ## Recent Changes (January 2026)
 
+- **Video Save/Resume Workflow**: Complete save/resume system with kid-friendly "Name Your Video" prompt before downloads, localStorage draft metadata, and auto-restore clip trims when videos are re-imported into the editor
 - **Aurora Nexus Arcade Theme**: Premium gaming aesthetic redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents (NO PINK - per user preference)
 - **Gaming-Inspired Visual Language**: References to Stranger Things (portal gradients), Squid Game (circle/triangle/square progress indicators), and Fortnite (holographic card effects)
 - **Aurora Nexus Color Palette**:
