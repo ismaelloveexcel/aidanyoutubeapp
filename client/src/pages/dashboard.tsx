@@ -153,29 +153,29 @@ export default function Dashboard() {
         </p>
       </div>
 
-      {/* Quick Stats Row - Compact */}
+      {/* Quick Stats Row - Styled like reference */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="p-2 rounded-lg bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-xl font-bold text-[#6DFF9C]" data-testid="stat-videos">
-            {statsLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : videoStats?.published ?? 0}
+        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
+          <div className="text-2xl font-bold text-[#2BD4FF] leading-none" data-testid="stat-videos">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.published ?? 0}
           </div>
-          <p className="text-[10px] text-zinc-500">Videos</p>
+          <p className="text-xs text-zinc-500 mt-1.5">Total Views</p>
         </div>
-        <div className="p-2 rounded-lg bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-xl font-bold text-[#F3C94C]" data-testid="stat-in-progress">
-            {statsLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
+        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
+          <div className="text-2xl font-bold text-[#F3C94C] leading-none" data-testid="stat-in-progress">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
           </div>
-          <p className="text-[10px] text-zinc-500">In Progress</p>
+          <p className="text-xs text-zinc-500 mt-1.5">In Progress</p>
         </div>
-        <div className="p-2 rounded-lg bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-xl font-bold text-[#2BD4FF]" data-testid="stat-streak">
+        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
+          <div className="text-2xl font-bold text-[#6DFF9C] leading-none" data-testid="stat-streak">
             {Math.min(MAX_STREAK_DISPLAY, (videoStats?.published ?? 0))}
           </div>
-          <p className="text-[10px] text-zinc-500">Streak</p>
+          <p className="text-xs text-zinc-500 mt-1.5">Day Streak</p>
         </div>
       </div>
 
-      {/* Mode Entry Buttons - Compact Horizontal */}
+      {/* Mode Entry Buttons - Clean horizontal style like reference */}
       <section className="space-y-2">
         <h2 className="text-sm font-semibold text-white">Jump Into</h2>
         <div className="space-y-2">
@@ -183,27 +183,21 @@ export default function Dashboard() {
             const Icon = entry.icon;
             return (
               <Link key={entry.mode} href={entry.path}>
-                <Card 
-                  className="group relative overflow-visible p-3 bg-[#0a1525] border-[#1a2a4a]/60 hover-elevate active-elevate-2 cursor-pointer"
-                  style={{ borderColor: `${entry.color}30` }}
+                <div 
+                  className="flex items-center gap-3 p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40 hover-elevate active-elevate-2 cursor-pointer"
                   data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
                 >
-                  <div className="flex items-center gap-3">
-                    <div 
-                      className="p-2 rounded-lg shrink-0"
-                      style={{ background: `${entry.color}15` }}
-                    >
-                      <Icon className="h-5 w-5" style={{ color: entry.color }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-sm font-semibold text-white">
-                        {entry.title}
-                      </h3>
-                      <p className="text-xs text-zinc-500 truncate">{entry.description}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0" style={{ color: entry.color }} />
+                  <div className="shrink-0">
+                    <Icon className="h-5 w-5" style={{ color: entry.color }} />
                   </div>
-                </Card>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-white">
+                      {entry.title}
+                    </h3>
+                    <p className="text-xs text-zinc-500">{entry.description}</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" />
+                </div>
               </Link>
             );
           })}
