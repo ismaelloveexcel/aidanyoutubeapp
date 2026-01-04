@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { useEffect } from "react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import * as LucideIcons from "lucide-react";
@@ -52,6 +53,16 @@ export default function Dashboard() {
   const { profile, setName, setChannelName, setAvatar, setRememberMe, isSetup } = useCreatorProfile();
   const { toast } = useToast();
   const [showSetup, setShowSetup] = useState(!isSetup || !profile.rememberMe);
+  const [showTour, setShowTour] = useState(false);
+  const [firstVisit, setFirstVisit] = useState(() => {
+    return !localStorage.getItem("aidan-onboarded");
+  });
+    useEffect(() => {
+      if (firstVisit) {
+        setShowTour(true);
+        localStorage.setItem("aidan-onboarded", "true");
+      }
+    }, [firstVisit]);
   const [tempName, setTempName] = useState(profile.name);
   const [tempChannel, setTempChannel] = useState(profile.channelName);
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
@@ -100,6 +111,46 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 sm:space-y-12 pb-12">
+            {/* Feature Tour Button */}
+            <div className="flex justify-end mb-2">
+              <Button variant="outline" size="sm" onClick={() => setShowTour(true)} aria-label="Show Feature Tour">Feature Tour</Button>
+            </div>
+            {/* Onboarding / Feature Tour Dialog */}
+            <Dialog open={showTour} onOpenChange={setShowTour}>
+              <DialogContent className="bg-[#0a1525] border-[#1a2a4a]/60 max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-white">Welcome to TubeStar!</DialogTitle>
+                  <DialogDescription className="text-zinc-400">Here's a quick tour of all the features to help you get started:</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-4">
+                  <div className="p-3 rounded-lg bg-[#2BD4FF]/10">
+                    <strong className="text-[#2BD4FF]">Ideas:</strong> Get fun video ideas to kickstart your creativity.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#4E4DFF]/10">
+                    <strong className="text-[#4E4DFF]">Script:</strong> Plan what you'll say with easy templates.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#6DFF9C]/10">
+                    <strong className="text-[#6DFF9C]">Record:</strong> Capture your video using webcam or screen.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#F3C94C]/10">
+                    <strong className="text-[#F3C94C]">Edit:</strong> Make your video awesome with simple editing tools.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#2BD4FF]/10">
+                    <strong className="text-[#2BD4FF]">Thumbnail:</strong> Design cool thumbnails to attract viewers.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#4E4DFF]/10">
+                    <strong className="text-[#4E4DFF]">Upload:</strong> Share your video to YouTube (with parent help).
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#6DFF9C]/10">
+                    <strong className="text-[#6DFF9C]">Progress:</strong> Track your achievements and badges.
+                  </div>
+                  <div className="p-3 rounded-lg bg-[#F3C94C]/10">
+                    <strong className="text-[#F3C94C]">AI Assistant:</strong> Get smart help and tips anytime.
+                  </div>
+                </div>
+                <Button className="w-full mt-6" onClick={() => setShowTour(false)} aria-label="Close Tour">Got it!</Button>
+              </DialogContent>
+            </Dialog>
       {/* Welcome Header */}
       <div className="flex items-start justify-between gap-6 pt-2">
         <div className="flex items-center gap-4">
