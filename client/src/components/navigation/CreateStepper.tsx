@@ -54,7 +54,7 @@ export default function CreateStepper({ currentPath }: CreateStepperProps) {
                         isComplete
                           ? "bg-[#6DFF9C] border-[#6DFF9C] text-[#0a1628]"
                           : isActive
-                            ? "border-2"
+                            ? "bg-[#0a1628]"
                             : "bg-[#0f1f3f] border-[#1a2a4a]/80 text-zinc-500"
                       )}
                       style={{
