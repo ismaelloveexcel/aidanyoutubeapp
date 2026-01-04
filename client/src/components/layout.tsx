@@ -30,7 +30,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header - Clean Professional Design */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#1a2a4a] bg-[#0a1628]/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 w-full border-b border-[#17233b] bg-gradient-to-r from-[#081121]/95 via-[#0a1628]/95 to-[#081121]/95 backdrop-blur-xl shadow-[0_10px_40px_-30px_rgba(0,0,0,0.9)]">
         <div className="flex h-20 items-center justify-between px-6 sm:px-8 max-w-6xl mx-auto sticky-nav">
           {/* Logo - Left */}
           <Link href="/">
@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
           </Link>
           
           {/* Navigation - Center */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#0f1d32]/80 rounded-full px-2 py-2 border border-[#1a2a4a]/70 shadow-[0_10px_40px_-20px_rgba(0,0,0,0.6)]">
+          <nav className="hidden md:flex items-center gap-1 bg-[#0f1d32]/85 rounded-full px-2 py-2 border border-[#1a2a4a]/60 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.7)]">
             {mainNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -57,7 +57,7 @@ export default function Layout({ children }: LayoutProps) {
                       "relative flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer",
                       isActive
                         ? "text-white bg-white/10 ring-1 ring-[#2BD4FF]/60 shadow-[0_8px_30px_-10px_rgba(43,212,255,0.45)]"
-                        : "text-zinc-400 hover:text-white hover:bg-white/5"
+                        : "text-zinc-300 hover:text-white hover:bg-white/5"
                     )}
                     data-testid={`nav-${item.label.toLowerCase()}`}
                   >
@@ -75,8 +75,8 @@ export default function Layout({ children }: LayoutProps) {
                 className={cn(
                   "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all",
                   showMore
-                    ? "bg-white/10 text-white ring-1 ring-[#2BD4FF]/40"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    ? "bg-white/10 text-white ring-1 ring-[#2BD4FF]/40 shadow-[0_10px_30px_-18px_rgba(43,212,255,0.55)]"
+                    : "text-zinc-300 hover:text-white hover:bg-white/5"
                 )}
                 data-testid="nav-more"
               >

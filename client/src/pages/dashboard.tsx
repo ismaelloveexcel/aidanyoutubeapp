@@ -122,6 +122,30 @@ const TOOLKIT_ITEMS = [
   },
 ];
 
+const QUICK_ACTIONS = [
+  {
+    title: "View roadmap",
+    description: "See what's up next and track every milestone.",
+    path: "/roadmap",
+    icon: Target,
+    color: "#2BD4FF",
+  },
+  {
+    title: "Start recording",
+    description: "Jump into camera or screen capture with checks done for you.",
+    path: "/recorder",
+    icon: Video,
+    color: "#6DFF9C",
+  },
+  {
+    title: "Edit your cut",
+    description: "Trim, add reactions, and polish pacing before sharing.",
+    path: "/editor",
+    icon: Scissors,
+    color: "#F3C94C",
+  },
+];
+
 const STEP_STORAGE_KEY = "tubestar-completed-steps";
 
 function getStoredSteps(): number[] {
@@ -229,26 +253,26 @@ export default function Dashboard() {
       </Dialog>
 
       <div className="grid gap-6 lg:grid-cols-[2fr,1fr] items-stretch">
-        <Card className="relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70">
-          <div className="absolute inset-0 opacity-40 pointer-events-none bg-[radial-gradient(circle_at_20%_20%,rgba(43,212,255,0.25),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(243,201,76,0.18),transparent_35%)]" />
+        <Card className="relative overflow-hidden p-6 sm:p-8 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.75)]">
+          <div className="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_18%_18%,rgba(43,212,255,0.22),transparent_42%),radial-gradient(circle_at_80%_0%,rgba(243,201,76,0.16),transparent_35%),linear-gradient(120deg,rgba(255,255,255,0.04),transparent)]" />
           <div className="relative space-y-4">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">Gifted to Aidan • Future YouTube Star</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">Gifted to Aidan • Calm creator cockpit</p>
                 <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight">
-                  {displayName ? `Hey ${displayName}, let's design your next hit!` : "Welcome, let's build your next hit!"}
+                  {displayName ? `Hey ${displayName}, ready to ship your next upload?` : "Welcome—let's ship your next upload."}
                 </h1>
-                <p className="text-zinc-300 text-sm sm:text-base max-w-2xl">
-                  This workspace keeps the journey calm: clear steps, bright highlights, and quick shortcuts so no feature gets lost.
+                <p className="text-zinc-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+                  A polished dashboard that keeps the essentials in view: roadmap, toolkit, and next steps without the clutter.
                 </p>
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="px-3 py-1 rounded-full bg-white/10 border border-white/10 text-xs font-semibold text-white">{channelTag}</span>
-                  <span className="px-3 py-1 rounded-full bg-[#2BD4FF]/10 border border-[#2BD4FF]/30 text-xs font-semibold text-[#2BD4FF]">{completedSteps.length} / {STEPS.length} steps</span>
-                  <span className="px-3 py-1 rounded-full bg-[#F3C94C]/10 border border-[#F3C94C]/25 text-xs font-semibold text-[#F3C94C]">Feature tour ready</span>
+                  <span className="px-3 py-1 rounded-full bg-[#2BD4FF]/12 border border-[#2BD4FF]/30 text-xs font-semibold text-[#2BD4FF]">{completedSteps.length} / {STEPS.length} steps</span>
+                  <span className="px-3 py-1 rounded-full bg-[#6DFF9C]/12 border border-[#6DFF9C]/25 text-xs font-semibold text-[#6DFF9C]">Guided mode on</span>
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" className="text-zinc-200 border-white/15" onClick={() => setShowTour(true)}>
+                <Button variant="outline" size="sm" className="text-zinc-100 border-white/15 hover:border-[#2BD4FF]/40" onClick={() => setShowTour(true)}>
                   <Sparkles className="h-4 w-4 mr-2" /> Feature tour
                 </Button>
                 <Button variant="ghost" size="sm" className="text-zinc-200 hover:text-white" onClick={() => setShowSetup(true)}>
@@ -351,8 +375,8 @@ export default function Dashboard() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Creator toolkit</p>
-            <h2 className="text-xl font-semibold text-white">Every feature, neatly organized</h2>
-            <p className="text-sm text-zinc-400">Follow the icons to jump directly into the tool you need.</p>
+            <h2 className="text-xl font-semibold text-white">Quick actions with every feature in reach</h2>
+            <p className="text-sm text-zinc-400">Jump back into your flow with shortcuts, then open any tool when you’re ready.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="ghost" size="sm" className="text-zinc-200" onClick={() => setShowTour(true)}>
@@ -362,6 +386,34 @@ export default function Dashboard() {
               <Settings className="h-4 w-4 mr-2" /> Update profile
             </Button>
           </div>
+        </div>
+
+        <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+          {QUICK_ACTIONS.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link key={action.title} href={action.path}>
+                <Card className="group relative h-full p-4 sm:p-5 bg-gradient-to-br from-[#0e1a2f] via-[#0b1526] to-[#0d1930] border border-[#1a2a4a]/60 hover:border-[#2BD4FF]/40 transition-all shadow-[0_20px_60px_-45px_rgba(0,0,0,0.9)]">
+                  <div className="absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition" />
+                  <div className="relative flex items-start gap-4">
+                    <div className="p-3 rounded-xl" style={{ background: `${action.color}1A`, color: action.color }}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="text-base font-semibold text-white">{action.title}</h3>
+                        <span className="text-[11px] px-2 py-1 rounded-full bg-white/5 text-zinc-300 uppercase tracking-wide">Shortcut</span>
+                      </div>
+                      <p className="text-sm text-zinc-400 leading-relaxed">{action.description}</p>
+                      <div className="inline-flex items-center gap-1 text-xs font-semibold text-[#2BD4FF] group-hover:translate-x-1 transition">
+                        Go now <ChevronRight className="h-3.5 w-3.5" />
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            );
+          })}
         </div>
 
         <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
