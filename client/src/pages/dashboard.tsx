@@ -115,9 +115,16 @@ export default function Dashboard() {
             })()}
           </div>
           <div className="space-y-4">
-            <p className="text-sm sm:text-base text-[#2BD4FF] font-medium tracking-wide">
-              {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
-            </p>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <div className="w-1 h-1 rounded-full bg-[#2BD4FF] animate-pulse" />
+                <div className="w-1 h-1 rounded-full bg-[#4E4DFF] animate-pulse [animation-delay:200ms]" />
+                <div className="w-1 h-1 rounded-full bg-[#6DFF9C] animate-pulse [animation-delay:400ms]" />
+              </div>
+              <p className="text-xs sm:text-sm text-[#2BD4FF] font-bold tracking-[0.2em] uppercase">
+                {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
+              </p>
+            </div>
             <h1 className="text-2xl sm:text-4xl font-bold font-display text-white leading-tight">
               {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
             </h1>
