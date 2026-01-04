@@ -101,37 +101,36 @@ export default function Ideas() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
+    <div className="max-w-3xl mx-auto space-y-10">
       {/* Header */}
-      <div className="text-center">
-        <div className="inline-flex items-center gap-3 mb-4">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-3">
           <div 
             className="p-3 rounded-xl"
             style={{ 
-              background: "rgba(43, 212, 255, 0.2)",
-              boxShadow: "0 0 30px rgba(43, 212, 255, 0.3)"
+              background: "rgba(43, 212, 255, 0.12)"
             }}
           >
-            <Lightbulb className="h-8 w-8 text-[#2BD4FF]" />
+            <Lightbulb className="h-7 w-7 text-[#2BD4FF]" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold font-display text-white mb-2">Idea Generator</h1>
-        <p className="text-zinc-400">Need inspiration? Get a random video idea!</p>
+        <h1 className="text-3xl font-bold font-display text-white">Idea Generator</h1>
+        <p className="text-zinc-400 text-sm">Need inspiration? Get a random video idea!</p>
       </div>
 
       {/* Idea Generator Card */}
-      <div className="holo-card rounded-2xl p-6 neon-border">
-        <div className="text-center space-y-4">
+      <div className="holo-card rounded-2xl p-8 neon-border">
+        <div className="text-center space-y-5">
           {currentIdea ? (
             <div 
               className="p-6 rounded-xl"
               style={{ 
-                background: `linear-gradient(135deg, ${CATEGORY_COLORS[currentIdea.category]}15 0%, transparent 100%)`,
-                border: `1px solid ${CATEGORY_COLORS[currentIdea.category]}40`
+                background: `linear-gradient(135deg, ${CATEGORY_COLORS[currentIdea.category]}10 0%, transparent 100%)`,
+                border: `1px solid ${CATEGORY_COLORS[currentIdea.category]}25`
               }}
             >
               <div 
-                className="inline-block px-3 py-1 rounded-full text-sm font-bold font-display uppercase tracking-wider mb-3"
+                className="inline-block px-3 py-1 rounded-full text-sm font-semibold font-display uppercase tracking-wider mb-4"
                 style={{ 
                   background: CATEGORY_COLORS[currentIdea.category],
                   color: currentIdea.category === "Vlog" || currentIdea.category === "React" ? "#000" : "#fff"
@@ -139,14 +138,14 @@ export default function Ideas() {
               >
                 {currentIdea.category}
               </div>
-              <h3 className="font-display text-2xl text-white mb-2">{currentIdea.title}</h3>
-              <p className="text-zinc-400">{currentIdea.description}</p>
+              <h3 className="font-display text-xl text-white mb-2">{currentIdea.title}</h3>
+              <p className="text-zinc-400 text-sm">{currentIdea.description}</p>
               <div className="flex gap-3 justify-center mt-6">
                 <Button 
                   onClick={() => saveIdeaMutation.mutate(currentIdea)}
                   className="gap-2"
                   style={{ 
-                    background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
+                    background: "#6DFF9C",
                     color: "#000"
                   }}
                 >
@@ -164,15 +163,14 @@ export default function Ideas() {
               </div>
             </div>
           ) : (
-            <div className="py-12">
-              <Sparkles className="h-16 w-16 text-[#4E4DFF] mx-auto mb-4 opacity-50" />
+            <div className="py-14">
+              <Sparkles className="h-12 w-12 text-[#4E4DFF] mx-auto mb-5 opacity-40" />
               <Button 
                 size="lg" 
                 onClick={generateIdea}
                 className="font-display uppercase tracking-wide"
                 style={{ 
-                  background: "linear-gradient(135deg, #4E4DFF 0%, #2BD4FF 100%)",
-                  boxShadow: "0 10px 30px rgba(43, 212, 255, 0.3)"
+                  background: "#4E4DFF"
                 }}
               >
                 Generate Idea
@@ -183,12 +181,12 @@ export default function Ideas() {
       </div>
 
       {/* Category Buttons */}
-      <div>
-        <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#4E4DFF] to-transparent" />
+      <div className="space-y-5">
+        <h2 className="font-display text-lg text-white flex items-center gap-3">
+          <span className="inline-block w-6 h-[1px] bg-gradient-to-r from-[#4E4DFF] to-transparent" />
           Browse by Category
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {Object.keys(VIDEO_IDEAS).map((category) => (
             <button
               key={category}
@@ -197,12 +195,11 @@ export default function Ideas() {
                 const randomIdea = ideas[Math.floor(Math.random() * ideas.length)];
                 setCurrentIdea({ ...randomIdea, category });
               }}
-              className="px-4 py-3 rounded-xl font-display font-medium transition-all hover:scale-105"
+              className="px-4 py-3.5 rounded-xl font-display font-medium transition-all hover:scale-102"
               style={{ 
-                background: `${CATEGORY_COLORS[category]}20`,
-                border: `1px solid ${CATEGORY_COLORS[category]}40`,
-                color: CATEGORY_COLORS[category],
-                boxShadow: `0 0 20px ${CATEGORY_COLORS[category]}20`
+                background: `${CATEGORY_COLORS[category]}12`,
+                border: `1px solid ${CATEGORY_COLORS[category]}25`,
+                color: CATEGORY_COLORS[category]
               }}
               data-testid={`button-category-${category.toLowerCase()}`}
             >
@@ -213,12 +210,12 @@ export default function Ideas() {
       </div>
 
       {/* Block Divider */}
-      <div className="block-divider" />
+      <div className="block-divider opacity-50" />
 
       {/* Saved Ideas */}
-      <div>
-        <h2 className="font-display text-xl text-white mb-4 flex items-center gap-2">
-          <span className="inline-block w-8 h-[2px] bg-gradient-to-r from-[#2BD4FF] to-transparent" />
+      <div className="space-y-5">
+        <h2 className="font-display text-lg text-white flex items-center gap-3">
+          <span className="inline-block w-6 h-[1px] bg-gradient-to-r from-[#2BD4FF] to-transparent" />
           Your Saved Ideas
         </h2>
         {savedIdeas.length === 0 ? (
