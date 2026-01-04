@@ -24,7 +24,7 @@ const XP_PER_LEVEL = 100;
 const calculateLevel = (xp: number) => Math.floor(xp / XP_PER_LEVEL) + 1;
 const getXpProgress = (xp: number) => xp % XP_PER_LEVEL;
 
-const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: 'Gamepad2', rememberMe: false, xp: 0, level: 1 };
+const defaultProfile: CreatorProfile = { name: 'Aidan', channelName: "Aidan's Channel", avatar: 'Rocket', rememberMe: true, xp: 0, level: 1 };
 const AVATARS = ['Gamepad2', 'Clapperboard', 'Mic2', 'Palette', 'Rocket', 'Star', 'Flame', 'Heart', 'Ghost', 'Zap', 'Sword', 'Crown', 'Target', 'Gamepad', 'Headset'];
 const CreatorProfileContext = createContext<CreatorProfileContextType | null>(null);
 

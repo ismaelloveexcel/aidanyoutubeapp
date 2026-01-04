@@ -89,10 +89,10 @@ export default function Dashboard() {
     const isSetupDone = localStorage.getItem('tubestar-profile');
     return !isSetupDone;
   });
-  const [tempName, setTempName] = useState(profile.name);
-  const [tempChannel, setTempChannel] = useState(profile.channelName);
-  const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
-  const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe);
+  const [tempName, setTempName] = useState(profile.name || 'Aidan');
+  const [tempChannel, setTempChannel] = useState(profile.channelName || "Aidan's Channel");
+  const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar || 'Rocket');
+  const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe ?? true);
 
   // Fetch recent projects for "Continue" functionality
   const { data: recentProjects, isLoading: projectsLoading } = useQuery<VideoProject[]>({
@@ -129,9 +129,9 @@ export default function Dashboard() {
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Creator Studio</p>
             <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight mt-1">
-              {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
+              {displayName ? `Hey ${displayName}!` : "Hey Aidan!"}
             </h1>
-            <p className="text-zinc-400 mt-2">What would you like to do today?</p>
+            <p className="text-zinc-400 mt-2">Ready to create something awesome today?</p>
           </div>
           <Button 
             variant="ghost" 
@@ -282,10 +282,10 @@ export default function Dashboard() {
         <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/30 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="text-center pb-2">
             <DialogTitle className="text-2xl font-bold text-white font-display">
-              Player Setup
+              Welcome, Aidan!
             </DialogTitle>
             <DialogDescription className="text-zinc-400 text-base">
-              Enter your name and pick your avatar
+              Set up your creator profile and pick your avatar
             </DialogDescription>
           </DialogHeader>
 
@@ -296,7 +296,7 @@ export default function Dashboard() {
                 id="name"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder="Aidan"
                 className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-10 text-base"
                 data-testid="input-name"
               />
@@ -308,7 +308,7 @@ export default function Dashboard() {
                 id="channel"
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
-                placeholder="Enter your channel name"
+                placeholder="Aidan's Channel"
                 className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-10 text-base"
                 data-testid="input-channel"
               />
