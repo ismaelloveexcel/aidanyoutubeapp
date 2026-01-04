@@ -1,3 +1,5 @@
+  // Show quick-start banner for new users (if not all steps complete)
+  const [showQuickStart, setShowQuickStart] = useState(!allComplete);
 import { useState } from "react";
 import { useCreatorProfile, AVATARS } from "@/lib/creator-profile";
 import { cn } from "@/lib/utils";
@@ -93,6 +95,25 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-10 sm:space-y-14 pb-16">
+      {/* Quick Start Banner */}
+      {showQuickStart && (
+        <div className="mb-6 rounded-2xl bg-gradient-to-r from-[#2BD4FF]/80 to-[#4E4DFF]/80 p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+          <div className="flex-1">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-1">🚀 New here? Start with the Roadmap!</h2>
+            <p className="text-white/90 text-base md:text-lg">Follow the step-by-step guide to create your first viral video. Each step is interactive and full of tips!</p>
+          </div>
+          <Link href="/roadmap">
+            <Button size="lg" className="bg-white text-[#2BD4FF] font-bold hover:bg-[#2BD4FF] hover:text-white transition">View Roadmap</Button>
+          </Link>
+          <button
+            className="ml-2 text-white/70 hover:text-white text-2xl md:text-3xl"
+            aria-label="Dismiss quick start"
+            onClick={() => setShowQuickStart(false)}
+          >
+            ×
+          </button>
+        </div>
+      )}
       {/* Welcome Header */}
       <div className="flex items-start justify-between gap-6 pt-2">
         <div className="space-y-4">

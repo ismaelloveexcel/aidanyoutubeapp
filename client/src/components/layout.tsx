@@ -13,6 +13,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const mainNavItems = [
     { path: "/", label: "Home", icon: Home },
+    { path: "/roadmap", label: "Roadmap", icon: BarChart3 },
     { path: "/ideas", label: "Ideas", icon: Lightbulb },
     { path: "/script", label: "Script", icon: FileText },
     { path: "/recorder", label: "Record", icon: Video },
@@ -30,22 +31,22 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen flex flex-col">
       {/* Header - Clean Professional Design */}
       <header className="sticky top-0 z-50 w-full border-b border-[#1a2a4a] bg-[#0a1628]/95 backdrop-blur-xl">
-        <div className="flex h-16 items-center justify-between px-6 max-w-7xl mx-auto">
+        <div className="flex h-20 items-center justify-between px-8 max-w-7xl mx-auto">
           {/* Logo - Left */}
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer group" data-testid="link-home-logo">
               <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-gradient-to-br from-[#F3C94C] to-[#ff9500]">
                 <Zap className="h-5 w-5 text-[#0a1628]" strokeWidth={2.5} />
               </div>
-              <span className="text-xl font-bold font-display tracking-tight">
-                <span className="text-white">Tube</span>
+              <span className="text-2xl md:text-3xl font-bold font-display tracking-tight">
+                <span className="text-white pr-1">Tube</span>
                 <span className="text-[#2BD4FF]">Star</span>
               </span>
             </div>
           </Link>
           
           {/* Navigation - Center */}
-          <nav className="hidden md:flex items-center gap-1 bg-[#0f1d32] rounded-full px-2 py-1.5 border border-[#1a2a4a]">
+          <nav className="hidden md:flex items-center gap-2 bg-[#0f1d32] rounded-full px-4 py-3 border border-[#1a2a4a]">
             {mainNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -53,7 +54,7 @@ export default function Layout({ children }: LayoutProps) {
                 <Link key={item.path} href={item.path}>
                   <span
                     className={cn(
-                      "relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer",
+                      "relative flex items-center gap-3 px-6 py-3 rounded-full text-base font-semibold transition-all cursor-pointer",
                       isActive
                         ? "text-white bg-gradient-to-r from-[#2BD4FF] to-[#4E4DFF] shadow-lg shadow-[#2BD4FF]/25"
                         : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
@@ -72,7 +73,7 @@ export default function Layout({ children }: LayoutProps) {
               <button
                 onClick={() => setShowMore(!showMore)}
                 className={cn(
-                  "flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all",
+                  "flex items-center gap-2 px-6 py-3 rounded-full text-base font-semibold transition-all",
                   showMore
                     ? "bg-[#1a2a4a] text-white"
                     : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
@@ -151,8 +152,8 @@ export default function Layout({ children }: LayoutProps) {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 pb-24 md:pb-0">
-        <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12 py-10 sm:py-12">
+      <main className="flex-1 pb-32 md:pb-0">
+        <div className="max-w-5xl mx-auto px-10 sm:px-20 lg:px-32 py-16 sm:py-24">
           {children}
         </div>
       </main>
