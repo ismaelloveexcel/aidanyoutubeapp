@@ -37,26 +37,30 @@
   --color-input: 225 30% 12%;
   --color-ring: 193 100% 58%;
 
-  --radius-lg: 1.5rem;
-  --radius-md: 1rem;
-  --radius-sm: 0.75rem;
+  --radius-lg: 2rem;
+  --radius-md: 1.25rem;
+  --radius-sm: 1rem;
+  --spacing-lg: 2.5rem;
+  --spacing-md: 1.5rem;
+  --spacing-sm: 1rem;
 }
 
 /* Force standard shadcn components to not use pink rings/focus states */
+
 .focus-visible\:ring-ring:focus-visible {
   --tw-ring-color: hsl(var(--color-ring)) !important;
 }
 
 .border-primary {
-  border-color: var(--aurora-cyan) !important;
+  border-color: hsl(var(--color-primary)) !important;
 }
 
 .bg-primary {
-  background-color: var(--aurora-cyan) !important;
+  background-color: hsl(var(--color-primary)) !important;
 }
 
 .text-primary-foreground {
-  color: var(--aurora-eclipse) !important;
+  color: hsl(var(--color-primary-foreground)) !important;
 }
 
 /* Aurora Nexus Color Tokens */

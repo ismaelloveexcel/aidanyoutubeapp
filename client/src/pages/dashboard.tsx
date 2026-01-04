@@ -107,7 +107,7 @@ export default function Dashboard() {
             {(() => {
               const ProfileIcon = (LucideIcons as any)[profile.avatar];
               return (
-                <div className="p-3 rounded-xl bg-[#2BD4FF]/10 text-[#2BD4FF] border border-[#2BD4FF]/20">
+                <div className="p-3 rounded-xl bg-[#2BD4FF]/10 text-[#2BD4FF] border border-[#2BD4FF]/20 shadow-lg">
                   {ProfileIcon ? <ProfileIcon className="h-10 w-10" /> : <Sparkles className="h-10 w-10" />}
                 </div>
               );
@@ -121,7 +121,7 @@ export default function Dashboard() {
                 <div className="w-1.5 h-1.5 rounded-full bg-[#6DFF9C] shadow-[0_0_8px_#6DFF9C] animate-pulse [animation-delay:400ms]" />
               </div>
               <p className="text-sm sm:text-base text-[#2BD4FF] font-black tracking-[0.25em] uppercase drop-shadow-[0_0_8px_rgba(43,212,255,0.4)]">
-                {displayName ? `Made for Awesome ${displayName}!!` : "Made for Awesome Creators!!"}
+                {`Made for Awesome Aidan!!`}
               </p>
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold font-display text-white leading-tight tracking-tight">
@@ -130,6 +130,10 @@ export default function Dashboard() {
             <p className="text-zinc-400 text-lg sm:text-xl font-medium">
               {allComplete ? "Victory Royale! Ready to create another masterpiece?" : "Your next viral video starts here"}
             </p>
+            <div className="mt-2">
+              <span className="inline-block bg-[#F3C94C]/20 text-[#F3C94C] rounded-full px-3 py-1 text-xs font-semibold mr-2">Tip: Click your avatar to personalize your experience!</span>
+              <Button variant="ghost" size="sm" className="ml-2" aria-label="Send Feedback" onClick={() => toast({title: 'Feedback', description: 'Let us know what you think!'})}>Send Feedback</Button>
+            </div>
           </div>
         </div>
         <button 

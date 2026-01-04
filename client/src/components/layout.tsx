@@ -119,7 +119,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="w-[140px] flex justify-end">
             <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500">
               <span>Made for</span>
-              <span className="text-[#F3C94C] font-semibold">Aidan</span>
+              <span className="text-[#F3C94C] font-semibold">Awesome Aidan</span>
             </div>
           </div>
         </div>
