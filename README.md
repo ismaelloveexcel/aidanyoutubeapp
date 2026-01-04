@@ -67,6 +67,19 @@ npm run build
 npm start
 ```
 
+## Open in GitHub Codespaces ☁️
+
+The easiest way to start developing is with GitHub Codespaces:
+
+1. Click the green "Code" button on the repository page
+2. Select the "Codespaces" tab
+3. Click "Create codespace on main"
+4. Wait for the environment to set up (dependencies install automatically)
+5. Copy `.env.example` to `.env` and configure your database connection
+6. Run `npm run dev` to start the development server
+
+The Codespace comes pre-configured with Node.js 20 and all required extensions.
+
 ## Deploy to Replit ⭐
 
 This app is fully Replit-ready with one-click deployment! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.
