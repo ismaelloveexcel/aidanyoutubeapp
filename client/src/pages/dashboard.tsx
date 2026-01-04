@@ -116,20 +116,20 @@ export default function Dashboard() {
           </div>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="flex gap-1">
-                <div className="w-1 h-1 rounded-full bg-[#2BD4FF] animate-pulse" />
-                <div className="w-1 h-1 rounded-full bg-[#4E4DFF] animate-pulse [animation-delay:200ms]" />
-                <div className="w-1 h-1 rounded-full bg-[#6DFF9C] animate-pulse [animation-delay:400ms]" />
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#2BD4FF] shadow-[0_0_8px_#2BD4FF] animate-pulse" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#4E4DFF] shadow-[0_0_8px_#4E4DFF] animate-pulse [animation-delay:200ms]" />
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6DFF9C] shadow-[0_0_8px_#6DFF9C] animate-pulse [animation-delay:400ms]" />
               </div>
-              <p className="text-xs sm:text-sm text-[#2BD4FF] font-bold tracking-[0.2em] uppercase">
+              <p className="text-sm sm:text-base text-[#2BD4FF] font-black tracking-[0.25em] uppercase drop-shadow-[0_0_8px_rgba(43,212,255,0.4)]">
                 {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
               </p>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-bold font-display text-white leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-bold font-display text-white leading-tight tracking-tight">
               {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
             </h1>
-            <p className="text-zinc-400 text-base sm:text-lg">
-              {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
+            <p className="text-zinc-400 text-lg sm:text-xl font-medium">
+              {allComplete ? "Victory Royale! Ready to create another masterpiece?" : "Your next viral video starts here"}
             </p>
           </div>
         </div>
