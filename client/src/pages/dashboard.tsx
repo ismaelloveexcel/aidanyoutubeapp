@@ -110,15 +110,7 @@ export default function Dashboard() {
   const displayName = profile.name?.trim() || "";
 
   return (
-  const [theme, setTheme] = useState('dark');
-  const handleThemeToggle = () => setTheme(theme === 'dark' ? 'light' : 'dark');
-  return (
-    <div className={`space-y-8 sm:space-y-12 pb-12 bg-stars-pattern theme-${theme}`}>
-                        <div className="flex justify-end mb-2">
-                          <Button variant="outline" size="sm" onClick={handleThemeToggle} aria-label="Toggle Theme">
-                            {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                          </Button>
-                        </div>
+    <div className="space-y-8 sm:space-y-12 pb-12 bg-stars-pattern">
                   {/* Mascot Illustration */}
                   <div className="flex justify-center mb-4">
                     <img src="/public/mascot-star.png" alt="TubeStar Mascot" className="h-20 w-20 mascot-bounce drop-shadow-xl" />
