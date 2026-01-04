@@ -639,82 +639,84 @@ export default function Dashboard() {
       </section>
 
       <Dialog open={showSetup} onOpenChange={setShowSetup}>
-        <DialogContent className="bg-[#0a1525] border-[#1a2a4a]/60 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-white">
+        <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/30 max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="text-center pb-2">
+            <DialogTitle className="text-2xl font-bold text-white font-display">
               Player Setup
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Enter your name and pick your avatar.
+            <DialogDescription className="text-zinc-400 text-base">
+              Enter your name and pick your avatar
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-5 mt-4">
+          <div className="space-y-6 mt-2">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-sm font-medium text-zinc-300">Your Name</Label>
+              <Label htmlFor="name" className="text-sm font-semibold text-zinc-200">Your Name</Label>
               <Input
                 id="name"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Enter your name"
-                className="bg-[#0a1525] border-[#1a2a4a]/60 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]/60 focus-visible:ring-[#2BD4FF]/30"
+                className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-12 text-base"
                 data-testid="input-name"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="channel" className="text-sm font-medium text-zinc-300">Channel Name (optional)</Label>
+              <Label htmlFor="channel" className="text-sm font-semibold text-zinc-200">Channel Name <span className="text-zinc-500 font-normal">(optional)</span></Label>
               <Input
                 id="channel"
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
                 placeholder="Enter your channel name"
-                className="bg-[#0a1525] border-[#1a2a4a]/60 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]/60"
+                className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-12 text-base"
                 data-testid="input-channel"
               />
             </div>
 
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-zinc-300">Choose Your Avatar</Label>
-              <div className="grid grid-cols-5 gap-2.5">
+              <Label className="text-sm font-semibold text-zinc-200">Choose Your Avatar</Label>
+              <div className="grid grid-cols-5 gap-3">
                 {AVATARS.map((avatarName, index) => {
                   const Icon = (LucideIcons as any)[avatarName];
-                  const colors = ["#2BD4FF", "#F3C94C", "#4E4DFF", "#6DFF9C", "#2BD4FF"];
+                  const colors = ["#2BD4FF", "#F3C94C", "#4E4DFF", "#6DFF9C", "#A259FF"];
                   const color = colors[index % colors.length];
+                  const isSelected = selectedAvatar === avatarName;
 
                   return (
                     <button
                       key={avatarName}
                       onClick={() => setSelectedAvatar(avatarName)}
                       className={cn(
-                        "p-2.5 rounded-lg transition-all flex items-center justify-center border",
-                        selectedAvatar === avatarName
-                          ? "bg-[#2BD4FF] text-[#0a1628] scale-105 border-[#2BD4FF] shadow-[0_0_15px_rgba(43,212,255,0.4)]"
-                          : "bg-[#1a2a4a]/40 border-[#1a2a4a]/60 text-zinc-400 hover:bg-[#1a2a4a] hover:text-white"
+                        "aspect-square rounded-xl transition-all flex items-center justify-center border-2",
+                        isSelected
+                          ? "scale-110 shadow-[0_0_20px_rgba(43,212,255,0.5)]"
+                          : "hover:scale-105"
                       )}
                       style={{
-                        color: selectedAvatar === avatarName ? "#0a1628" : color,
-                        borderColor: selectedAvatar === avatarName ? "#2BD4FF" : `${color}40`
+                        background: isSelected ? color : `${color}20`,
+                        borderColor: isSelected ? color : `${color}50`,
+                        color: isSelected ? "#0a1628" : color,
                       }}
                       data-testid={`button-avatar-${avatarName}`}
                     >
-                      {Icon ? <Icon className="h-6 w-6" /> : avatarName}
+                      {Icon ? <Icon className="h-6 w-6 sm:h-7 sm:w-7" /> : avatarName}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex items-center space-x-2 pt-2">
+            <div className="flex items-center space-x-3 pt-1">
               <Checkbox
                 id="remember"
                 checked={rememberMe}
                 onCheckedChange={(checked: boolean) => setRememberMeLocal(!!checked)}
-                className="border-[#1a2a4a] data-[state=checked]:bg-[#2BD4FF] data-[state=checked]:text-[#0a1628]"
+                className="border-[#2BD4FF]/50 data-[state=checked]:bg-[#2BD4FF] data-[state=checked]:border-[#2BD4FF] data-[state=checked]:text-[#0a1628] h-5 w-5"
               />
               <Label
                 htmlFor="remember"
-                className="text-sm font-medium text-zinc-400 cursor-pointer"
+                className="text-sm font-medium text-zinc-300 cursor-pointer"
               >
                 Remember Me
               </Label>
@@ -722,9 +724,9 @@ export default function Dashboard() {
 
             <Button
               onClick={handleSaveProfile}
-              className="w-full font-semibold mt-2"
+              className="w-full font-bold text-base h-12 mt-2 shadow-[0_0_20px_rgba(109,255,156,0.3)]"
               style={{
-                background: "#6DFF9C",
+                background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)",
                 color: "#0a1628"
               }}
               data-testid="button-save-profile"
