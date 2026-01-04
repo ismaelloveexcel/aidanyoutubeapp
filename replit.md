@@ -6,6 +6,12 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 
 ## Recent Changes (January 2026)
 
+- **Dashboard Simplification (Latest)**: Reduced visual overwhelm for kids by:
+  - Combining welcome/feature tour/player setup into single Player Setup modal
+  - Replacing verbose step cards with compact horizontal roadmap strip
+  - Condensing 4 toolkit sections into 2 collapsible accordions (Idea Tools, Video Tools)
+  - Adding clickable step number badges to mark progress complete
+  - Subtle micro-animations (pulse on current step, scale on hover)
 - **Video Save/Resume Workflow**: Complete save/resume system with kid-friendly "Name Your Video" prompt before downloads, localStorage draft metadata, and auto-restore clip trims when videos are re-imported into the editor
 - **Aurora Nexus Arcade Theme**: Premium gaming aesthetic redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents (NO PINK - per user preference)
 - **Gaming-Inspired Visual Language**: References to Stranger Things (portal gradients), Squid Game (circle/triangle/square progress indicators), and Fortnite (holographic card effects)
@@ -19,10 +25,10 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 - **Typography**: Rajdhani display font for headings (geometric futurism), Plus Jakarta Sans for body text
 - **Gaming Terminology**: "Victory Royale", "Quest Log", "Player Setup", "Next Mission" throughout the UX
 - **5-Step Workflow**: Generate Idea, Write Script, Record Video, Edit Video, Upload & Share
-- **Progress Tracking**: Users can mark steps as complete by clicking the step numbers
+- **Progress Tracking**: Users can mark steps as complete by clicking the step number badges
 - **Holographic Nav Bar**: Glassmorphism header with glow effects and neon borders
-- **Professional Layout**: Centered pill navigation (3-section header: logo, nav, utility), responsive two-column dashboard grid
-- **Player Setup Modal**: Cohesive onboarding experience with 5-column avatar grid
+- **Professional Layout**: Centered pill navigation (3-section header: logo, nav, utility), responsive dashboard layout
+- **Player Setup Modal**: Cohesive onboarding experience with 5-column avatar grid and scrollable content
 
 ## User Preferences
 
