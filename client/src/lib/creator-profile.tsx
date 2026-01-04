@@ -4,6 +4,7 @@ interface CreatorProfile {
   name: string;
   channelName: string;
   avatar: string;
+  rememberMe: boolean;
 }
 
 interface CreatorProfileContextType {
@@ -11,11 +12,12 @@ interface CreatorProfileContextType {
   setName: (name: string) => void;
   setChannelName: (channelName: string) => void;
   setAvatar: (avatar: string) => void;
+  setRememberMe: (rememberMe: boolean) => void;
   isSetup: boolean;
 }
 
-const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: '🎮' };
-const AVATARS = ['🎮', '🎬', '🎤', '🎨', '🚀', '⭐', '🔥', '💜', '🦄', '🐱', '🐶', '🦊', '👹'];
+const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: 'Gamepad2', rememberMe: false };
+const AVATARS = ['Gamepad2', 'Clapperboard', 'Mic2', 'Palette', 'Rocket', 'Star', 'Flame', 'Heart', 'Ghost', 'Zap', 'Sword', 'Crown', 'Target', 'Gamepad', 'Headset'];
 const CreatorProfileContext = createContext<CreatorProfileContextType | null>(null);
 
 export function CreatorProfileProvider({ children }: { children: ReactNode }) {
@@ -39,8 +41,9 @@ export function CreatorProfileProvider({ children }: { children: ReactNode }) {
   const setName = (name: string) => saveProfile({ ...profile, name });
   const setChannelName = (channelName: string) => saveProfile({ ...profile, channelName });
   const setAvatar = (avatar: string) => saveProfile({ ...profile, avatar });
+  const setRememberMe = (rememberMe: boolean) => saveProfile({ ...profile, rememberMe });
   return (
-    <CreatorProfileContext.Provider value={{ profile, setName, setChannelName, setAvatar, isSetup }}>
+    <CreatorProfileContext.Provider value={{ profile, setName, setChannelName, setAvatar, setRememberMe, isSetup }}>
       {children}
     </CreatorProfileContext.Provider>
   );

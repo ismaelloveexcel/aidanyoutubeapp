@@ -5,10 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { Lightbulb, FileText, Video, Scissors, Upload, ChevronRight, Check, RotateCcw, Settings, Trophy, Target, Sparkles } from "lucide-react";
+import * as LucideIcons from "lucide-react";
+import { 
+  Lightbulb, FileText, Video, Scissors, Upload, 
+  ChevronRight, Check, RotateCcw, Settings, Trophy, 
+  Target, Sparkles 
+} from "lucide-react";
 
 interface RoadmapStep {
   id: number;
@@ -43,12 +49,13 @@ function storeCompletedSteps(steps: number[]) {
 }
 
 export default function Dashboard() {
-  const { profile, setName, setChannelName, setAvatar, isSetup } = useCreatorProfile();
+  const { profile, setName, setChannelName, setAvatar, setRememberMe, isSetup } = useCreatorProfile();
   const { toast } = useToast();
-  const [showSetup, setShowSetup] = useState(!isSetup);
+  const [showSetup, setShowSetup] = useState(!isSetup || !profile.rememberMe);
   const [tempName, setTempName] = useState(profile.name);
   const [tempChannel, setTempChannel] = useState(profile.channelName);
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
+  const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe);
   const [completedSteps, setCompletedSteps] = useState<number[]>(getStoredSteps);
 
   const handleSaveProfile = () => {
@@ -56,6 +63,7 @@ export default function Dashboard() {
       setName(tempName);
       setChannelName(tempChannel);
       setAvatar(selectedAvatar);
+      setRememberMe(rememberMe);
       setShowSetup(false);
     }
   };
@@ -95,16 +103,28 @@ export default function Dashboard() {
     <div className="space-y-8 sm:space-y-12 pb-12">
       {/* Welcome Header */}
       <div className="flex items-start justify-between gap-6 pt-2">
-        <div className="space-y-4">
-          <p className="text-sm sm:text-base text-[#2BD4FF] font-medium tracking-wide">
-            {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
-          </p>
-          <h1 className="text-2xl sm:text-4xl font-bold font-display text-white leading-tight">
-            {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
-          </h1>
-          <p className="text-zinc-400 text-base sm:text-lg">
-            {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="p-2 relative">
+            {(() => {
+              const ProfileIcon = (LucideIcons as any)[profile.avatar];
+              return (
+                <div className="p-3 rounded-xl bg-[#2BD4FF]/10 text-[#2BD4FF] border border-[#2BD4FF]/20">
+                  {ProfileIcon ? <ProfileIcon className="h-10 w-10" /> : <Sparkles className="h-10 w-10" />}
+                </div>
+              );
+            })()}
+          </div>
+          <div className="space-y-4">
+            <p className="text-sm sm:text-base text-[#2BD4FF] font-medium tracking-wide">
+              {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
+            </p>
+            <h1 className="text-2xl sm:text-4xl font-bold font-display text-white leading-tight">
+              {displayName ? `Hey ${displayName}!` : "Welcome, Creator!"}
+            </h1>
+            <p className="text-zinc-400 text-base sm:text-lg">
+              {allComplete ? "Victory! Ready to create another masterpiece?" : "Your next viral video starts here"}
+            </p>
+          </div>
         </div>
         <button 
           onClick={() => setShowSetup(true)}
@@ -405,22 +425,40 @@ export default function Dashboard() {
             <div className="space-y-3">
               <Label className="text-sm font-medium text-zinc-300">Choose Your Avatar</Label>
               <div className="grid grid-cols-5 gap-2.5">
-                {AVATARS.map((avatar) => (
-                  <button
-                    key={avatar}
-                    onClick={() => setSelectedAvatar(avatar)}
-                    className={cn(
-                      "text-2xl p-2.5 rounded-lg transition-all",
-                      selectedAvatar === avatar
-                        ? "bg-[#2BD4FF] scale-105"
-                        : "bg-[#1a2a4a]/60 hover:bg-[#1a2a4a]"
-                    )}
-                    data-testid={`button-avatar-${avatar}`}
-                  >
-                    {avatar}
-                  </button>
-                ))}
+                {AVATARS.map((avatarName) => {
+                  const Icon = (LucideIcons as any)[avatarName];
+                  return (
+                    <button
+                      key={avatarName}
+                      onClick={() => setSelectedAvatar(avatarName)}
+                      className={cn(
+                        "p-2.5 rounded-lg transition-all flex items-center justify-center",
+                        selectedAvatar === avatarName
+                          ? "bg-[#2BD4FF] text-[#0a1628] scale-105 shadow-[0_0_15px_rgba(43,212,255,0.4)]"
+                          : "bg-[#1a2a4a]/60 text-zinc-400 hover:bg-[#1a2a4a] hover:text-white"
+                      )}
+                      data-testid={`button-avatar-${avatarName}`}
+                    >
+                      {Icon ? <Icon className="h-6 w-6" /> : avatarName}
+                    </button>
+                  );
+                })}
               </div>
+            </div>
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox 
+                id="remember" 
+                checked={rememberMe}
+                onCheckedChange={(checked: boolean) => setRememberMeLocal(!!checked)}
+                className="border-[#1a2a4a] data-[state=checked]:bg-[#2BD4FF] data-[state=checked]:text-[#0a1628]"
+              />
+              <Label 
+                htmlFor="remember" 
+                className="text-sm font-medium text-zinc-400 cursor-pointer"
+              >
+                Remember Me
+              </Label>
             </div>
             
             <Button 
