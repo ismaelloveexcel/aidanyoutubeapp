@@ -56,7 +56,7 @@ export default function Layout({ children }: LayoutProps) {
                     className={cn(
                       "relative flex items-center gap-3 px-6 py-3 rounded-full text-base font-semibold transition-all cursor-pointer",
                       isActive
-                        ? "text-white bg-gradient-to-r from-[#2BD4FF] to-[#F3C94C] shadow-lg shadow-[#2BD4FF]/25 animate-bounce"
+                        ? "text-white bg-linear-to-r from-[#2BD4FF] to-[#F3C94C] shadow-lg shadow-[#2BD4FF]/25 animate-bounce"
                         : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
                     )}
                     style={isActive ? { boxShadow: "0 0 16px #2BD4FF, 0 0 32px #F3C94C" } : {}}
