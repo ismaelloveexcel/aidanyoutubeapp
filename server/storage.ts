@@ -1,4 +1,4 @@
-import { users, scripts, ideas, thumbnails, recordings, type User, type InsertUser, type Script, type InsertScript, type Idea, type InsertIdea, type Thumbnail, type InsertThumbnail, type Recording, type InsertRecording } from "@shared/schema";
+import { users, scripts, ideas, thumbnails, recordings, videoProjects, type User, type InsertUser, type Script, type InsertScript, type Idea, type InsertIdea, type Thumbnail, type InsertThumbnail, type Recording, type InsertRecording, type VideoProject, type InsertVideoProject } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -29,6 +29,12 @@ export interface IStorage {
   getRecording(id: number): Promise<Recording | undefined>;
   getAllRecordings(): Promise<Recording[]>;
   deleteRecording(id: number): Promise<boolean>;
+  createVideoProject(project: InsertVideoProject): Promise<VideoProject>;
+  updateVideoProject(id: number, project: Partial<InsertVideoProject>): Promise<VideoProject | undefined>;
+  getVideoProject(id: number): Promise<VideoProject | undefined>;
+  getAllVideoProjects(): Promise<VideoProject[]>;
+  deleteVideoProject(id: number): Promise<boolean>;
+  getVideoProjectStats(): Promise<{ total: number; draft: number; inProgress: number; published: number }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -124,6 +130,33 @@ export class DatabaseStorage implements IStorage {
   async deleteRecording(id: number): Promise<boolean> {
     const result = await db.delete(recordings).where(eq(recordings.id, id));
     return result.rowCount !== null && result.rowCount > 0;
+  }
+  async createVideoProject(project: InsertVideoProject): Promise<VideoProject> {
+    const [newProject] = await db.insert(videoProjects).values(project as any).returning();
+    return newProject;
+  }
+  async updateVideoProject(id: number, project: Partial<InsertVideoProject>): Promise<VideoProject | undefined> {
+    const updateData: any = { ...project, updatedAt: new Date() };
+    const [updated] = await db.update(videoProjects).set(updateData).where(eq(videoProjects.id, id)).returning();
+    return updated || undefined;
+  }
+  async getVideoProject(id: number): Promise<VideoProject | undefined> {
+    const [project] = await db.select().from(videoProjects).where(eq(videoProjects.id, id));
+    return project || undefined;
+  }
+  async getAllVideoProjects(): Promise<VideoProject[]> {
+    return await db.select().from(videoProjects).orderBy(desc(videoProjects.updatedAt));
+  }
+  async deleteVideoProject(id: number): Promise<boolean> {
+    const result = await db.delete(videoProjects).where(eq(videoProjects.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  async getVideoProjectStats(): Promise<{ total: number; draft: number; inProgress: number; published: number }> {
+    const projects = await db.select().from(videoProjects);
+    const draft = projects.filter(p => p.status === "draft").length;
+    const inProgress = projects.filter(p => p.status === "in_progress").length;
+    const published = projects.filter(p => p.status === "published").length;
+    return { total: projects.length, draft, inProgress, published };
   }
 }
 

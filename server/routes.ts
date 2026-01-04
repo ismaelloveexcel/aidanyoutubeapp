@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { type Server } from "http";
 import { storage } from "./storage";
 import { pool } from "./db";
-import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema, insertRecordingSchema } from "@shared/schema";
+import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema, insertRecordingSchema, insertVideoProjectSchema } from "@shared/schema";
 import { z } from "zod";
 import { moderateObject } from "./moderation";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
@@ -257,6 +257,60 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       if (!success) { res.status(404).json({ error: "Recording not found" }); return; }
       res.json({ success: true });
     } catch { res.status(500).json({ error: "Failed to delete recording" }); }
+  });
+
+  // Video Project routes
+  app.post("/api/video-projects", async (req, res) => {
+    try {
+      const project = insertVideoProjectSchema.parse(req.body);
+      const moderation = moderateObject({ title: project.title });
+      if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
+      res.json(await storage.createVideoProject(project));
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to create video project" });
+    }
+  });
+  app.get("/api/video-projects", async (req, res) => {
+    try { res.json(await storage.getAllVideoProjects()); } catch { res.status(500).json({ error: "Failed to fetch video projects" }); }
+  });
+  app.get("/api/video-projects/stats", async (req, res) => {
+    try { res.json(await storage.getVideoProjectStats()); } catch { res.status(500).json({ error: "Failed to fetch video project stats" }); }
+  });
+  app.get("/api/video-projects/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid project id" }); return; }
+      const project = await storage.getVideoProject(id);
+      if (!project) { res.status(404).json({ error: "Video project not found" }); return; }
+      res.json(project);
+    } catch { res.status(500).json({ error: "Failed to fetch video project" }); }
+  });
+  app.patch("/api/video-projects/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid project id" }); return; }
+      const updates = insertVideoProjectSchema.partial().parse(req.body);
+      if (updates.title) {
+        const moderation = moderateObject({ title: updates.title });
+        if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
+      }
+      const updated = await storage.updateVideoProject(id, updates);
+      if (!updated) { res.status(404).json({ error: "Video project not found" }); return; }
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to update video project" });
+    }
+  });
+  app.delete("/api/video-projects/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid project id" }); return; }
+      const success = await storage.deleteVideoProject(id);
+      if (!success) { res.status(404).json({ error: "Video project not found" }); return; }
+      res.json({ success: true });
+    } catch { res.status(500).json({ error: "Failed to delete video project" }); }
   });
 
   // Register object storage routes for file uploads

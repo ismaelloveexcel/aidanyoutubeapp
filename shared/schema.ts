@@ -63,6 +63,7 @@ export const insertThumbnailSchema = createInsertSchema(thumbnails).omit({
 export const videoProjects = pgTable("video_projects", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  status: text("status").notNull().default("draft"), // "draft", "in_progress", "published"
   clips: json("clips").$type<{ id: string; url: string; startTime: number; endTime: number; duration: number }[]>().notNull().default([]),
   textOverlays: json("text_overlays").$type<{ id: string; text: string; startTime: number; endTime: number; x: number; y: number; fontSize: number; color: string }[]>().notNull().default([]),
   transitions: json("transitions").$type<{ id: string; type: string; at: number }[]>().notNull().default([]),
