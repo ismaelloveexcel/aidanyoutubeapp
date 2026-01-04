@@ -41,8 +41,8 @@ function Router() {
             <Route path="/soundboard" component={Soundboard} />
             <Route path="/recorder" component={VideoRecorder} />
             <Route path="/editor" component={VideoEditor} />
-            <Route path="/viral" component={ViralOptimizer} />
-            <Route path="/upload" component={YouTubeUpload} />
+            <Route path="/viral-optimizer" component={ViralOptimizer} />
+            <Route path="/youtube-upload" component={YouTubeUpload} />
             <Route path="/progress" component={Progress} />
             <Route path="/analytics" component={Analytics} />
             <Route path="/calendar" component={Calendar} />
