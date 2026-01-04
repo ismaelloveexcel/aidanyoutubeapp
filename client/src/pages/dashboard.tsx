@@ -64,15 +64,6 @@ const MODE_ENTRY_BUTTONS = [
     gradient: "from-[#6DFF9C] to-[#4BCC7A]"
   },
   {
-    mode: "GROW",
-    title: "Grow",
-    description: "Analyze and optimize your channel",
-    path: "/analytics",
-    icon: TrendingUp,
-    color: "#F3C94C",
-    gradient: "from-[#F3C94C] to-[#E5A800]"
-  },
-  {
     mode: "LIBRARY",
     title: "Library",
     description: "Templates, sounds, and assets",
