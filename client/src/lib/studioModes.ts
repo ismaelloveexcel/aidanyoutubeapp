@@ -12,7 +12,8 @@ export const MODE_MAP: Record<StudioMode, string[]> = {
     "/recorder",
     "/editor",
     "/thumbnail",
-    "/youtube-upload"
+    "/youtube-upload",
+    "/ai-assistant"
   ],
   GROW: [
     "/analytics",
