@@ -19,7 +19,25 @@ import {
   PlayCircle,
   Film,
   Loader2,
+  Sparkles,
+  Zap,
+  Target,
+  Star,
 } from "lucide-react";
+
+// Daily tips for young creators
+const DAILY_TIPS = [
+  { icon: Sparkles, tip: "Great thumbnails get more clicks! Use bright colors and big text.", color: "#F3C94C" },
+  { icon: Target, tip: "Post consistently! Pick a schedule and stick to it.", color: "#6DFF9C" },
+  { icon: Star, tip: "Reply to comments - your fans love hearing from you!", color: "#2BD4FF" },
+  { icon: Zap, tip: "Hook viewers in the first 5 seconds with something exciting!", color: "#A259FF" },
+  { icon: Sparkles, tip: "Use trending sounds and music to boost your reach.", color: "#FF6B6B" },
+  { icon: Target, tip: "Tell a story - beginning, middle, and end!", color: "#4ECDC4" },
+  { icon: Star, tip: "Collaborate with other creators to grow faster!", color: "#F3C94C" },
+];
+
+// Maximum streak to display before capping
+const MAX_STREAK_DISPLAY = 7;
 
 interface VideoProject {
   id: number;
@@ -97,11 +115,16 @@ export default function Dashboard() {
 
   const displayName = profile.name?.trim() || "";
   const lastProject = recentProjects?.[0];
+  
+  // Get a daily tip based on the day of year
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 1).getTime()) / (1000 * 60 * 60 * 24));
+  const dailyTip = DAILY_TIPS[dayOfYear % DAILY_TIPS.length];
+  const DailyTipIcon = dailyTip.icon;
 
   return (
-    <div className="space-y-8 pb-14">
-      {/* Hero Section */}
-      <div className="space-y-2">
+    <div className="space-y-6 pb-14">
+      {/* Hero Section with Daily Tip */}
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Creator Studio</p>
@@ -119,14 +142,57 @@ export default function Dashboard() {
             <Settings className="h-4 w-4" />
           </Button>
         </div>
+        
+        {/* Daily Creator Tip */}
+        <div 
+          className="flex items-center gap-3 p-3 rounded-xl border transition-all"
+          style={{ 
+            background: `${dailyTip.color}08`, 
+            borderColor: `${dailyTip.color}25` 
+          }}
+        >
+          <div 
+            className="p-2 rounded-lg shrink-0"
+            style={{ background: `${dailyTip.color}15` }}
+          >
+            <DailyTipIcon className="h-4 w-4" style={{ color: dailyTip.color }} />
+          </div>
+          <p className="text-sm text-zinc-300">
+            <span className="font-semibold" style={{ color: dailyTip.color }}>Pro Tip:</span>{" "}
+            {dailyTip.tip}
+          </p>
+        </div>
+      </div>
+
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#6DFF9C]" data-testid="stat-videos">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : videoStats?.published ?? 0}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">Videos Made</p>
+        </div>
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#F3C94C]" data-testid="stat-in-progress">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">In Progress</p>
+        </div>
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#2BD4FF]" data-testid="stat-streak">
+            🔥 {Math.min(MAX_STREAK_DISPLAY, (videoStats?.published ?? 0))}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">Day Streak</p>
+        </div>
       </div>
 
       {/* Continue Project Card */}
       {lastProject && (
-        <Card className="relative overflow-hidden p-5 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70">
-          <div className="flex items-center justify-between gap-4">
+        <Card className="relative overflow-hidden p-5 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70 group hover:border-[#6DFF9C]/30 transition-all">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity bg-gradient-to-br from-[#6DFF9C] to-transparent" />
+          <div className="flex items-center justify-between gap-4 relative">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-[#6DFF9C]/10">
+              <div className="p-3 rounded-xl bg-[#6DFF9C]/10 group-hover:scale-110 transition-transform">
                 <Film className="h-6 w-6 text-[#6DFF9C]" />
               </div>
               <div>
@@ -137,7 +203,7 @@ export default function Dashboard() {
             </div>
             <Link href="/editor">
               <Button 
-                className="gap-2 font-semibold"
+                className="gap-2 font-semibold group-hover:scale-105 transition-transform"
                 style={{ background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)", color: "#0a1628" }}
                 data-testid="button-continue-project"
               >
@@ -158,16 +224,16 @@ export default function Dashboard() {
             return (
               <Link key={entry.mode} href={entry.path}>
                 <Card 
-                  className="group relative overflow-hidden p-5 h-full bg-[#0a1525] border-[#1a2a4a]/60 hover:border-opacity-100 transition-all cursor-pointer"
+                  className="group relative overflow-hidden p-5 h-full bg-[#0a1525] border-[#1a2a4a]/60 hover:border-opacity-100 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 cursor-pointer"
                   style={{ borderColor: `${entry.color}40` }}
                   data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
                 >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity" 
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300" 
                     style={{ background: `linear-gradient(135deg, ${entry.color}, transparent)` }} 
                   />
                   <div className="relative space-y-3">
                     <div 
-                      className="p-3 rounded-xl w-fit"
+                      className="p-3 rounded-xl w-fit group-hover:scale-110 transition-transform duration-200"
                       style={{ background: `${entry.color}15` }}
                     >
                       <Icon className="h-6 w-6" style={{ color: entry.color }} />

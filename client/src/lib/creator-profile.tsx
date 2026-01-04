@@ -5,6 +5,8 @@ interface CreatorProfile {
   channelName: string;
   avatar: string;
   rememberMe: boolean;
+  xp: number;
+  level: number;
 }
 
 interface CreatorProfileContextType {
@@ -13,10 +15,16 @@ interface CreatorProfileContextType {
   setChannelName: (channelName: string) => void;
   setAvatar: (avatar: string) => void;
   setRememberMe: (rememberMe: boolean) => void;
+  addXp: (amount: number) => void;
   isSetup: boolean;
 }
 
-const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: 'Gamepad2', rememberMe: false };
+// XP required per level (fixed amount)
+const XP_PER_LEVEL = 100;
+const calculateLevel = (xp: number) => Math.floor(xp / XP_PER_LEVEL) + 1;
+const getXpProgress = (xp: number) => xp % XP_PER_LEVEL;
+
+const defaultProfile: CreatorProfile = { name: '', channelName: '', avatar: 'Gamepad2', rememberMe: false, xp: 0, level: 1 };
 const AVATARS = ['Gamepad2', 'Clapperboard', 'Mic2', 'Palette', 'Rocket', 'Star', 'Flame', 'Heart', 'Ghost', 'Zap', 'Sword', 'Crown', 'Target', 'Gamepad', 'Headset'];
 const CreatorProfileContext = createContext<CreatorProfileContextType | null>(null);
 
@@ -28,7 +36,10 @@ export function CreatorProfileProvider({ children }: { children: ReactNode }) {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setProfile(parsed);
+        // Ensure xp and level exist for backwards compatibility
+        const xp = parsed.xp ?? 0;
+        const level = calculateLevel(xp);
+        setProfile({ ...defaultProfile, ...parsed, xp, level });
         setIsSetup(!!parsed.name);
       } catch (e) {}
     }
@@ -42,8 +53,13 @@ export function CreatorProfileProvider({ children }: { children: ReactNode }) {
   const setChannelName = (channelName: string) => saveProfile({ ...profile, channelName });
   const setAvatar = (avatar: string) => saveProfile({ ...profile, avatar });
   const setRememberMe = (rememberMe: boolean) => saveProfile({ ...profile, rememberMe });
+  const addXp = (amount: number) => {
+    const newXp = profile.xp + amount;
+    const newLevel = calculateLevel(newXp);
+    saveProfile({ ...profile, xp: newXp, level: newLevel });
+  };
   return (
-    <CreatorProfileContext.Provider value={{ profile, setName, setChannelName, setAvatar, setRememberMe, isSetup }}>
+    <CreatorProfileContext.Provider value={{ profile, setName, setChannelName, setAvatar, setRememberMe, addXp, isSetup }}>
       {children}
     </CreatorProfileContext.Provider>
   );
@@ -55,4 +71,4 @@ export function useCreatorProfile() {
   return context;
 }
 
-export { AVATARS };
+export { AVATARS, XP_PER_LEVEL, calculateLevel, getXpProgress };

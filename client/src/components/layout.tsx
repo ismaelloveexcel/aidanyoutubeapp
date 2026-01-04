@@ -2,8 +2,9 @@ import { Link, useLocation } from "wouter";
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { getModeFromPath } from "@/lib/studioModes";
+import { useCreatorProfile, XP_PER_LEVEL, getXpProgress } from "@/lib/creator-profile";
 import { ModeSwitcher, CreateStepper, GrowNav, LibraryNav } from "@/components/navigation";
-import { Zap, Home, PenTool, TrendingUp, FolderOpen } from "lucide-react";
+import { Zap, Home, PenTool, TrendingUp, FolderOpen, Star } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -11,9 +12,14 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
+  const { profile } = useCreatorProfile();
   
   // Detect current mode from route
   const mode = getModeFromPath(location);
+  
+  // XP progress calculation
+  const xpProgress = getXpProgress(profile.xp);
+  const xpPercent = (xpProgress / XP_PER_LEVEL) * 100;
 
   // Mobile nav items for quick mode access
   const mobileNavItems = [
@@ -46,11 +52,26 @@ export default function Layout({ children }: LayoutProps) {
             <ModeSwitcher activeMode={mode} />
           </div>
 
-          {/* ProfileXP placeholder */}
-          <div className="w-[140px] hidden md:flex items-center justify-end">
-            <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs font-medium text-zinc-300 border border-white/5">
-              <div className="h-2 w-2 rounded-full bg-[#6DFF9C] shadow-[0_0_6px_rgba(109,255,156,0.9)]" />
-              <span className="text-white text-sm">Creator</span>
+          {/* ProfileXP - Shows Level and XP progress */}
+          <div className="w-[160px] hidden md:flex items-center justify-end">
+            <div className="flex items-center gap-2.5 rounded-full bg-white/5 px-3 py-1.5 border border-white/10 hover:border-[#F3C94C]/30 transition-colors cursor-pointer group">
+              <div className="relative">
+                <div className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-[#F3C94C] to-[#ff9500] shadow-[0_0_10px_rgba(243,201,76,0.3)]">
+                  <Star className="h-3.5 w-3.5 text-[#0a1628]" fill="#0a1628" />
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 bg-[#0a1628] rounded-full px-1 text-[9px] font-bold text-[#F3C94C] border border-[#F3C94C]/50">
+                  {profile.level}
+                </div>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[10px] text-zinc-400 font-medium">Level {profile.level}</span>
+                <div className="w-16 h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div 
+                    className="h-full rounded-full bg-gradient-to-r from-[#F3C94C] to-[#ff9500] transition-all duration-500"
+                    style={{ width: `${xpPercent}%` }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
