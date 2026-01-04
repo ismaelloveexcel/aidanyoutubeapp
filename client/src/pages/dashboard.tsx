@@ -76,27 +76,6 @@ const TOOLKIT_SECTIONS = [
   }
 ];
 
-const ONBOARDING_STEPS = [
-  {
-    title: "Welcome to TubeStar!",
-    description: "Your all-in-one studio to become a YouTuber.",
-    color: "#2BD4FF",
-    highlights: ["Templates & music", "Easy editing tools", "AI-powered help"]
-  },
-  {
-    title: "Your Creator Journey",
-    description: "Follow the 5-step roadmap to publish your first video.",
-    color: "#6DFF9C",
-    highlights: ["Idea to upload", "Track progress", "Guided mode"]
-  },
-  {
-    title: "Ready to Create!",
-    description: "Dream big. Create boldly. Shine online.",
-    color: "#F3C94C",
-    highlights: ["Start with ideas", "Record anytime", "Share everywhere"]
-  }
-];
-
 const STEP_STORAGE_KEY = "tubestar-completed-steps";
 
 function getStoredSteps(): number[] {
@@ -116,8 +95,6 @@ export default function Dashboard() {
   const { profile, setName, setChannelName, setAvatar, setRememberMe } = useCreatorProfile();
   const { toast } = useToast();
   const [showSetup, setShowSetup] = useState(() => !localStorage.getItem('tubestar-profile'));
-  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("tubestar-onboarded"));
-  const [onboardingStep, setOnboardingStep] = useState(0);
   const [expandedSection, setExpandedSection] = useState<string | null>("Create");
   
   const [tempName, setTempName] = useState(profile.name);
@@ -133,15 +110,6 @@ export default function Dashboard() {
       setAvatar(selectedAvatar);
       setRememberMe(rememberMe);
       setShowSetup(false);
-    }
-  };
-
-  const handleOnboardingNext = () => {
-    if (onboardingStep < ONBOARDING_STEPS.length - 1) {
-      setOnboardingStep(prev => prev + 1);
-    } else {
-      localStorage.setItem("tubestar-onboarded", "true");
-      setShowOnboarding(false);
     }
   };
 
@@ -172,55 +140,9 @@ export default function Dashboard() {
   const allComplete = completedSteps.length === STEPS.length;
   const displayName = profile.name?.trim() || "";
   const channelTag = profile.channelName?.trim() || "New Channel";
-  const currentOnboarding = ONBOARDING_STEPS[onboardingStep];
 
   return (
     <div className="space-y-6 pb-10">
-      {/* Unified Onboarding Stepper */}
-      <Dialog open={showOnboarding} onOpenChange={setShowOnboarding}>
-        <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/30 max-w-sm" style={{ maxHeight: '70vh' }}>
-          <DialogHeader className="text-center">
-            <div className="flex justify-center gap-2 mb-3">
-              {ONBOARDING_STEPS.map((_, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    "w-2.5 h-2.5 rounded-full transition-all",
-                    i === onboardingStep ? "bg-[#2BD4FF] scale-125" : i < onboardingStep ? "bg-[#6DFF9C]" : "bg-zinc-600"
-                  )}
-                />
-              ))}
-            </div>
-            <DialogTitle className="text-xl font-bold text-white font-display" style={{ color: currentOnboarding.color }}>
-              {currentOnboarding.title}
-            </DialogTitle>
-            <DialogDescription className="text-zinc-300 text-sm">
-              {currentOnboarding.description}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-2 mt-3">
-            {currentOnboarding.highlights.map((h, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm"
-                style={{ background: `${currentOnboarding.color}15`, color: currentOnboarding.color }}
-              >
-                <Check className="h-4 w-4" />
-                {h}
-              </div>
-            ))}
-          </div>
-          <Button
-            className="w-full mt-4 font-semibold"
-            style={{ background: currentOnboarding.color, color: "#0a1628" }}
-            onClick={handleOnboardingNext}
-            data-testid="button-onboarding-next"
-          >
-            {onboardingStep < ONBOARDING_STEPS.length - 1 ? "Next" : "Let's Go!"}
-          </Button>
-        </DialogContent>
-      </Dialog>
-
       {/* Hero Section - Compact */}
       <Card className="relative overflow-hidden p-5 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70">
         <div className="absolute inset-0 opacity-40 pointer-events-none bg-[radial-gradient(circle_at_18%_18%,rgba(43,212,255,0.2),transparent_40%)]" />
