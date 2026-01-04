@@ -110,7 +110,19 @@ export default function Dashboard() {
   const displayName = profile.name?.trim() || "";
 
   return (
-    <div className="space-y-8 sm:space-y-12 pb-12">
+    const [theme, setTheme] = useState('dark');
+    const handleThemeToggle = () => setTheme(theme === 'dark' ? 'light' : 'dark');
+    return (
+    <div className={`space-y-8 sm:space-y-12 pb-12 bg-stars-pattern theme-${theme}`}>
+                        <div className="flex justify-end mb-2">
+                          <Button variant="outline" size="sm" onClick={handleThemeToggle} aria-label="Toggle Theme">
+                            {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                          </Button>
+                        </div>
+                  {/* Mascot Illustration */}
+                  <div className="flex justify-center mb-4">
+                    <img src="/public/mascot-star.png" alt="TubeStar Mascot" className="h-20 w-20 mascot-bounce drop-shadow-xl" />
+                  </div>
             {/* Feature Tour Button */}
             <div className="flex justify-end mb-2">
               <Button variant="outline" size="sm" onClick={() => setShowTour(true)} aria-label="Show Feature Tour">Feature Tour</Button>
@@ -231,10 +243,10 @@ export default function Dashboard() {
         {/* Progress Bar */}
         <div className="h-2 bg-[#1a2a4a]/60 rounded-full overflow-hidden">
           <div 
-            className="h-full rounded-full transition-all duration-500 ease-out"
+            className="h-full rounded-full transition-all duration-700 ease-out progress-animated"
             style={{ 
               width: `${progressPercent}%`,
-              background: "linear-gradient(90deg, #2BD4FF 0%, #4E4DFF 50%, #6DFF9C 100%)"
+              background: "linear-gradient(90deg, #2BD4FF 0%, #F3C94C 50%, #6DFF9C 100%)"
             }}
           />
         </div>
@@ -444,8 +456,8 @@ export default function Dashboard() {
 
           {/* Quick Tips */}
           <Card className="p-6 bg-[#0a1525] border-[#1a2a4a]/60">
-            <h4 className="text-sm font-semibold text-zinc-300 mb-2">Quick Tip</h4>
-            <p className="text-sm text-zinc-400 leading-relaxed">
+            <h4 className="text-sm font-semibold text-zinc-300 mb-2">Quick Tip <span className="ml-1" title="Fun Fact!">✨</span></h4>
+            <p className="text-sm text-zinc-400 leading-relaxed fun-tooltip" title="You can do steps in any order!">
               Click the step numbers to mark them as complete. You can go in any order!
             </p>
           </Card>

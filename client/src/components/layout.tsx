@@ -31,7 +31,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen flex flex-col">
       {/* Header - Clean Professional Design */}
       <header className="sticky top-0 z-50 w-full border-b border-[#1a2a4a] bg-[#0a1628]/95 backdrop-blur-xl">
-        <div className="flex h-20 items-center justify-between px-8 max-w-7xl mx-auto">
+        <div className="flex h-20 items-center justify-between px-8 max-w-7xl mx-auto sticky-nav">
           {/* Logo - Left */}
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer group" data-testid="link-home-logo">
@@ -56,12 +56,13 @@ export default function Layout({ children }: LayoutProps) {
                     className={cn(
                       "relative flex items-center gap-3 px-6 py-3 rounded-full text-base font-semibold transition-all cursor-pointer",
                       isActive
-                        ? "text-white bg-linear-to-r from-[#2BD4FF] to-[#4E4DFF] shadow-lg shadow-[#2BD4FF]/25"
+                        ? "text-white bg-gradient-to-r from-[#2BD4FF] to-[#F3C94C] shadow-lg shadow-[#2BD4FF]/25 animate-bounce"
                         : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
                     )}
+                    style={isActive ? { boxShadow: "0 0 16px #2BD4FF, 0 0 32px #F3C94C" } : {}}
                     data-testid={`nav-${item.label.toLowerCase()}`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className={cn("h-6 w-6", isActive ? "text-[#F3C94C]" : "text-[#2BD4FF]")} />
                     <span>{item.label}</span>
                   </span>
                 </Link>
