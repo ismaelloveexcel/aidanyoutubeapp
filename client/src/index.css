@@ -42,6 +42,23 @@
   --radius-sm: 0.75rem;
 }
 
+/* Force standard shadcn components to not use pink rings/focus states */
+.focus-visible\:ring-ring:focus-visible {
+  --tw-ring-color: hsl(var(--color-ring)) !important;
+}
+
+.border-primary {
+  border-color: var(--aurora-cyan) !important;
+}
+
+.bg-primary {
+  background-color: var(--aurora-cyan) !important;
+}
+
+.text-primary-foreground {
+  color: var(--aurora-eclipse) !important;
+}
+
 /* Aurora Nexus Color Tokens */
 :root {
   --aurora-eclipse: #050B1F;

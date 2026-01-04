@@ -96,7 +96,6 @@ export default function Dashboard() {
   const progressPercent = (completedSteps.length / STEPS.length) * 100;
   const allComplete = completedSteps.length === STEPS.length;
 
-  // Get display name - use profile name or fallback
   const displayName = profile.name?.trim() || "";
 
   return (
@@ -134,7 +133,13 @@ export default function Dashboard() {
           </div>
         </div>
         <button 
-          onClick={() => setShowSetup(true)}
+          onClick={() => {
+            setTempName(profile.name);
+            setTempChannel(profile.channelName);
+            setSelectedAvatar(profile.avatar);
+            setRememberMeLocal(profile.rememberMe);
+            setShowSetup(true);
+          }}
           className="p-3 rounded-xl text-zinc-400 hover:text-white hover:bg-[#1a2a4a]/60 transition-colors"
           data-testid="button-edit-profile"
         >
@@ -412,7 +417,7 @@ export default function Dashboard() {
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
                 placeholder="Enter your name"
-                className="bg-[#0a1525] border-[#1a2a4a]/60 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]/60"
+                className="bg-[#0a1525] border-[#1a2a4a]/60 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF]/60 focus-visible:ring-[#2BD4FF]/30"
                 data-testid="input-name"
               />
             </div>
