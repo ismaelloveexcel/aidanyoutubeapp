@@ -28,24 +28,25 @@ interface TextOverlay {
 }
 
 const MUSIC_TRACKS = [
-  const VIDEO_FILTERS = [
-    { id: 'none', name: 'None' },
-    { id: 'bw', name: 'Black & White' },
-    { id: 'sepia', name: 'Sepia' },
-    { id: 'vivid', name: 'Vivid' },
-    { id: 'blur', name: 'Blur' },
-  ];
-
-  const TRANSITIONS = [
-    { id: 'none', name: 'None' },
-    { id: 'fade', name: 'Fade' },
-    { id: 'zoom', name: 'Zoom' },
-    { id: 'swipe', name: 'Swipe' },
-  ];
   { id: "upbeat", name: "Upbeat Energy" },
   { id: "chill", name: "Chill Vibes" },
   { id: "epic", name: "Epic Adventure" },
   { id: "happy", name: "Happy Days" },
+];
+
+const VIDEO_FILTERS = [
+  { id: 'none', name: 'None' },
+  { id: 'bw', name: 'Black & White' },
+  { id: 'sepia', name: 'Sepia' },
+  { id: 'vivid', name: 'Vivid' },
+  { id: 'blur', name: 'Blur' },
+];
+
+const TRANSITIONS = [
+  { id: 'none', name: 'None' },
+  { id: 'fade', name: 'Fade' },
+  { id: 'zoom', name: 'Zoom' },
+  { id: 'swipe', name: 'Swipe' },
 ];
 
 const DRAFT_KEY = "tubestar-editor-draft";
