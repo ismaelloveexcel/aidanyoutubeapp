@@ -23,6 +23,7 @@ import MultiPlatform from "@/pages/multi-platform";
 import AIAssistant from "@/pages/ai-assistant";
 import Login from "@/pages/login";
 import Roadmap from "@/pages/roadmap";
+import Repository from "@/pages/repository";
 
 function Router() {
   return (
@@ -47,6 +48,7 @@ function Router() {
             <Route path="/calendar" component={Calendar} />
             <Route path="/multi-platform" component={MultiPlatform} />
             <Route path="/ai-assistant" component={AIAssistant} />
+            <Route path="/repository" component={Repository} />
             <Route component={NotFound} />
           </Switch>
         </Layout>

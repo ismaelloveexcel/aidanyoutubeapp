@@ -166,15 +166,17 @@ export default function Dashboard() {
   const { toast } = useToast();
   const [showSetup, setShowSetup] = useState(!isSetup || !profile.rememberMe);
   const [showTour, setShowTour] = useState(false);
-  const [firstVisit, setFirstVisit] = useState(() => {
-    return !localStorage.getItem("aidan-onboarded");
-  });
+  const [showWelcome, setShowWelcome] = useState(() => !localStorage.getItem("aidan-welcome"));
+  const [firstVisit, setFirstVisit] = useState(() => !localStorage.getItem("aidan-onboarded"));
   useEffect(() => {
     if (firstVisit) {
       setShowTour(true);
       localStorage.setItem("aidan-onboarded", "true");
     }
-  }, [firstVisit]);
+    if (showWelcome) {
+      localStorage.setItem("aidan-welcome", "true");
+    }
+  }, [firstVisit, showWelcome]);
   const [tempName, setTempName] = useState(profile.name);
   const [tempChannel, setTempChannel] = useState(profile.channelName);
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar);
@@ -224,6 +226,39 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-10 sm:space-y-12 pb-14">
+      {/* Welcome Modal for First-Time Users */}
+      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+        <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/40 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white font-display">Welcome to TubeStar!</DialogTitle>
+            <DialogDescription className="text-zinc-300 text-base mt-2">
+              <span className="block mb-2">This app is your all-in-one creative studio to help you become a YouTuber. Plan, record, edit, and share your videos with tools inspired by your favorite creators and apps like CapCut.</span>
+              <span className="block mb-2">Get started with templates, music, effects, and more. Every step is designed to make your journey fun and easy!</span>
+              <span className="block font-semibold text-[#2BD4FF]">Dream big. Create boldly. Shine online.</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 mt-4">
+            <div className="rounded-lg bg-[#2BD4FF]/10 border border-[#2BD4FF]/20 p-3 text-sm text-zinc-200">
+              <strong className="text-[#2BD4FF]">What can you do?</strong> <br />
+              <ul className="list-disc pl-5 mt-1 space-y-1">
+                <li>Use viral video templates and pro tips</li>
+                <li>Add music, sound effects, and overlays</li>
+                <li>Edit with easy tools and cool transitions</li>
+                <li>Track your progress and unlock achievements</li>
+                <li>Get AI help for ideas, scripts, and more</li>
+              </ul>
+            </div>
+            <div className="rounded-lg bg-[#6DFF9C]/10 border border-[#6DFF9C]/20 p-3 text-sm text-zinc-200">
+              <strong className="text-[#6DFF9C]">Tip:</strong> Explore each tab at your own pace. You can always revisit this welcome from the dashboard.
+            </div>
+          </div>
+          <Button className="w-full mt-6" onClick={() => setShowWelcome(false)} aria-label="Close Welcome">
+            Let's Go!
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Feature Tour Dialog */}
       <Dialog open={showTour} onOpenChange={setShowTour}>
         <DialogContent className="bg-[#0a1525] border-[#1a2a4a]/60 max-w-lg">
           <DialogHeader>

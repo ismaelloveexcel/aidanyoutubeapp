@@ -24,9 +24,24 @@ interface TextOverlay {
   y: number;
   fontSize: number;
   color: string;
+  animation?: 'none' | 'fade' | 'slide' | 'zoom';
 }
 
 const MUSIC_TRACKS = [
+  const VIDEO_FILTERS = [
+    { id: 'none', name: 'None' },
+    { id: 'bw', name: 'Black & White' },
+    { id: 'sepia', name: 'Sepia' },
+    { id: 'vivid', name: 'Vivid' },
+    { id: 'blur', name: 'Blur' },
+  ];
+
+  const TRANSITIONS = [
+    { id: 'none', name: 'None' },
+    { id: 'fade', name: 'Fade' },
+    { id: 'zoom', name: 'Zoom' },
+    { id: 'swipe', name: 'Swipe' },
+  ];
   { id: "upbeat", name: "Upbeat Energy" },
   { id: "chill", name: "Chill Vibes" },
   { id: "epic", name: "Epic Adventure" },
@@ -77,6 +92,9 @@ export default function VideoEditor() {
   const [trimStart, setTrimStart] = useState(0);
   const [trimEnd, setTrimEnd] = useState(0);
   const [newOverlayText, setNewOverlayText] = useState("");
+  const [overlayAnimation, setOverlayAnimation] = useState<'none' | 'fade' | 'slide' | 'zoom'>('none');
+  const [selectedFilter, setSelectedFilter] = useState('none');
+  const [selectedTransition, setSelectedTransition] = useState('none');
   const [showSaveReminder, setShowSaveReminder] = useState(false);
   const [savedDraft, setSavedDraft] = useState<EditorDraft | null>(null);
 
@@ -217,6 +235,7 @@ export default function VideoEditor() {
       y: 80,
       fontSize: 48,
       color: "#ffffff",
+      animation: overlayAnimation,
     };
 
     setTextOverlays([...textOverlays, overlay]);
@@ -224,7 +243,7 @@ export default function VideoEditor() {
 
     toast({
       title: "Text Added!",
-      description: "Added text overlay to video",
+      description: "Added animated text overlay to video",
     });
   };
 
@@ -403,14 +422,14 @@ export default function VideoEditor() {
                   <>
                     <video
                       ref={videoRef}
-                      className="w-full h-full object-contain"
+                      className={`w-full h-full object-contain ${selectedFilter !== 'none' ? `filter-${selectedFilter}` : ''}`}
                       controls={false}
                     />
                     {textOverlays.map(overlay => (
                       currentTime >= overlay.startTime && currentTime <= overlay.endTime && (
                         <div
                           key={overlay.id}
-                          className="absolute pointer-events-none"
+                          className={`absolute pointer-events-none animated-text-${overlay.animation || 'none'}`}
                           style={{
                             left: `${overlay.x}%`,
                             top: `${overlay.y}%`,
@@ -609,8 +628,21 @@ export default function VideoEditor() {
                   maxLength={50}
                   data-testid="input-overlay-text"
                 />
+                <div className="flex gap-2 items-center">
+                  <label className="text-zinc-300 text-sm">Animation:</label>
+                  <select
+                    value={overlayAnimation}
+                    onChange={e => setOverlayAnimation(e.target.value as any)}
+                    className="rounded-md border border-[#2BD4FF]/40 bg-[#122046] text-white px-2 py-1"
+                  >
+                    <option value="none">None</option>
+                    <option value="fade">Fade</option>
+                    <option value="slide">Slide</option>
+                    <option value="zoom">Zoom</option>
+                  </select>
+                </div>
                 <Button onClick={addTextOverlay} className="w-full" data-testid="button-add-text">
-                  Add Text Overlay
+                  Add Animated Text
                 </Button>
                 {textOverlays.length > 0 && (
                   <div className="text-sm text-zinc-400">
@@ -620,6 +652,64 @@ export default function VideoEditor() {
               </CardContent>
             </Card>
           )}
+          {/* Video Filter */}
+          {currentClip && (
+            <Card className="bg-[#0a1525] border-[#1a2a4a]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  🎨 Video Filter
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <label className="text-zinc-300 text-sm">Choose a filter:</label>
+                <select
+                  value={selectedFilter}
+                  onChange={e => setSelectedFilter(e.target.value)}
+                  className="rounded-md border border-[#2BD4FF]/40 bg-[#122046] text-white px-2 py-1"
+                >
+                  {VIDEO_FILTERS.map(f => (
+                    <option key={f.id} value={f.id}>{f.name}</option>
+                  ))}
+                </select>
+              </CardContent>
+            </Card>
+          )}
+          {/* Transition (applies to next clip) */}
+          {clips.length > 1 && (
+            <Card className="bg-[#0a1525] border-[#1a2a4a]">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  🔄 Clip Transition
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <label className="text-zinc-300 text-sm">Transition to next clip:</label>
+                <select
+                  value={selectedTransition}
+                  onChange={e => setSelectedTransition(e.target.value)}
+                  className="rounded-md border border-[#2BD4FF]/40 bg-[#122046] text-white px-2 py-1"
+                >
+                  {TRANSITIONS.map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+                <div className="text-xs text-zinc-400">(Preview only; export with transitions coming soon)</div>
+              </CardContent>
+            </Card>
+          )}
+/* Add styles for video filters and animated text overlays */
+<style jsx global>{`
+  .filter-bw video { filter: grayscale(1); }
+  .filter-sepia video { filter: sepia(1); }
+  .filter-vivid video { filter: contrast(1.3) saturate(1.5); }
+  .filter-blur video { filter: blur(2px); }
+  .animated-text-fade { animation: fadeIn 1s; }
+  .animated-text-slide { animation: slideIn 0.7s; }
+  .animated-text-zoom { animation: zoomIn 0.7s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+  @keyframes zoomIn { from { transform: scale(0.7) translate(-50%, -50%); opacity: 0; } to { transform: scale(1) translate(-50%, -50%); opacity: 1; } }
+`}</style>
 
           {/* Music */}
           <Card className="bg-[#0a1525] border-[#1a2a4a]">

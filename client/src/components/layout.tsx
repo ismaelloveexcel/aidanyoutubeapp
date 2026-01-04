@@ -25,6 +25,7 @@ export default function Layout({ children }: LayoutProps) {
     { path: "/thumbnail", label: "Thumbnail", icon: Palette },
     { path: "/ai-assistant", label: "AI Help", icon: Sparkles },
     { path: "/analytics", label: "Stats", icon: BarChart3 },
+    { path: "/repository", label: "Repository", icon: Upload },
   ];
 
   return (
