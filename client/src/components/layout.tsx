@@ -30,8 +30,8 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header - Clean Professional Design */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#1a2a4a] bg-[#0a1628]/95 backdrop-blur-xl">
-        <div className="flex h-20 items-center justify-between px-8 max-w-7xl mx-auto sticky-nav">
+      <header className="sticky top-0 z-50 w-full border-b border-[#17233b] bg-gradient-to-r from-[#081121]/95 via-[#0a1628]/95 to-[#081121]/95 backdrop-blur-xl shadow-[0_10px_40px_-30px_rgba(0,0,0,0.9)]">
+        <div className="flex h-20 items-center justify-between px-6 sm:px-8 max-w-6xl mx-auto sticky-nav">
           {/* Logo - Left */}
           <Link href="/">
             <div className="flex items-center gap-2.5 cursor-pointer group" data-testid="link-home-logo">
@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
           </Link>
           
           {/* Navigation - Center */}
-          <nav className="hidden md:flex items-center gap-2 bg-[#0f1d32] rounded-full px-4 py-3 border border-[#1a2a4a]">
+          <nav className="hidden md:flex items-center gap-1 bg-[#0f1d32]/85 rounded-full px-2 py-2 border border-[#1a2a4a]/60 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.7)]">
             {mainNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = location === item.path;
@@ -54,15 +54,14 @@ export default function Layout({ children }: LayoutProps) {
                 <Link key={item.path} href={item.path}>
                   <span
                     className={cn(
-                      "relative flex items-center gap-3 px-6 py-3 rounded-full text-base font-semibold transition-all cursor-pointer",
+                      "relative flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-all cursor-pointer",
                       isActive
-                        ? "text-white bg-linear-to-r from-[#2BD4FF] to-[#F3C94C] shadow-lg shadow-[#2BD4FF]/25 animate-bounce"
-                        : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
+                        ? "text-white bg-white/10 ring-1 ring-[#2BD4FF]/60 shadow-[0_8px_30px_-10px_rgba(43,212,255,0.45)]"
+                        : "text-zinc-300 hover:text-white hover:bg-white/5"
                     )}
-                    style={isActive ? { boxShadow: "0 0 16px #2BD4FF, 0 0 32px #F3C94C" } : {}}
                     data-testid={`nav-${item.label.toLowerCase()}`}
                   >
-                    <Icon className={cn("h-6 w-6", isActive ? "text-[#F3C94C]" : "text-[#2BD4FF]")} />
+                    <Icon className={cn("h-5 w-5", isActive ? "text-[#F3C94C]" : "text-[#2BD4FF]")} />
                     <span>{item.label}</span>
                   </span>
                 </Link>
@@ -74,10 +73,10 @@ export default function Layout({ children }: LayoutProps) {
               <button
                 onClick={() => setShowMore(!showMore)}
                 className={cn(
-                  "flex items-center gap-2 px-6 py-3 rounded-full text-base font-semibold transition-all",
+                  "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all",
                   showMore
-                    ? "bg-[#1a2a4a] text-white"
-                    : "text-zinc-400 hover:text-white hover:bg-[#1a2a4a]"
+                    ? "bg-white/10 text-white ring-1 ring-[#2BD4FF]/40 shadow-[0_10px_30px_-18px_rgba(43,212,255,0.55)]"
+                    : "text-zinc-300 hover:text-white hover:bg-white/5"
                 )}
                 data-testid="nav-more"
               >
@@ -117,10 +116,13 @@ export default function Layout({ children }: LayoutProps) {
           </nav>
 
           {/* Right side - Placeholder for future profile/actions */}
-          <div className="w-[140px] flex justify-end">
-            <div className="hidden md:flex items-center gap-2 text-sm text-zinc-500">
-              <span>Made for</span>
-              <span className="text-[#F3C94C] font-semibold">Awesome Aidan</span>
+          <div className="w-[160px] hidden md:flex items-center justify-end">
+            <div className="flex items-center gap-3 rounded-full bg-white/5 px-3 py-2 text-xs font-medium text-zinc-300 border border-white/5">
+              <div className="h-2 w-2 rounded-full bg-[#2BD4FF] shadow-[0_0_6px_rgba(43,212,255,0.9)]" />
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-400">For Aidan</p>
+                <p className="text-white">Future YouTube Star</p>
+              </div>
             </div>
           </div>
         </div>
