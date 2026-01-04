@@ -6,12 +6,15 @@ TubeStar Creator Studio is a YouTube video creation helper app designed for 8-12
 
 ## Recent Changes (January 2026)
 
-- **Dashboard Simplification (Latest)**: Reduced visual overwhelm for kids by:
+- **Dashboard Simplification & Video Tracking (Latest)**: Reduced visual overwhelm for kids by:
+  - Adding video stats cards to hero section (Videos Made, In Progress, Steps Done, Progress %)
   - Combining welcome/feature tour/player setup into single Player Setup modal
   - Replacing verbose step cards with compact horizontal roadmap strip
-  - Condensing 4 toolkit sections into 2 collapsible accordions (Idea Tools, Video Tools)
+  - Condensing toolkit sections into 2 collapsible accordions (Idea Tools, Video Tools)
+  - Merging Quick Actions into Toolkit to eliminate duplication
   - Adding clickable step number badges to mark progress complete
   - Subtle micro-animations (pulse on current step, scale on hover)
+- **Video Projects API**: Full CRUD endpoints for video project tracking at /api/video-projects with stats endpoint
 - **Video Save/Resume Workflow**: Complete save/resume system with kid-friendly "Name Your Video" prompt before downloads, localStorage draft metadata, and auto-restore clip trims when videos are re-imported into the editor
 - **Aurora Nexus Arcade Theme**: Premium gaming aesthetic redesign with cosmic midnight backgrounds, holographic card effects, and neon glow accents (NO PINK - per user preference)
 - **Gaming-Inspired Visual Language**: References to Stranger Things (portal gradients), Squid Game (circle/triangle/square progress indicators), and Fortnite (holographic card effects)
@@ -58,6 +61,7 @@ Located in `shared/schema.ts` using Drizzle ORM:
 - **scripts**: id, templateId, title, steps (JSON array), timestamps
 - **ideas**: id, title, description, category, saved flag, createdAt
 - **thumbnails**: id, title, bgColor, emoji, createdAt
+- **videoProjects**: id, title, status (draft/in_progress/published), clips, textOverlays, transitions, musicTrack, duration, timestamps
 
 ### Build System
 - **Development**: `tsx server/index.ts` runs TypeScript directly
