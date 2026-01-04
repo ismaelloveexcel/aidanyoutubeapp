@@ -75,8 +75,9 @@ The easiest way to start developing is with GitHub Codespaces:
 2. Select the "Codespaces" tab
 3. Click "Create codespace on main"
 4. Wait for the environment to set up (dependencies install automatically)
-5. Copy `.env.example` to `.env` and configure your database connection
-6. Run `npm run dev` to start the development server
+5. Copy `.env.example` to `.env` and set `DATABASE_URL` to your PostgreSQL connection string
+6. Run `npm run db:push` to set up the database schema
+7. Run `npm run dev` to start the development server
 
 The Codespace comes pre-configured with Node.js 20 and all required extensions.
 
