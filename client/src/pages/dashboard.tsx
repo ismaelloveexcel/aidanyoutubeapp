@@ -425,18 +425,25 @@ export default function Dashboard() {
             <div className="space-y-3">
               <Label className="text-sm font-medium text-zinc-300">Choose Your Avatar</Label>
               <div className="grid grid-cols-5 gap-2.5">
-                {AVATARS.map((avatarName) => {
+                {AVATARS.map((avatarName, index) => {
                   const Icon = (LucideIcons as any)[avatarName];
+                  // Assign colors from the Aurora Nexus palette
+                  const colors = ["#2BD4FF", "#F3C94C", "#4E4DFF", "#6DFF9C", "#2BD4FF"];
+                  const color = colors[index % colors.length];
+                  
                   return (
                     <button
                       key={avatarName}
                       onClick={() => setSelectedAvatar(avatarName)}
                       className={cn(
-                        "p-2.5 rounded-lg transition-all flex items-center justify-center",
+                        "p-2.5 rounded-lg transition-all flex items-center justify-center border",
                         selectedAvatar === avatarName
-                          ? "bg-[#2BD4FF] text-[#0a1628] scale-105 shadow-[0_0_15px_rgba(43,212,255,0.4)]"
-                          : "bg-[#1a2a4a]/60 text-zinc-400 hover:bg-[#1a2a4a] hover:text-white"
+                          ? "bg-[#2BD4FF] text-[#0a1628] scale-105 border-[#2BD4FF] shadow-[0_0_15px_rgba(43,212,255,0.4)]"
+                          : "bg-[#1a2a4a]/40 border-[#1a2a4a]/60 text-zinc-400 hover:bg-[#1a2a4a] hover:text-white"
                       )}
+                      style={{ 
+                        color: selectedAvatar === avatarName ? "#0a1628" : color 
+                      }}
                       data-testid={`button-avatar-${avatarName}`}
                     >
                       {Icon ? <Icon className="h-6 w-6" /> : avatarName}
