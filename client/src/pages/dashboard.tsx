@@ -442,7 +442,8 @@ export default function Dashboard() {
                           : "bg-[#1a2a4a]/40 border-[#1a2a4a]/60 text-zinc-400 hover:bg-[#1a2a4a] hover:text-white"
                       )}
                       style={{ 
-                        color: selectedAvatar === avatarName ? "#0a1628" : color 
+                        color: selectedAvatar === avatarName ? "#0a1628" : color,
+                        borderColor: selectedAvatar === avatarName ? "#2BD4FF" : `${color}40`
                       }}
                       data-testid={`button-avatar-${avatarName}`}
                     >

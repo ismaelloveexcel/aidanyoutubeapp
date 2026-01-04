@@ -26,7 +26,7 @@
   --color-muted-foreground: 220 15% 50%;
   
   /* Nebula Violet Accent */
-  --color-accent: 291 100% 70%; /* Neon pink/purple */
+  --color-accent: 225 40% 14%; /* Matching secondary for now, will replace pink */
   --color-accent-foreground: 0 0% 100%;
   
   --color-destructive: 0 84% 60%;
