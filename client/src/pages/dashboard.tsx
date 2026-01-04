@@ -293,7 +293,7 @@ export default function Dashboard() {
           <div className="relative space-y-4">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="space-y-2">
-                <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">Gifted to Aidan • Calm creator cockpit</p>
+                <p className="text-xs uppercase tracking-[0.25em] text-zinc-400">Gifted to Aidan • Doodletastic Dusty</p>
                 <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight">
                   {displayName ? `Hey ${displayName}, ready to ship your next upload?` : "Welcome—let's ship your next upload."}
                 </h1>
