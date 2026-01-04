@@ -2,9 +2,10 @@ import type { Express } from "express";
 import { type Server } from "http";
 import { storage } from "./storage";
 import { pool } from "./db";
-import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema } from "@shared/schema";
+import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema, insertRecordingSchema } from "@shared/schema";
 import { z } from "zod";
 import { moderateObject } from "./moderation";
+import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 
 const updateScriptSchema = insertScriptSchema.partial();
 const updateIdeaSchema = insertIdeaSchema.partial();
@@ -206,5 +207,60 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       res.json({ success: true });
     } catch { res.status(500).json({ error: "Failed to delete thumbnail" }); }
   });
+
+  // Recording routes
+  app.post("/api/recordings", async (req, res) => {
+    try {
+      const recording = insertRecordingSchema.parse(req.body);
+      const moderation = moderateObject({ title: recording.title });
+      if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
+      res.json(await storage.createRecording(recording));
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to create recording" });
+    }
+  });
+  app.get("/api/recordings", async (req, res) => {
+    try { res.json(await storage.getAllRecordings()); } catch { res.status(500).json({ error: "Failed to fetch recordings" }); }
+  });
+  app.get("/api/recordings/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid recording id" }); return; }
+      const recording = await storage.getRecording(id);
+      if (!recording) { res.status(404).json({ error: "Recording not found" }); return; }
+      res.json(recording);
+    } catch { res.status(500).json({ error: "Failed to fetch recording" }); }
+  });
+  app.patch("/api/recordings/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid recording id" }); return; }
+      const updates = insertRecordingSchema.partial().parse(req.body);
+      if (updates.title) {
+        const moderation = moderateObject({ title: updates.title });
+        if (!moderation.isClean) { res.status(400).json({ error: moderation.errorMessage, moderated: true }); return; }
+      }
+      const updated = await storage.updateRecording(id, updates);
+      if (!updated) { res.status(404).json({ error: "Recording not found" }); return; }
+      res.json(updated);
+    } catch (error) {
+      if (error instanceof z.ZodError) res.status(400).json({ error: error.errors });
+      else res.status(500).json({ error: "Failed to update recording" });
+    }
+  });
+  app.delete("/api/recordings/:id", async (req, res) => {
+    try {
+      const id = parseIdParam(req.params.id);
+      if (id === null) { res.status(400).json({ error: "Invalid recording id" }); return; }
+      const success = await storage.deleteRecording(id);
+      if (!success) { res.status(404).json({ error: "Recording not found" }); return; }
+      res.json({ success: true });
+    } catch { res.status(500).json({ error: "Failed to delete recording" }); }
+  });
+
+  // Register object storage routes for file uploads
+  registerObjectStorageRoutes(app);
+
   return httpServer;
 }

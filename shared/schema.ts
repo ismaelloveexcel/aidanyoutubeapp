@@ -145,6 +145,27 @@ export const insertDailyChallengeSchema = createInsertSchema(dailyChallenges).om
   date: true,
 });
 
+// Saved Recordings
+export const recordings = pgTable("recordings", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  objectPath: text("object_path").notNull(),
+  duration: integer("duration").notNull().default(0),
+  recordingType: text("recording_type").notNull(), // "webcam" or "screen"
+  status: text("status").notNull().default("draft"), // "draft", "complete"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertRecordingSchema = createInsertSchema(recordings).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRecording = z.infer<typeof insertRecordingSchema>;
+export type Recording = typeof recordings.$inferSelect;
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 

@@ -1,4 +1,4 @@
-import { users, scripts, ideas, thumbnails, type User, type InsertUser, type Script, type InsertScript, type Idea, type InsertIdea, type Thumbnail, type InsertThumbnail } from "@shared/schema";
+import { users, scripts, ideas, thumbnails, recordings, type User, type InsertUser, type Script, type InsertScript, type Idea, type InsertIdea, type Thumbnail, type InsertThumbnail, type Recording, type InsertRecording } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcrypt";
@@ -24,6 +24,11 @@ export interface IStorage {
   getAllThumbnails(): Promise<Thumbnail[]>;
   getThumbnail(id: number): Promise<Thumbnail | undefined>;
   deleteThumbnail(id: number): Promise<boolean>;
+  createRecording(recording: InsertRecording): Promise<Recording>;
+  updateRecording(id: number, recording: Partial<InsertRecording>): Promise<Recording | undefined>;
+  getRecording(id: number): Promise<Recording | undefined>;
+  getAllRecordings(): Promise<Recording[]>;
+  deleteRecording(id: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -98,6 +103,26 @@ export class DatabaseStorage implements IStorage {
   }
   async deleteThumbnail(id: number): Promise<boolean> {
     const result = await db.delete(thumbnails).where(eq(thumbnails.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  async createRecording(recording: InsertRecording): Promise<Recording> {
+    const [newRecording] = await db.insert(recordings).values(recording).returning();
+    return newRecording;
+  }
+  async updateRecording(id: number, recording: Partial<InsertRecording>): Promise<Recording | undefined> {
+    const updateData: any = { ...recording, updatedAt: new Date() };
+    const [updated] = await db.update(recordings).set(updateData).where(eq(recordings.id, id)).returning();
+    return updated || undefined;
+  }
+  async getRecording(id: number): Promise<Recording | undefined> {
+    const [recording] = await db.select().from(recordings).where(eq(recordings.id, id));
+    return recording || undefined;
+  }
+  async getAllRecordings(): Promise<Recording[]> {
+    return await db.select().from(recordings).orderBy(desc(recordings.updatedAt));
+  }
+  async deleteRecording(id: number): Promise<boolean> {
+    const result = await db.delete(recordings).where(eq(recordings.id, id));
     return result.rowCount !== null && result.rowCount > 0;
   }
 }

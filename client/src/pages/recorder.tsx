@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Camera, Monitor, Play, Pause, Square, Download, RotateCcw, AlertTriangle, FolderOpen } from "lucide-react";
 
 type RecordingMode = "webcam" | "screen" | null;
 
-// Default MIME type and supported formats for cross-browser compatibility
 const DEFAULT_MIME_TYPE = "video/webm";
 const SUPPORTED_MIME_TYPES = [
   "video/webm;codecs=vp9",
@@ -13,6 +13,32 @@ const SUPPORTED_MIME_TYPES = [
   "video/webm",
   "video/mp4",
 ];
+
+const DRAFT_KEY = "tubestar-video-draft";
+
+interface VideoDraft {
+  title: string;
+  recordingType: string;
+  savedAt: string;
+  duration: number;
+}
+
+function saveDraft(draft: VideoDraft) {
+  localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+}
+
+function getDraft(): VideoDraft | null {
+  try {
+    const saved = localStorage.getItem(DRAFT_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  localStorage.removeItem(DRAFT_KEY);
+}
 
 export default function VideoRecorder() {
   const [mode, setMode] = useState<RecordingMode>(null);
@@ -22,20 +48,31 @@ export default function VideoRecorder() {
   const [recordingTime, setRecordingTime] = useState(0);
   const [hasRecording, setHasRecording] = useState(false);
   const [recordedMimeType, setRecordedMimeType] = useState(DEFAULT_MIME_TYPE);
+  const [showSaveReminder, setShowSaveReminder] = useState(false);
+  const [draft, setDraft] = useState<VideoDraft | null>(null);
+  const [importedVideo, setImportedVideo] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
 
   useEffect(() => {
+    setDraft(getDraft());
     return () => {
       stopStream();
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (hasRecording && !isRecording) {
+      setShowSaveReminder(true);
+    }
+  }, [hasRecording, isRecording]);
 
   const stopStream = () => {
     if (streamRef.current) {
@@ -50,7 +87,6 @@ export default function VideoRecorder() {
         video: { width: 1280, height: 720 },
         audio: true,
       });
-
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -70,7 +106,6 @@ export default function VideoRecorder() {
         video: { width: 1280, height: 720 },
         audio: true,
       });
-
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -86,8 +121,6 @@ export default function VideoRecorder() {
 
   const startRecording = () => {
     if (!streamRef.current) return;
-
-    // Find a supported MIME type for video recording
     let mimeType = "";
     for (const type of SUPPORTED_MIME_TYPES) {
       if (MediaRecorder.isTypeSupported(type)) {
@@ -95,7 +128,6 @@ export default function VideoRecorder() {
         break;
       }
     }
-    
     if (!mimeType) {
       toast({
         title: "Recording Error",
@@ -103,12 +135,9 @@ export default function VideoRecorder() {
       });
       return;
     }
-
     const options = { mimeType };
     const mediaRecorder = new MediaRecorder(streamRef.current, options);
     const chunks: Blob[] = [];
-    
-    // Save the mime type for download
     setRecordedMimeType(mimeType);
 
     mediaRecorder.ondataavailable = (event) => {
@@ -126,14 +155,13 @@ export default function VideoRecorder() {
     mediaRecorderRef.current = mediaRecorder;
     setIsRecording(true);
     setRecordingTime(0);
-
     timerRef.current = setInterval(() => {
-      setRecordingTime(prev => prev + 1);
+      setRecordingTime((prev) => prev + 1);
     }, 1000);
   };
 
   const pauseRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
+    if (mediaRecorderRef.current?.state === "recording") {
       mediaRecorderRef.current.pause();
       setIsPaused(true);
       if (timerRef.current) clearInterval(timerRef.current);
@@ -141,11 +169,11 @@ export default function VideoRecorder() {
   };
 
   const resumeRecording = () => {
-    if (mediaRecorderRef.current && isPaused) {
+    if (mediaRecorderRef.current?.state === "paused") {
       mediaRecorderRef.current.resume();
       setIsPaused(false);
       timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
+        setRecordingTime((prev) => prev + 1);
       }, 1000);
     }
   };
@@ -155,37 +183,55 @@ export default function VideoRecorder() {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       setIsPaused(false);
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
+      if (timerRef.current) clearInterval(timerRef.current);
     }
   };
 
   const downloadVideo = () => {
     if (recordedChunks.length === 0) return;
-
     const blob = new Blob(recordedChunks, { type: recordedMimeType });
     const url = URL.createObjectURL(blob);
-    const extension = recordedMimeType.includes("mp4") ? "mp4" : "webm";
+    const timestamp = new Date().toISOString().slice(0, 10);
+    const filename = `tubestar-video-${timestamp}.webm`;
+    
     const a = document.createElement("a");
     a.href = url;
-    a.download = `tubestar-video-${Date.now()}.${extension}`;
+    a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    // Save draft metadata so user can resume editing later
+    saveDraft({
+      title: filename,
+      recordingType: mode || "webcam",
+      savedAt: new Date().toISOString(),
+      duration: recordingTime,
+    });
+    setDraft(getDraft());
+
+    setShowSaveReminder(false);
     toast({
-      title: "Video Downloaded!",
-      description: "Your video has been saved to your device.",
+      title: "Video Saved!",
+      description: "Your video has been downloaded. You can import it in the Editor to continue working on it.",
     });
   };
 
   const playback = () => {
-    if (recordedChunks.length === 0) return;
+    if (recordedChunks.length === 0 && !importedVideo) return;
+    
+    if (importedVideo) {
+      if (videoRef.current) {
+        videoRef.current.src = importedVideo;
+        videoRef.current.controls = true;
+        videoRef.current.play();
+      }
+      return;
+    }
 
     const blob = new Blob(recordedChunks, { type: recordedMimeType });
     const url = URL.createObjectURL(blob);
-
     stopStream();
     if (videoRef.current) {
       videoRef.current.srcObject = null;
@@ -200,12 +246,40 @@ export default function VideoRecorder() {
     setHasRecording(false);
     setRecordedMimeType(DEFAULT_MIME_TYPE);
     setMode(null);
+    setShowSaveReminder(false);
+    setImportedVideo(null);
     stopStream();
     if (videoRef.current) {
       videoRef.current.srcObject = null;
       videoRef.current.src = "";
       videoRef.current.controls = false;
     }
+  };
+
+  const handleFileImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const url = URL.createObjectURL(file);
+    setImportedVideo(url);
+    setHasRecording(true);
+    setMode("webcam");
+    
+    if (videoRef.current) {
+      videoRef.current.src = url;
+      videoRef.current.controls = true;
+    }
+
+    toast({
+      title: "Video Imported!",
+      description: "Your video is ready. You can send it to the Editor for effects!",
+    });
+  };
+
+  const clearDraftAndNotify = () => {
+    clearDraft();
+    setDraft(null);
+    toast({ title: "Draft Cleared", description: "Ready to start fresh!" });
   };
 
   const formatTime = (seconds: number) => {
@@ -217,40 +291,123 @@ export default function VideoRecorder() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">🎬 Video Recorder</h1>
-        <p className="text-gray-400">Record videos with your webcam or screen</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold text-white mb-2">Video Recorder</h1>
+        <p className="text-zinc-400">Record videos with your webcam or screen</p>
       </div>
 
+      {/* Prominent Save Reminder Banner */}
+      {showSaveReminder && hasRecording && !isRecording && (
+        <div className="rounded-xl bg-gradient-to-r from-[#F3C94C]/20 to-[#2BD4FF]/20 border border-[#F3C94C]/40 p-4 sm:p-6" data-testid="banner-save-reminder">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="p-3 rounded-full bg-[#F3C94C]/20">
+              <AlertTriangle className="h-6 w-6 text-[#F3C94C]" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-white mb-1">Save Your Video!</h3>
+              <p className="text-zinc-300 text-sm">Your recording will be lost if you leave this page. Download it now to keep it safe!</p>
+            </div>
+            <Button onClick={downloadVideo} className="w-full sm:w-auto bg-[#6DFF9C] text-black" data-testid="button-download-reminder">
+              <Download className="h-4 w-4 mr-2" />
+              Download Video
+            </Button>
+          </div>
+        </div>
+      )}
+
       {!mode ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="cursor-pointer hover:scale-105 transition-transform" onClick={startCamera}>
-            <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-4">📹</div>
-              <h3 className="font-display text-2xl mb-2">Webcam Recording</h3>
-              <p className="text-gray-400">Record yourself with your camera</p>
+        <div className="space-y-8">
+          {/* Resume Draft Card */}
+          {draft && (
+            <Card className="bg-gradient-to-r from-[#4E4DFF]/10 to-[#2BD4FF]/10 border-[#4E4DFF]/30">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  <div className="p-3 rounded-full bg-[#4E4DFF]/20">
+                    <FolderOpen className="h-6 w-6 text-[#4E4DFF]" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-white mb-1">Continue Your Video</h3>
+                    <p className="text-zinc-300 text-sm">
+                      You saved "{draft.title}" on {new Date(draft.savedAt).toLocaleDateString()}. 
+                      Import it below to keep editing!
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <Button onClick={() => fileInputRef.current?.click()} className="flex-1 sm:flex-none" data-testid="button-import-draft">
+                      <FolderOpen className="h-4 w-4 mr-2" />
+                      Import Video
+                    </Button>
+                    <Button variant="ghost" onClick={clearDraftAndNotify} size="sm" data-testid="button-clear-draft">
+                      Start Fresh
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="cursor-pointer hover-elevate active-elevate-2 bg-[#0a1525] border-[#1a2a4a]" onClick={startCamera} data-testid="card-webcam">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#2BD4FF]/10 flex items-center justify-center">
+                  <Camera className="h-8 w-8 text-[#2BD4FF]" />
+                </div>
+                <h3 className="font-display text-2xl mb-2 text-white">Webcam Recording</h3>
+                <p className="text-zinc-400">Record yourself with your camera</p>
+              </CardContent>
+            </Card>
+
+            <Card className="cursor-pointer hover-elevate active-elevate-2 bg-[#0a1525] border-[#1a2a4a]" onClick={startScreen} data-testid="card-screen">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#4E4DFF]/10 flex items-center justify-center">
+                  <Monitor className="h-8 w-8 text-[#4E4DFF]" />
+                </div>
+                <h3 className="font-display text-2xl mb-2 text-white">Screen Recording</h3>
+                <p className="text-zinc-400">Record your screen for tutorials</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Import Previous Recording */}
+          <Card className="bg-[#0a1525] border-[#1a2a4a]">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                <div className="p-3 rounded-xl bg-[#6DFF9C]/10">
+                  <FolderOpen className="h-6 w-6 text-[#6DFF9C]" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-white mb-1">Have a saved video?</h3>
+                  <p className="text-sm text-zinc-400">Import a video you downloaded earlier to continue editing</p>
+                </div>
+                <Button variant="ghost" onClick={() => fileInputRef.current?.click()} data-testid="button-import-video">
+                  <FolderOpen className="h-4 w-4 mr-2" />
+                  Import Video
+                </Button>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:scale-105 transition-transform" onClick={startScreen}>
-            <CardContent className="p-8 text-center">
-              <div className="text-6xl mb-4">🖥️</div>
-              <h3 className="font-display text-2xl mb-2">Screen Recording</h3>
-              <p className="text-gray-400">Record your screen for tutorials</p>
-            </CardContent>
-          </Card>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/*"
+            onChange={handleFileImport}
+            className="hidden"
+            data-testid="input-file-import"
+          />
         </div>
       ) : (
         <div className="space-y-6">
-          <Card>
+          <Card className="bg-[#0a1525] border-[#1a2a4a]">
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>
-                  {mode === "webcam" ? "📹 Webcam" : "🖥️ Screen"} Recording
+              <div className="flex items-center justify-between gap-4">
+                <CardTitle className="flex items-center gap-2 text-white">
+                  {mode === "webcam" ? <Camera className="h-5 w-5 text-[#2BD4FF]" /> : <Monitor className="h-5 w-5 text-[#4E4DFF]" />}
+                  {importedVideo ? "Imported Video" : mode === "webcam" ? "Webcam" : "Screen"} Recording
                 </CardTitle>
                 {isRecording && (
                   <div className="flex items-center gap-2">
                     <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
-                    <span className="font-display text-xl">{formatTime(recordingTime)}</span>
+                    <span className="font-display text-xl text-white">{formatTime(recordingTime)}</span>
                   </div>
                 )}
               </div>
@@ -260,20 +417,22 @@ export default function VideoRecorder() {
                 <video
                   ref={videoRef}
                   autoPlay
-                  muted={!hasRecording}
+                  muted={!hasRecording && !importedVideo}
                   playsInline
                   className="w-full h-full object-contain"
                 />
               </div>
 
               <div className="flex flex-wrap gap-3 justify-center">
-                {!isRecording && !hasRecording && (
+                {!isRecording && !hasRecording && !importedVideo && (
                   <>
-                    <Button onClick={startRecording} size="lg">
-                      ⏺️ Start Recording
+                    <Button onClick={startRecording} className="bg-[#6DFF9C] text-black" data-testid="button-start-recording">
+                      <div className="w-3 h-3 rounded-full bg-red-500 mr-2" />
+                      Start Recording
                     </Button>
-                    <Button variant="ghost" onClick={resetRecording}>
-                      ← Back
+                    <Button variant="ghost" onClick={resetRecording} data-testid="button-back">
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Back
                     </Button>
                   </>
                 )}
@@ -281,30 +440,38 @@ export default function VideoRecorder() {
                 {isRecording && (
                   <>
                     {!isPaused ? (
-                      <Button onClick={pauseRecording} variant="secondary">
-                        ⏸️ Pause
+                      <Button onClick={pauseRecording} variant="secondary" data-testid="button-pause">
+                        <Pause className="h-4 w-4 mr-2" />
+                        Pause
                       </Button>
                     ) : (
-                      <Button onClick={resumeRecording} variant="secondary">
-                        ▶️ Resume
+                      <Button onClick={resumeRecording} variant="secondary" data-testid="button-resume">
+                        <Play className="h-4 w-4 mr-2" />
+                        Resume
                       </Button>
                     )}
-                    <Button onClick={stopRecording} variant="accent">
-                      ⏹️ Stop
+                    <Button onClick={stopRecording} className="bg-[#F3C94C] text-black" data-testid="button-stop">
+                      <Square className="h-4 w-4 mr-2" />
+                      Stop
                     </Button>
                   </>
                 )}
 
-                {hasRecording && !isRecording && (
+                {(hasRecording || importedVideo) && !isRecording && (
                   <>
-                    <Button onClick={playback} variant="secondary">
-                      ▶️ Playback
+                    <Button onClick={playback} variant="secondary" data-testid="button-playback">
+                      <Play className="h-4 w-4 mr-2" />
+                      Play
                     </Button>
-                    <Button onClick={downloadVideo}>
-                      💾 Download
-                    </Button>
-                    <Button variant="ghost" onClick={resetRecording}>
-                      🔄 New Recording
+                    {!importedVideo && (
+                      <Button onClick={downloadVideo} className="bg-[#6DFF9C] text-black" data-testid="button-download">
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
+                    )}
+                    <Button variant="ghost" onClick={resetRecording} data-testid="button-new-recording">
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      New Recording
                     </Button>
                   </>
                 )}
@@ -312,27 +479,27 @@ export default function VideoRecorder() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-[#0a1525] border-[#1a2a4a]">
             <CardHeader>
-              <CardTitle>📝 Recording Tips</CardTitle>
+              <CardTitle className="text-white">Recording Tips</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-                  <h4 className="font-semibold mb-2">✓ Good Lighting</h4>
-                  <p className="text-sm text-gray-400">Face a window or use a lamp for clear video</p>
+                <div className="p-4 bg-[#122046] rounded-lg">
+                  <h4 className="font-semibold mb-2 text-[#6DFF9C]">Good Lighting</h4>
+                  <p className="text-sm text-zinc-400">Face a window or use a lamp for clear video</p>
                 </div>
-                <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-                  <h4 className="font-semibold mb-2">✓ Quiet Space</h4>
-                  <p className="text-sm text-gray-400">Find a quiet room for better audio</p>
+                <div className="p-4 bg-[#122046] rounded-lg">
+                  <h4 className="font-semibold mb-2 text-[#2BD4FF]">Quiet Space</h4>
+                  <p className="text-sm text-zinc-400">Find a quiet room for better audio</p>
                 </div>
-                <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-                  <h4 className="font-semibold mb-2">✓ Test First</h4>
-                  <p className="text-sm text-gray-400">Do a quick test to check quality</p>
+                <div className="p-4 bg-[#122046] rounded-lg">
+                  <h4 className="font-semibold mb-2 text-[#F3C94C]">Test First</h4>
+                  <p className="text-sm text-zinc-400">Do a quick test to check quality</p>
                 </div>
-                <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-                  <h4 className="font-semibold mb-2">✓ Be Yourself</h4>
-                  <p className="text-sm text-gray-400">Your personality makes your videos unique!</p>
+                <div className="p-4 bg-[#122046] rounded-lg">
+                  <h4 className="font-semibold mb-2 text-[#4E4DFF]">Be Yourself</h4>
+                  <p className="text-sm text-zinc-400">Your personality makes your videos unique!</p>
                 </div>
               </div>
             </CardContent>
