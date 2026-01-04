@@ -698,19 +698,19 @@ export default function VideoEditor() {
               </CardContent>
             </Card>
           )}
-/* Add styles for video filters and animated text overlays */
-<style jsx global>{`
-  .filter-bw video { filter: grayscale(1); }
-  .filter-sepia video { filter: sepia(1); }
-  .filter-vivid video { filter: contrast(1.3) saturate(1.5); }
-  .filter-blur video { filter: blur(2px); }
-  .animated-text-fade { animation: fadeIn 1s; }
-  .animated-text-slide { animation: slideIn 0.7s; }
-  .animated-text-zoom { animation: zoomIn 0.7s; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes slideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
-  @keyframes zoomIn { from { transform: scale(0.7) translate(-50%, -50%); opacity: 0; } to { transform: scale(1) translate(-50%, -50%); opacity: 1; } }
-`}</style>
+
+          <style dangerouslySetInnerHTML={{ __html: `
+            .filter-bw video { filter: grayscale(1); }
+            .filter-sepia video { filter: sepia(1); }
+            .filter-vivid video { filter: contrast(1.3) saturate(1.5); }
+            .filter-blur video { filter: blur(2px); }
+            .animated-text-fade { animation: fadeIn 1s; }
+            .animated-text-slide { animation: slideIn 0.7s; }
+            .animated-text-zoom { animation: zoomIn 0.7s; }
+            @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+            @keyframes slideIn { from { transform: translate(-50%, -60%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+            @keyframes zoomIn { from { transform: scale(0.7) translate(-50%, -50%); opacity: 0; } to { transform: scale(1) translate(-50%, -50%); opacity: 1; } }
+          `}} />
 
           {/* Music */}
           <Card className="bg-[#0a1525] border-[#1a2a4a]">
