@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Loader2, Sparkles, Zap } from "lucide-react";
+
+interface AIStatus {
+  enabled: boolean;
+  provider: string;
+  message: string;
+}
 
 export default function AIAssistant() {
   const [videoTitle, setVideoTitle] = useState("");
@@ -11,111 +18,139 @@ export default function AIAssistant() {
   const [generatedTags, setGeneratedTags] = useState<string[]>([]);
   const [thumbnailSuggestions, setThumbnailSuggestions] = useState<string[]>([]);
   const [contentIdeas, setContentIdeas] = useState<string[]>([]);
+  const [aiStatus, setAIStatus] = useState<AIStatus | null>(null);
+  const [isLoading, setIsLoading] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const generateDescription = () => {
+  // Check AI status on mount
+  useEffect(() => {
+    fetch("/api/ai/status")
+      .then(res => res.json())
+      .then(data => setAIStatus(data))
+      .catch(() => setAIStatus({ enabled: false, provider: "Offline", message: "AI service unavailable" }));
+  }, []);
+
+  const generateDescription = async () => {
     if (!videoTitle.trim()) {
       toast({ title: "Error", description: "Enter a video title first" });
       return;
     }
 
-    // AI-powered description generation (simulated)
-    const descriptions = [
-      `In this video, we dive deep into ${videoTitle}! You'll learn everything you need to know and more. Don't forget to like and subscribe for more awesome content!
-
-⏱️ Timestamps:
-0:00 - Intro
-0:30 - Main Content
-5:00 - Conclusion
-
-💜 Follow me on social media for behind-the-scenes content!
-
-#${videoTitle.replace(/\s/g, '')} #YouTube #Tutorial`,
-
-      `Welcome back to the channel! Today's video is all about ${videoTitle}. This is something I've been working on and I can't wait to share it with you!
-
-What you'll learn:
-✓ Key concepts and techniques
-✓ Pro tips and tricks
-✓ Common mistakes to avoid
-
-If you enjoyed this video, smash that like button and subscribe for weekly uploads!`,
-
-      `${videoTitle} - Everything you need to know in one video!
-
-This comprehensive guide covers all the basics and advanced techniques. Whether you're a beginner or experienced, you'll find value here.
-
-🔔 Turn on notifications so you never miss an upload!
-👍 Like if this helped you!
-💬 Comment your thoughts below!
-
-Let's get started!`,
-    ];
-
-    const randomDesc = descriptions[Math.floor(Math.random() * descriptions.length)];
-    setGeneratedDescription(randomDesc);
-
-    toast({
-      title: "Description Generated!",
-      description: "AI created a custom description for your video",
-    });
+    setIsLoading("description");
+    try {
+      const res = await fetch("/api/ai/description", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoTitle })
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        toast({ title: "Error", description: data.error });
+        return;
+      }
+      
+      setGeneratedDescription(data.description);
+      toast({
+        title: "Description Generated!",
+        description: data.aiPowered ? "Powered by Google Gemini AI ✨" : "Created with smart templates",
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate description" });
+    } finally {
+      setIsLoading(null);
+    }
   };
 
-  const generateTags = () => {
+  const generateTags = async () => {
     if (!videoTitle.trim()) {
       toast({ title: "Error", description: "Enter a video title first" });
       return;
     }
 
-    // Smart tag generation
-    const baseTags = videoTitle.toLowerCase().split(' ');
-    const additionalTags = ['tutorial', 'how to', 'tips', 'guide', 'beginner friendly', 'viral', 'trending', '2024'];
-
-    const allTags = [...baseTags, ...additionalTags].slice(0, 15);
-    setGeneratedTags(allTags);
-
-    toast({
-      title: "Tags Generated!",
-      description: `Created ${allTags.length} relevant tags`,
-    });
+    setIsLoading("tags");
+    try {
+      const res = await fetch("/api/ai/tags", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoTitle })
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        toast({ title: "Error", description: data.error });
+        return;
+      }
+      
+      setGeneratedTags(data.tags);
+      toast({
+        title: "Tags Generated!",
+        description: `Created ${data.tags.length} relevant tags`,
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate tags" });
+    } finally {
+      setIsLoading(null);
+    }
   };
 
-  const generateThumbnailIdeas = () => {
-    const ideas = [
-      "Bright yellow background with large text",
-      "Your face with shocked expression + text overlay",
-      "Before & After comparison split screen",
-      "Red circle highlighting key element",
-      "Epic action shot with motion blur",
-      "Minimalist design with emoji and number",
-    ];
+  const generateThumbnailIdeas = async () => {
+    if (!videoTitle.trim()) {
+      toast({ title: "Error", description: "Enter a video title first" });
+      return;
+    }
 
-    setThumbnailSuggestions(ideas);
-
-    toast({
-      title: "Thumbnail Ideas Generated!",
-      description: "Here are some proven thumbnail styles",
-    });
+    setIsLoading("thumbnail");
+    try {
+      const res = await fetch("/api/ai/thumbnail-ideas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoTitle })
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        toast({ title: "Error", description: data.error });
+        return;
+      }
+      
+      setThumbnailSuggestions(data.ideas);
+      toast({
+        title: "Thumbnail Ideas Generated!",
+        description: "Here are some creative thumbnail concepts",
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate thumbnail ideas" });
+    } finally {
+      setIsLoading(null);
+    }
   };
 
-  const generateContentIdeas = () => {
-    const ideas = [
-      "Top 10 Things You Didn't Know About...",
-      "I Tried [Challenge] for 24 Hours",
-      "ULTIMATE Beginner's Guide to...",
-      "5 Mistakes Everyone Makes (And How to Fix Them)",
-      "Behind the Scenes of My Creative Process",
-      "Reacting to Viewer Comments",
-      "My Monthly Favorites and Recommendations",
-      "Q&A: You Asked, I Answered!",
-    ];
-
-    setContentIdeas(ideas);
-
-    toast({
-      title: "Content Ideas Generated!",
-      description: "8 video ideas based on trending formats",
-    });
+  const generateContentIdeas = async () => {
+    setIsLoading("content");
+    try {
+      const res = await fetch("/api/ai/content-ideas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+      
+      if (data.error) {
+        toast({ title: "Error", description: data.error });
+        return;
+      }
+      
+      setContentIdeas(data.ideas);
+      toast({
+        title: "Content Ideas Generated!",
+        description: `${data.ideas.length} video ideas ready!`,
+      });
+    } catch (error) {
+      toast({ title: "Error", description: "Failed to generate content ideas" });
+    } finally {
+      setIsLoading(null);
+    }
   };
 
   return (
@@ -123,6 +158,19 @@ Let's get started!`,
       <div className="text-center">
         <h1 className="heading-display text-4xl mb-2">🤖 AI Assistant</h1>
         <p className="text-gray-400">Let AI help you create better content faster</p>
+        
+        {/* AI Status Badge */}
+        {aiStatus && (
+          <div className="mt-3 inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium" 
+            style={{ 
+              background: aiStatus.enabled ? "rgba(109,255,156,0.15)" : "rgba(243,201,76,0.15)",
+              color: aiStatus.enabled ? "#6DFF9C" : "#F3C94C"
+            }}
+          >
+            {aiStatus.enabled ? <Sparkles className="h-3 w-3" /> : <Zap className="h-3 w-3" />}
+            {aiStatus.provider}
+          </div>
+        )}
       </div>
 
       {/* Input Section */}
@@ -143,9 +191,18 @@ Let's get started!`,
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <Button onClick={generateDescription}>Generate Description</Button>
-            <Button onClick={generateTags} variant="secondary">Generate Tags</Button>
-            <Button onClick={generateThumbnailIdeas} variant="accent">Thumbnail Ideas</Button>
+            <Button onClick={generateDescription} disabled={isLoading !== null}>
+              {isLoading === "description" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Generate Description
+            </Button>
+            <Button onClick={generateTags} variant="secondary" disabled={isLoading !== null}>
+              {isLoading === "tags" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Generate Tags
+            </Button>
+            <Button onClick={generateThumbnailIdeas} variant="accent" disabled={isLoading !== null}>
+              {isLoading === "thumbnail" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              Thumbnail Ideas
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -232,7 +289,8 @@ Let's get started!`,
           <CardDescription>Generate fresh content ideas instantly</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button onClick={generateContentIdeas} className="mb-4">
+          <Button onClick={generateContentIdeas} className="mb-4" disabled={isLoading !== null}>
+            {isLoading === "content" ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Generate Content Ideas
           </Button>
 
@@ -260,7 +318,8 @@ Let's get started!`,
       {/* AI Features Info */}
       <Card>
         <CardHeader>
-          <CardTitle>✨ How AI Helps</CardTitle>
+          <CardTitle>✨ Powered by Google Gemini AI</CardTitle>
+          <CardDescription>Free tier - no cost for creators!</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -269,12 +328,12 @@ Let's get started!`,
               <p className="text-sm text-gray-400">AI writes engaging descriptions with timestamps and CTAs</p>
             </div>
             <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-              <h4 className="font-semibold mb-2">#️⃣ Relevant Tags</h4>
-              <p className="text-sm text-gray-400">Generates SEO-optimized tags from your title</p>
+              <h4 className="font-semibold mb-2">#️⃣ SEO Tags</h4>
+              <p className="text-sm text-gray-400">Generates optimized tags to help your video get discovered</p>
             </div>
             <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
               <h4 className="font-semibold mb-2">🎨 Thumbnail Tips</h4>
-              <p className="text-sm text-gray-400">Suggests proven thumbnail styles that get clicks</p>
+              <p className="text-sm text-gray-400">Custom thumbnail suggestions based on your video topic</p>
             </div>
             <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
               <h4 className="font-semibold mb-2">💡 Content Ideas</h4>

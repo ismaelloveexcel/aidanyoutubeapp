@@ -6,6 +6,7 @@ import { insertScriptSchema, insertIdeaSchema, insertThumbnailSchema, insertReco
 import { z } from "zod";
 import { moderateObject } from "./moderation";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { isAIEnabled, generateDescription, generateTags, generateThumbnailIdeas, generateContentIdeas } from "./ai";
 
 const updateScriptSchema = insertScriptSchema.partial();
 const updateIdeaSchema = insertIdeaSchema.partial();
@@ -315,6 +316,71 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   // Register object storage routes for file uploads
   registerObjectStorageRoutes(app);
+
+  // AI Assistant routes (Google Gemini - Free Tier)
+  app.get("/api/ai/status", (req, res) => {
+    res.json({ 
+      enabled: isAIEnabled(),
+      provider: isAIEnabled() ? "Google Gemini" : "Fallback Templates",
+      message: isAIEnabled() 
+        ? "AI is powered by Google Gemini (free tier)" 
+        : "Set GEMINI_API_KEY for real AI. Currently using smart templates."
+    });
+  });
+
+  app.post("/api/ai/description", async (req, res) => {
+    try {
+      const { videoTitle } = req.body;
+      if (!videoTitle || typeof videoTitle !== 'string') {
+        res.status(400).json({ error: "Video title is required" });
+        return;
+      }
+      const description = await generateDescription(videoTitle);
+      res.json({ description, aiPowered: isAIEnabled() });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate description" });
+    }
+  });
+
+  app.post("/api/ai/tags", async (req, res) => {
+    try {
+      const { videoTitle } = req.body;
+      if (!videoTitle || typeof videoTitle !== 'string') {
+        res.status(400).json({ error: "Video title is required" });
+        return;
+      }
+      const tags = await generateTags(videoTitle);
+      res.json({ tags, aiPowered: isAIEnabled() });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate tags" });
+    }
+  });
+
+  app.post("/api/ai/thumbnail-ideas", async (req, res) => {
+    try {
+      const { videoTitle } = req.body;
+      if (!videoTitle || typeof videoTitle !== 'string') {
+        res.status(400).json({ error: "Video title is required" });
+        return;
+      }
+      const ideas = await generateThumbnailIdeas(videoTitle);
+      res.json({ ideas, aiPowered: isAIEnabled() });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate thumbnail ideas" });
+    }
+  });
+
+  app.post("/api/ai/content-ideas", async (req, res) => {
+    try {
+      const { category } = req.body;
+      // Validate category is a string if provided
+      const validCategory = typeof category === 'string' ? category : undefined;
+      const ideas = await generateContentIdeas(validCategory);
+      res.json({ ideas, aiPowered: isAIEnabled() });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate content ideas" });
+    }
+  });
 
   return httpServer;
 }
