@@ -3,8 +3,8 @@ import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { getModeFromPath } from "@/lib/studioModes";
 import { useCreatorProfile, XP_PER_LEVEL, getXpProgress } from "@/lib/creator-profile";
-import { ModeSwitcher, CreateStepper, LibraryNav } from "@/components/navigation";
-import { Zap, Home, PenTool, FolderOpen, Star } from "lucide-react";
+import { ModeSwitcher, CreateStepper, GrowNav, LibraryNav } from "@/components/navigation";
+import { Zap, Home, PenTool, TrendingUp, FolderOpen, Star } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;

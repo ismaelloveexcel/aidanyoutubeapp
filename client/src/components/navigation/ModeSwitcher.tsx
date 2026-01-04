@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { cn } from "@/lib/utils";
 import { StudioMode } from "@/lib/studioModes";
-import { PenTool, FolderOpen } from "lucide-react";
+import { PenTool, TrendingUp, FolderOpen } from "lucide-react";
 
 interface ModeSwitcherProps {
   activeMode: StudioMode | null;
@@ -9,6 +9,7 @@ interface ModeSwitcherProps {
 
 const MODE_CONFIG: Partial<Record<StudioMode, { icon: typeof PenTool; label: string; color: string; path: string }>> = {
   CREATE: { icon: PenTool, label: "Create", color: "#6DFF9C", path: "/ideas" },
+  GROW: { icon: TrendingUp, label: "Grow", color: "#F3C94C", path: "/viral-optimizer" },
   LIBRARY: { icon: FolderOpen, label: "Library", color: "#2BD4FF", path: "/templates" }
 };
 
