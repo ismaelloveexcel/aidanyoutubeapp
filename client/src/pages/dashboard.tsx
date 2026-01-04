@@ -64,6 +64,15 @@ const MODE_ENTRY_BUTTONS = [
     gradient: "from-[#6DFF9C] to-[#4BCC7A]"
   },
   {
+    mode: "GROW",
+    title: "Grow",
+    description: "Analyze and optimize your channel",
+    path: "/analytics",
+    icon: TrendingUp,
+    color: "#F3C94C",
+    gradient: "from-[#F3C94C] to-[#E5A800]"
+  },
+  {
     mode: "LIBRARY",
     title: "Library",
     description: "Templates, sounds, and assets",
@@ -76,7 +85,10 @@ const MODE_ENTRY_BUTTONS = [
 
 export default function Dashboard() {
   const { profile, setName, setChannelName, setAvatar, setRememberMe } = useCreatorProfile();
-  const [showSetup, setShowSetup] = useState(false);
+  const [showSetup, setShowSetup] = useState(() => {
+    const isSetupDone = localStorage.getItem('tubestar-profile');
+    return !isSetupDone;
+  });
   const [tempName, setTempName] = useState(profile.name || 'Aidan');
   const [tempChannel, setTempChannel] = useState(profile.channelName || "Aidan's Channel");
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar || 'Rocket');
@@ -110,90 +122,160 @@ export default function Dashboard() {
   const DailyTipIcon = dailyTip.icon;
 
   return (
-    <div className="space-y-3 pb-4">
-      {/* Hero Section - Compact */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-[#F3C94C] font-semibold">Creator Studio</p>
-          <h1 className="text-2xl font-display font-bold text-white leading-tight">
-            {displayName ? `Hey ${displayName}!` : "Hey Aidan!"}
-          </h1>
+    <div className="space-y-6 pb-14">
+      {/* Hero Section with Daily Tip */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Creator Studio</p>
+            <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight mt-1">
+              {displayName ? `Hey ${displayName}!` : "Hey Aidan!"}
+            </h1>
+            <p className="text-zinc-400 mt-2">Ready to create something awesome today?</p>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-zinc-400 hover:text-white"
+            onClick={() => setShowSetup(true)}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
         </div>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="text-zinc-400 hover:text-white"
-          onClick={() => setShowSetup(true)}
+        
+        {/* Daily Creator Tip */}
+        <div 
+          className="flex items-center gap-3 p-3 rounded-xl border transition-all"
+          style={{ 
+            background: `${dailyTip.color}08`, 
+            borderColor: `${dailyTip.color}25` 
+          }}
         >
-          <Settings className="h-4 w-4" />
-        </Button>
-      </div>
-      
-      {/* Daily Creator Tip - Compact */}
-      <div 
-        className="flex items-center gap-2 p-2 rounded-lg border"
-        style={{ 
-          background: `${dailyTip.color}08`, 
-          borderColor: `${dailyTip.color}25` 
-        }}
-      >
-        <DailyTipIcon className="h-3.5 w-3.5 shrink-0" style={{ color: dailyTip.color }} />
-        <p className="text-xs text-zinc-300 line-clamp-1">
-          <span className="font-semibold" style={{ color: dailyTip.color }}>Tip:</span>{" "}
-          {dailyTip.tip}
-        </p>
-      </div>
-
-      {/* Quick Stats Row - Styled like reference */}
-      <div className="grid grid-cols-3 gap-2">
-        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
-          <div className="text-2xl font-bold text-[#2BD4FF] leading-none" data-testid="stat-videos">
-            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.published ?? 0}
+          <div 
+            className="p-2 rounded-lg shrink-0"
+            style={{ background: `${dailyTip.color}15` }}
+          >
+            <DailyTipIcon className="h-4 w-4" style={{ color: dailyTip.color }} />
           </div>
-          <p className="text-xs text-zinc-500 mt-1.5">Videos Made</p>
-        </div>
-        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
-          <div className="text-2xl font-bold text-[#F3C94C] leading-none" data-testid="stat-in-progress">
-            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
-          </div>
-          <p className="text-xs text-zinc-500 mt-1.5">In Progress</p>
-        </div>
-        <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
-          <div className="text-2xl font-bold text-[#6DFF9C] leading-none" data-testid="stat-streak">
-            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.total ?? 0}
-          </div>
-          <p className="text-xs text-zinc-500 mt-1.5">Ideas Saved</p>
+          <p className="text-sm text-zinc-300">
+            <span className="font-semibold" style={{ color: dailyTip.color }}>Pro Tip:</span>{" "}
+            {dailyTip.tip}
+          </p>
         </div>
       </div>
 
-      {/* Mode Entry Buttons - Clean horizontal style like reference */}
-      <section className="space-y-2">
-        <h2 className="text-sm font-semibold text-white">Jump Into</h2>
-        <div className="space-y-2">
+      {/* Quick Stats Row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#6DFF9C]" data-testid="stat-videos">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : videoStats?.published ?? 0}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">Videos Made</p>
+        </div>
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#F3C94C]" data-testid="stat-in-progress">
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">In Progress</p>
+        </div>
+        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
+          <div className="text-2xl font-bold text-[#2BD4FF]" data-testid="stat-streak">
+            🔥 {Math.min(MAX_STREAK_DISPLAY, (videoStats?.published ?? 0))}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">Day Streak</p>
+        </div>
+      </div>
+
+      {/* Continue Project Card */}
+      {lastProject && (
+        <Card className="relative overflow-hidden p-5 bg-gradient-to-br from-[#0f1f3f] via-[#0c172c] to-[#0b1322] border-[#1a2a4a]/70 group hover:border-[#6DFF9C]/30 transition-all">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity bg-gradient-to-br from-[#6DFF9C] to-transparent" />
+          <div className="flex items-center justify-between gap-4 relative">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-[#6DFF9C]/10 group-hover:scale-110 transition-transform">
+                <Film className="h-6 w-6 text-[#6DFF9C]" />
+              </div>
+              <div>
+                <p className="text-xs text-zinc-500 uppercase tracking-wider">Continue where you left off</p>
+                <h3 className="text-lg font-semibold text-white">{lastProject.title || "Untitled Project"}</h3>
+                <p className="text-sm text-zinc-400 capitalize">{lastProject.status?.replace('_', ' ') || "In Progress"}</p>
+              </div>
+            </div>
+            <Link href="/editor">
+              <Button 
+                className="gap-2 font-semibold group-hover:scale-105 transition-transform"
+                style={{ background: "linear-gradient(135deg, #6DFF9C 0%, #4BCC7A 100%)", color: "#0a1628" }}
+                data-testid="button-continue-project"
+              >
+                <PlayCircle className="h-4 w-4" />
+                Continue
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {/* Mode Entry Buttons */}
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold text-white">Jump Into</h2>
+        <div className="grid gap-4 sm:grid-cols-3">
           {MODE_ENTRY_BUTTONS.map((entry) => {
             const Icon = entry.icon;
             return (
               <Link key={entry.mode} href={entry.path}>
-                <div 
-                  className="flex items-center gap-3 p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40 hover-elevate active-elevate-2 cursor-pointer"
+                <Card 
+                  className="group relative overflow-hidden p-5 h-full bg-[#0a1525] border-[#1a2a4a]/60 hover:border-opacity-100 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 cursor-pointer"
+                  style={{ borderColor: `${entry.color}40` }}
                   data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
                 >
-                  <div className="shrink-0">
-                    <Icon className="h-5 w-5" style={{ color: entry.color }} />
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300" 
+                    style={{ background: `linear-gradient(135deg, ${entry.color}, transparent)` }} 
+                  />
+                  <div className="relative space-y-3">
+                    <div 
+                      className="p-3 rounded-xl w-fit group-hover:scale-110 transition-transform duration-200"
+                      style={{ background: `${entry.color}15` }}
+                    >
+                      <Icon className="h-6 w-6" style={{ color: entry.color }} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
+                        {entry.title}
+                      </h3>
+                      <p className="text-sm text-zinc-400 mt-1">{entry.description}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm font-medium" style={{ color: entry.color }}>
+                      Get started <ChevronRight className="h-4 w-4" />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-white">
-                      {entry.title}
-                    </h3>
-                    <p className="text-xs text-zinc-500">{entry.description}</p>
-                  </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-zinc-600" />
-                </div>
+                </Card>
               </Link>
             );
           })}
         </div>
       </section>
+
+      {/* Recent Activity (Optional) */}
+      {recentProjects && recentProjects.length > 1 && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
+          <div className="space-y-2">
+            {recentProjects.slice(1, 4).map((project) => (
+              <Link key={project.id} href="/editor">
+                <Card className="p-4 bg-[#0a1525] border-[#1a2a4a]/60 hover:border-[#2BD4FF]/30 transition-all cursor-pointer">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Film className="h-4 w-4 text-zinc-500" />
+                      <span className="text-sm font-medium text-white">{project.title || "Untitled"}</span>
+                    </div>
+                    <span className="text-xs text-zinc-500 capitalize">{project.status?.replace('_', ' ')}</span>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Player Setup Dialog */}
       <Dialog open={showSetup} onOpenChange={setShowSetup}>

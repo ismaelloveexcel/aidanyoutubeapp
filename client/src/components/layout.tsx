@@ -25,6 +25,7 @@ export default function Layout({ children }: LayoutProps) {
   const mobileNavItems = [
     { path: "/", label: "Home", icon: Home, color: "#2BD4FF" },
     { path: "/ideas", label: "Create", icon: PenTool, color: "#6DFF9C" },
+    { path: "/analytics", label: "Grow", icon: TrendingUp, color: "#F3C94C" },
     { path: "/templates", label: "Library", icon: FolderOpen, color: "#2BD4FF" }
   ];
 
@@ -78,6 +79,7 @@ export default function Layout({ children }: LayoutProps) {
 
       {/* Mode-specific navigation */}
       {mode === "CREATE" && <CreateStepper currentPath={location} />}
+      {mode === "GROW" && <GrowNav currentPath={location} />}
       {mode === "LIBRARY" && <LibraryNav currentPath={location} />}
 
       {/* Mobile Bottom Navigation */}
