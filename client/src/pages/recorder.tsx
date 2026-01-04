@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Monitor, Play, Pause, Square, Download, RotateCcw, AlertTriangle, FolderOpen } from "lucide-react";
+import { Camera, Monitor, Play, Pause, Square, Download, RotateCcw, AlertTriangle, FolderOpen, Save } from "lucide-react";
 
 type RecordingMode = "webcam" | "screen" | null;
 
@@ -51,6 +52,8 @@ export default function VideoRecorder() {
   const [showSaveReminder, setShowSaveReminder] = useState(false);
   const [draft, setDraft] = useState<VideoDraft | null>(null);
   const [importedVideo, setImportedVideo] = useState<string | null>(null);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [videoName, setVideoName] = useState("");
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -187,12 +190,27 @@ export default function VideoRecorder() {
     }
   };
 
+  const promptForName = () => {
+    // Generate a default name
+    const defaultName = `my-video-${Date.now().toString().slice(-6)}`;
+    setVideoName(defaultName);
+    setShowNamePrompt(true);
+  };
+
   const downloadVideo = () => {
     if (recordedChunks.length === 0) return;
+    
+    // Sanitize the name - remove special chars, replace spaces with dashes
+    const sanitizedName = videoName.trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .slice(0, 50) || 'my-video';
+    
+    const filename = `${sanitizedName}.webm`;
+    
     const blob = new Blob(recordedChunks, { type: recordedMimeType });
     const url = URL.createObjectURL(blob);
-    const timestamp = new Date().toISOString().slice(0, 10);
-    const filename = `tubestar-video-${timestamp}.webm`;
     
     const a = document.createElement("a");
     a.href = url;
@@ -212,9 +230,10 @@ export default function VideoRecorder() {
     setDraft(getDraft());
 
     setShowSaveReminder(false);
+    setShowNamePrompt(false);
     toast({
       title: "Video Saved!",
-      description: "Your video has been downloaded. You can import it in the Editor to continue working on it.",
+      description: `Saved as "${filename}". Import it in the Editor to continue working on it.`,
     });
   };
 
@@ -295,8 +314,44 @@ export default function VideoRecorder() {
         <p className="text-zinc-400">Record videos with your webcam or screen</p>
       </div>
 
+      {/* Name Your Video Prompt */}
+      {showNamePrompt && (
+        <Card className="bg-gradient-to-r from-[#6DFF9C]/10 to-[#2BD4FF]/10 border-[#6DFF9C]/40">
+          <CardContent className="p-6">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-[#6DFF9C]/20">
+                  <Save className="h-6 w-6 text-[#6DFF9C]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white">Name Your Video</h3>
+                  <p className="text-zinc-400 text-sm">Give your video a memorable name!</p>
+                </div>
+              </div>
+              <Input
+                value={videoName}
+                onChange={(e) => setVideoName(e.target.value)}
+                placeholder="my-awesome-video"
+                className="bg-[#0a1525] border-[#1a2a4a] text-white"
+                maxLength={50}
+                data-testid="input-video-name"
+              />
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={downloadVideo} className="flex-1 bg-[#6DFF9C] text-black" data-testid="button-confirm-download">
+                  <Download className="h-4 w-4 mr-2" />
+                  Save Video
+                </Button>
+                <Button variant="ghost" onClick={() => setShowNamePrompt(false)} data-testid="button-cancel-download">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Prominent Save Reminder Banner */}
-      {showSaveReminder && hasRecording && !isRecording && (
+      {showSaveReminder && hasRecording && !isRecording && !showNamePrompt && (
         <div className="rounded-xl bg-gradient-to-r from-[#F3C94C]/20 to-[#2BD4FF]/20 border border-[#F3C94C]/40 p-4 sm:p-6" data-testid="banner-save-reminder">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <div className="p-3 rounded-full bg-[#F3C94C]/20">
@@ -306,7 +361,7 @@ export default function VideoRecorder() {
               <h3 className="text-lg font-bold text-white mb-1">Save Your Video!</h3>
               <p className="text-zinc-300 text-sm">Your recording will be lost if you leave this page. Download it now to keep it safe!</p>
             </div>
-            <Button onClick={downloadVideo} className="w-full sm:w-auto bg-[#6DFF9C] text-black" data-testid="button-download-reminder">
+            <Button onClick={promptForName} className="w-full sm:w-auto bg-[#6DFF9C] text-black" data-testid="button-download-reminder">
               <Download className="h-4 w-4 mr-2" />
               Download Video
             </Button>
@@ -464,7 +519,7 @@ export default function VideoRecorder() {
                       Play
                     </Button>
                     {!importedVideo && (
-                      <Button onClick={downloadVideo} className="bg-[#6DFF9C] text-black" data-testid="button-download">
+                      <Button onClick={promptForName} className="bg-[#6DFF9C] text-black" data-testid="button-download">
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
