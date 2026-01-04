@@ -121,7 +121,7 @@ export default function Dashboard() {
                 <div className="w-1.5 h-1.5 rounded-full bg-[#6DFF9C] shadow-[0_0_8px_#6DFF9C] animate-pulse [animation-delay:400ms]" />
               </div>
               <p className="text-sm sm:text-base text-[#2BD4FF] font-black tracking-[0.25em] uppercase drop-shadow-[0_0_8px_rgba(43,212,255,0.4)]">
-                {displayName ? `Made for Awesome ${displayName}` : "Made for Awesome Creators"}
+                {displayName ? `Made for Awesome ${displayName}!!` : "Made for Awesome Creators!!"}
               </p>
             </div>
             <h1 className="text-3xl sm:text-5xl font-bold font-display text-white leading-tight tracking-tight">
