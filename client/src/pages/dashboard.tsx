@@ -159,7 +159,7 @@ export default function Dashboard() {
           <div className="text-2xl font-bold text-[#2BD4FF] leading-none" data-testid="stat-videos">
             {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.published ?? 0}
           </div>
-          <p className="text-xs text-zinc-500 mt-1.5">Total Views</p>
+          <p className="text-xs text-zinc-500 mt-1.5">Videos Made</p>
         </div>
         <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
           <div className="text-2xl font-bold text-[#F3C94C] leading-none" data-testid="stat-in-progress">
@@ -169,9 +169,9 @@ export default function Dashboard() {
         </div>
         <div className="p-3 rounded-md bg-[#0d1a2d] border border-[#1a2a4a]/40">
           <div className="text-2xl font-bold text-[#6DFF9C] leading-none" data-testid="stat-streak">
-            {Math.min(MAX_STREAK_DISPLAY, (videoStats?.published ?? 0))}
+            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : videoStats?.total ?? 0}
           </div>
-          <p className="text-xs text-zinc-500 mt-1.5">Day Streak</p>
+          <p className="text-xs text-zinc-500 mt-1.5">Ideas Saved</p>
         </div>
       </div>
 
