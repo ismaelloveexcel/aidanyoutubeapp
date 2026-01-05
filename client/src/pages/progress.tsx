@@ -66,8 +66,8 @@ export default function Progress() {
 
   const currentLevelInfo = LEVELS.find(l => l.level === level) || LEVELS[0];
   const nextLevelInfo = LEVELS.find(l => l.level === level + 1);
-  const xpProgress = getXpProgress(xp);
-  const xpToNextLevel = XP_PER_LEVEL - xpProgress;
+  const xpInCurrentLevel = getXpProgress(xp);
+  const xpToNextLevel = XP_PER_LEVEL - xpInCurrentLevel;
 
   const unlockedBadges = badges.filter(b => b.unlocked);
   const lockedBadges = badges.filter(b => !b.unlocked);
@@ -133,7 +133,7 @@ export default function Progress() {
                 <div
                   className="h-full transition-all duration-500"
                   style={{
-                    width: `${(xpProgress / XP_PER_LEVEL) * 100}%`,
+                    width: `${(xpInCurrentLevel / XP_PER_LEVEL) * 100}%`,
                     background: `linear-gradient(90deg, ${currentLevelInfo.color}, ${nextLevelInfo.color})`,
                   }}
                 />

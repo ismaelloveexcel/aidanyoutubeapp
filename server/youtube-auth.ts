@@ -76,8 +76,12 @@ export async function exchangeCodeForTokens(code: string): Promise<{
 
   try {
     const { tokens } = await oauth2Client.getToken(code);
+    if (!tokens.access_token) {
+      console.error("No access token received from OAuth exchange");
+      return null;
+    }
     return {
-      accessToken: tokens.access_token || "",
+      accessToken: tokens.access_token,
       refreshToken: tokens.refresh_token || undefined,
       expiryDate: tokens.expiry_date || undefined,
     };
@@ -101,8 +105,12 @@ export async function refreshAccessToken(refreshToken: string): Promise<{
   try {
     oauth2Client.setCredentials({ refresh_token: refreshToken });
     const { credentials } = await oauth2Client.refreshAccessToken();
+    if (!credentials.access_token) {
+      console.error("No access token received from token refresh");
+      return null;
+    }
     return {
-      accessToken: credentials.access_token || "",
+      accessToken: credentials.access_token,
       expiryDate: credentials.expiry_date || undefined,
     };
   } catch (error) {

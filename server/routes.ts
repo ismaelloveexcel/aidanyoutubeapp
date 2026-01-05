@@ -438,9 +438,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       // Get channel info to verify the connection works
       const channelInfo = await getChannelInfo(tokens.accessToken);
       
-      // In a real app, you would store these tokens securely in the database
-      // For this demo, we'll pass them back to the frontend via query params
-      // (In production, use secure HTTP-only cookies or session storage)
+      // SECURITY NOTE: In a production application, tokens should be stored securely in the database
+      // associated with a user session, and retrieved via authenticated API calls.
+      // The current implementation only passes non-sensitive info (connection status, channel name)
+      // to the frontend via query params. Access tokens are NOT passed to the frontend.
       const params = new URLSearchParams({
         youtube_connected: "true",
         channel_name: channelInfo?.channelTitle || "YouTube Channel",
