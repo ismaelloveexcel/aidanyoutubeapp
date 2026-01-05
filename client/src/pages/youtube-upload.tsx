@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Upload, AlertTriangle, Youtube, Video, FileVideo } from "lucide-react";
 
 export default function YouTubeUpload() {
   const [isConnected, setIsConnected] = useState(false);
@@ -83,7 +84,10 @@ export default function YouTubeUpload() {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">📤 YouTube Upload</h1>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <Upload className="h-10 w-10 text-[#F3C94C]" />
+          <h1 className="heading-display text-4xl">YouTube Upload</h1>
+        </div>
         <p className="text-gray-400">Upload your videos directly to YouTube</p>
       </div>
 
@@ -91,7 +95,8 @@ export default function YouTubeUpload() {
       <Card className="border-[hsl(50,100%,50%)] border-4">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            ⚠️ Parental Permission Required
+            <AlertTriangle className="h-5 w-5 text-[hsl(50,100%,50%)]" />
+            Parental Permission Required
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -122,7 +127,9 @@ export default function YouTubeUpload() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center py-8">
-              <div className="text-6xl mb-4">📺</div>
+              <div className="flex justify-center mb-4">
+                <Youtube className="h-16 w-16 text-[#FF0000]" />
+              </div>
               <p className="text-gray-400 mb-6">
                 Connect your YouTube account with parental approval
               </p>
@@ -135,19 +142,27 @@ export default function YouTubeUpload() {
               <h4 className="font-semibold mb-3">What We'll Need Access To:</h4>
               <div className="space-y-2 text-sm text-gray-400">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
+                  <div className="w-4 h-4 rounded-full bg-[#6DFF9C] flex items-center justify-center">
+                    <span className="text-[10px] text-[#0a1628] font-bold">Y</span>
+                  </div>
                   <span>Upload videos to your channel</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
+                  <div className="w-4 h-4 rounded-full bg-[#6DFF9C] flex items-center justify-center">
+                    <span className="text-[10px] text-[#0a1628] font-bold">Y</span>
+                  </div>
                   <span>Set video titles, descriptions, and thumbnails</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-400">✓</span>
+                  <div className="w-4 h-4 rounded-full bg-[#6DFF9C] flex items-center justify-center">
+                    <span className="text-[10px] text-[#0a1628] font-bold">Y</span>
+                  </div>
                   <span>View your video analytics</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-red-400">✗</span>
+                  <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center">
+                    <span className="text-[10px] text-white font-bold">N</span>
+                  </div>
                   <span>We will NOT access comments, subscriptions, or personal data</span>
                 </div>
               </div>
@@ -170,7 +185,7 @@ export default function YouTubeUpload() {
                   type="file"
                   accept="video/*"
                   onChange={handleFileSelect}
-                  className="mt-2 w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[hsl(320,100%,50%)] file:text-white hover:file:bg-[hsl(320,100%,60%)]"
+                  className="mt-2 w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#2BD4FF] file:text-[#0a1628] hover:file:bg-[#1BA8D4]"
                 />
                 {videoFile && (
                   <p className="text-sm text-gray-400 mt-2">
