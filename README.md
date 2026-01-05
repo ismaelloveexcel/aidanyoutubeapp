@@ -10,6 +10,8 @@ A YouTube video creation helper app designed for 8-12 year old kids. Create amaz
 - **Templates**: Browse professional video templates for trending styles (Stranger Things, Minecraft, Challenges, etc.)
 - **Thumbnail Designer**: Create eye-catching thumbnails with colors, emojis, and quick templates
 - **Soundboard**: Fun sound effect buttons with visual feedback animations
+- **YouTube Integration**: Connect your YouTube account to upload videos directly (requires parental setup)
+- **Analytics**: Track your channel performance after connecting your YouTube account
 - **Content Moderation**: Kid-safe content filtering built-in
 
 ## Tech Stack
@@ -28,6 +30,7 @@ A YouTube video creation helper app designed for 8-12 year old kids. Create amaz
 - TypeScript
 - Drizzle ORM
 - PostgreSQL
+- Google OAuth (YouTube API)
 
 ## Design
 
@@ -59,6 +62,29 @@ A YouTube video creation helper app designed for 8-12 year old kids. Create amaz
    ```
 
 6. Open [http://localhost:5000](http://localhost:5000) in your browser
+
+## YouTube Integration (Optional)
+
+To enable YouTube account connection and video uploads, parents/guardians need to set up YouTube API credentials:
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com)
+2. Create a new project or select an existing one
+3. Enable the **YouTube Data API v3**
+4. Go to **APIs & Services > Credentials**
+5. Click **Create Credentials > OAuth client ID**
+6. Select **Web application** as the application type
+7. Add authorized redirect URIs:
+   - Development: `http://localhost:5000/api/auth/youtube/callback`
+   - Production: `https://your-domain.com/api/auth/youtube/callback`
+8. Copy the **Client ID** and **Client Secret**
+9. Add them to your `.env` file:
+   ```
+   YOUTUBE_CLIENT_ID=your-client-id
+   YOUTUBE_CLIENT_SECRET=your-client-secret
+   YOUTUBE_REDIRECT_URI=http://localhost:5000/api/auth/youtube/callback
+   ```
+
+**Note**: YouTube connection requires parental permission for creators under 13 in compliance with COPPA guidelines.
 
 ## Build for Production
 

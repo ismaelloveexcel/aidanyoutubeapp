@@ -7,6 +7,7 @@ import { z } from "zod";
 import { moderateObject } from "./moderation";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { isAIEnabled, generateDescription, generateTags, generateThumbnailIdeas, generateContentIdeas } from "./ai";
+import { isYouTubeAuthConfigured, getYouTubeAuthUrl, exchangeCodeForTokens, getChannelInfo } from "./youtube-auth";
 
 const updateScriptSchema = insertScriptSchema.partial();
 const updateIdeaSchema = insertIdeaSchema.partial();
@@ -382,6 +383,93 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       res.json({ ideas, aiPowered: isAIEnabled() });
     } catch (error) {
       res.status(500).json({ error: "Failed to generate content ideas" });
+    }
+  });
+
+  // YouTube OAuth routes
+  app.get("/api/auth/youtube/status", (req, res) => {
+    res.json({
+      configured: isYouTubeAuthConfigured(),
+      message: isYouTubeAuthConfigured()
+        ? "YouTube OAuth is configured. You can connect your account."
+        : "YouTube OAuth is not configured. Set YOUTUBE_CLIENT_ID and YOUTUBE_CLIENT_SECRET environment variables.",
+    });
+  });
+
+  app.get("/api/auth/youtube", (req, res) => {
+    if (!isYouTubeAuthConfigured()) {
+      res.status(503).json({
+        error: "YouTube OAuth is not configured",
+        message: "Please ask your parent or guardian to configure YouTube API credentials.",
+      });
+      return;
+    }
+
+    const authUrl = getYouTubeAuthUrl();
+    if (!authUrl) {
+      res.status(500).json({ error: "Failed to generate auth URL" });
+      return;
+    }
+
+    res.json({ authUrl });
+  });
+
+  app.get("/api/auth/youtube/callback", async (req, res) => {
+    const { code, error } = req.query;
+
+    if (error) {
+      // User denied access or there was an error
+      res.redirect("/?youtube_error=" + encodeURIComponent(String(error)));
+      return;
+    }
+
+    if (!code || typeof code !== "string") {
+      res.redirect("/?youtube_error=no_code");
+      return;
+    }
+
+    try {
+      const tokens = await exchangeCodeForTokens(code);
+      if (!tokens) {
+        res.redirect("/?youtube_error=token_exchange_failed");
+        return;
+      }
+
+      // Get channel info to verify the connection works
+      const channelInfo = await getChannelInfo(tokens.accessToken);
+      
+      // In a real app, you would store these tokens securely in the database
+      // For this demo, we'll pass them back to the frontend via query params
+      // (In production, use secure HTTP-only cookies or session storage)
+      const params = new URLSearchParams({
+        youtube_connected: "true",
+        channel_name: channelInfo?.channelTitle || "YouTube Channel",
+      });
+      
+      res.redirect("/youtube-upload?" + params.toString());
+    } catch (error) {
+      console.error("YouTube OAuth callback error:", error);
+      res.redirect("/?youtube_error=callback_failed");
+    }
+  });
+
+  app.post("/api/auth/youtube/channel-info", async (req, res) => {
+    const { accessToken } = req.body;
+    
+    if (!accessToken || typeof accessToken !== "string") {
+      res.status(400).json({ error: "Access token is required" });
+      return;
+    }
+
+    try {
+      const channelInfo = await getChannelInfo(accessToken);
+      if (!channelInfo) {
+        res.status(404).json({ error: "Channel not found" });
+        return;
+      }
+      res.json(channelInfo);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get channel info" });
     }
   });
 
