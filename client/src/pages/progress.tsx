@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useCreatorProfile } from "@/lib/creator-profile";
+import { useCreatorProfile, calculateLevel, getXpProgress, XP_PER_LEVEL } from "@/lib/creator-profile";
 import { useToast } from "@/hooks/use-toast";
 
 interface Badge {
@@ -39,22 +39,24 @@ const ALL_BADGES: Badge[] = [
 const LEVELS = [
   { level: 1, name: "Beginner", xpRequired: 0, color: "hsl(0, 100%, 50%)" },
   { level: 2, name: "Newbie", xpRequired: 100, color: "hsl(30, 100%, 50%)" },
-  { level: 3, name: "Creator", xpRequired: 250, color: "hsl(50, 100%, 50%)" },
-  { level: 4, name: "Rising Star", xpRequired: 500, color: "hsl(100, 100%, 50%)" },
-  { level: 5, name: "Content Maker", xpRequired: 1000, color: "hsl(140, 100%, 50%)" },
-  { level: 6, name: "Influencer", xpRequired: 2000, color: "hsl(180, 100%, 50%)" },
-  { level: 7, name: "Pro Creator", xpRequired: 4000, color: "hsl(220, 100%, 50%)" },
-  { level: 8, name: "Viral Sensation", xpRequired: 8000, color: "hsl(280, 100%, 50%)" },
-  { level: 9, name: "YouTube Star", xpRequired: 15000, color: "hsl(320, 100%, 50%)" },
-  { level: 10, name: "Legend", xpRequired: 30000, color: "hsl(340, 100%, 50%)" },
+  { level: 3, name: "Creator", xpRequired: 200, color: "hsl(50, 100%, 50%)" },
+  { level: 4, name: "Rising Star", xpRequired: 300, color: "hsl(100, 100%, 50%)" },
+  { level: 5, name: "Content Maker", xpRequired: 400, color: "hsl(140, 100%, 50%)" },
+  { level: 6, name: "Influencer", xpRequired: 500, color: "hsl(180, 100%, 50%)" },
+  { level: 7, name: "Pro Creator", xpRequired: 600, color: "hsl(220, 100%, 50%)" },
+  { level: 8, name: "Viral Sensation", xpRequired: 700, color: "hsl(280, 100%, 50%)" },
+  { level: 9, name: "YouTube Star", xpRequired: 800, color: "hsl(320, 100%, 50%)" },
+  { level: 10, name: "Legend", xpRequired: 900, color: "hsl(340, 100%, 50%)" },
 ];
 
 export default function Progress() {
-  const { profile } = useCreatorProfile();
+  const { profile, addXp } = useCreatorProfile();
   const { toast } = useToast();
 
-  const [xp, setXp] = useState(850);
-  const [level, setLevel] = useState(3);
+  // Use XP and level from the actual profile, not hardcoded values
+  const xp = profile.xp;
+  const level = profile.level;
+
   const [badges, setBadges] = useState<Badge[]>(ALL_BADGES);
   const [dailyChallenges, setDailyChallenges] = useState<DailyChallenge[]>([
     { id: "1", title: "Create a Thumbnail", description: "Design and save a new thumbnail", xpReward: 50, completed: false },
@@ -64,10 +66,8 @@ export default function Progress() {
 
   const currentLevelInfo = LEVELS.find(l => l.level === level) || LEVELS[0];
   const nextLevelInfo = LEVELS.find(l => l.level === level + 1);
-  const xpToNextLevel = nextLevelInfo ? nextLevelInfo.xpRequired - xp : 0;
-  const xpProgress = nextLevelInfo
-    ? ((xp - currentLevelInfo.xpRequired) / (nextLevelInfo.xpRequired - currentLevelInfo.xpRequired)) * 100
-    : 100;
+  const xpInCurrentLevel = getXpProgress(xp);
+  const xpToNextLevel = XP_PER_LEVEL - xpInCurrentLevel;
 
   const unlockedBadges = badges.filter(b => b.unlocked);
   const lockedBadges = badges.filter(b => !b.unlocked);
@@ -82,16 +82,17 @@ export default function Progress() {
       )
     );
 
+    // Add XP through the profile context (persisted)
+    addXp(challenge.xpReward);
     const newXp = xp + challenge.xpReward;
-    setXp(newXp);
+    const newLevel = calculateLevel(newXp);
 
     // Check for level up
-    const newLevel = LEVELS.filter(l => newXp >= l.xpRequired).pop();
-    if (newLevel && newLevel.level > level) {
-      setLevel(newLevel.level);
+    if (newLevel > level) {
+      const newLevelInfo = LEVELS.find(l => l.level === newLevel);
       toast({
         title: `🎉 Level Up!`,
-        description: `You're now a ${newLevel.name}! Keep creating amazing content!`,
+        description: `You're now a ${newLevelInfo?.name || 'Level ' + newLevel}! Keep creating amazing content!`,
       });
     } else {
       toast({
@@ -113,12 +114,12 @@ export default function Progress() {
         <CardContent className="p-8">
           <div className="text-center mb-6">
             <div className="text-6xl mb-4">
-              {LEVELS.find(l => l.level === level)?.level || 1}
+              {level}
             </div>
             <h2 className="font-display text-3xl mb-2">{currentLevelInfo.name}</h2>
             <p className="text-gray-400">
               {xp.toLocaleString()} XP
-              {nextLevelInfo && ` • ${xpToNextLevel} XP to ${nextLevelInfo.name}`}
+              {nextLevelInfo && ` • ${xpToNextLevel} XP to Level ${level + 1}`}
             </p>
           </div>
 
@@ -132,7 +133,7 @@ export default function Progress() {
                 <div
                   className="h-full transition-all duration-500"
                   style={{
-                    width: `${xpProgress}%`,
+                    width: `${(xpInCurrentLevel / XP_PER_LEVEL) * 100}%`,
                     background: `linear-gradient(90deg, ${currentLevelInfo.color}, ${nextLevelInfo.color})`,
                   }}
                 />

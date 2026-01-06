@@ -1,28 +1,101 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, AlertTriangle, Youtube, Video, FileVideo } from "lucide-react";
+import { Upload, AlertTriangle, Youtube, CheckCircle, Loader2, ExternalLink, Settings } from "lucide-react";
+import { Link } from "wouter";
+
+interface YouTubeAuthStatus {
+  configured: boolean;
+  message: string;
+}
 
 export default function YouTubeUpload() {
   const [isConnected, setIsConnected] = useState(false);
+  const [channelName, setChannelName] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isConnecting, setIsConnecting] = useState(false);
   const { toast } = useToast();
 
-  const connectToYouTube = () => {
+  // Check if YouTube OAuth is configured on the server
+  const { data: authStatus, isLoading: checkingAuth } = useQuery<YouTubeAuthStatus>({
+    queryKey: ['/api/auth/youtube/status'],
+  });
+
+  // Check for successful OAuth callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const youtubeConnected = urlParams.get('youtube_connected');
+    const youtubeError = urlParams.get('youtube_error');
+    const channelNameParam = urlParams.get('channel_name');
+
+    if (youtubeConnected === 'true') {
+      setIsConnected(true);
+      setChannelName(channelNameParam || 'Your Channel');
+      toast({
+        title: "🎉 YouTube Connected!",
+        description: `Successfully connected to ${channelNameParam || 'your YouTube channel'}!`,
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/youtube-upload');
+    } else if (youtubeError) {
+      toast({
+        title: "❌ Connection Failed",
+        description: `Could not connect to YouTube: ${youtubeError}. Please try again.`,
+      });
+      // Clean up URL
+      window.history.replaceState({}, '', '/youtube-upload');
+    }
+  }, [toast]);
+
+  const connectToYouTube = async () => {
+    if (!authStatus?.configured) {
+      toast({
+        title: "YouTube Not Configured",
+        description: "Ask your parent or guardian to set up YouTube API credentials.",
+      });
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      const response = await fetch('/api/auth/youtube');
+      const data = await response.json();
+      
+      if (data.authUrl) {
+        // Redirect to Google OAuth
+        window.location.href = data.authUrl;
+      } else {
+        toast({
+          title: "Connection Error",
+          description: data.error || "Could not start YouTube connection. Please try again.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to YouTube. Please try again.",
+      });
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const disconnectYouTube = () => {
+    setIsConnected(false);
+    setChannelName("");
     toast({
-      title: "YouTube Connection",
-      description: "This feature requires parental permission and YouTube API setup. Contact your parent or guardian to enable YouTube uploads.",
+      title: "Disconnected",
+      description: "Your YouTube account has been disconnected.",
     });
-    // In a real implementation, this would initiate OAuth flow
-    // window.location.href = '/api/auth/youtube';
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +124,7 @@ export default function YouTubeUpload() {
     setUploading(true);
     setUploadProgress(0);
 
-    // Simulate upload progress
+    // Simulate upload progress (real implementation would use YouTube API)
     const interval = setInterval(() => {
       setUploadProgress(prev => {
         if (prev >= 100) {
@@ -71,14 +144,6 @@ export default function YouTubeUpload() {
         return prev + 5;
       });
     }, 500);
-
-    // In a real implementation, this would upload via YouTube API
-    // const formData = new FormData();
-    // formData.append('video', videoFile);
-    // formData.append('title', title);
-    // formData.append('description', description);
-    // formData.append('tags', tags);
-    // await fetch('/api/youtube/upload', { method: 'POST', body: formData });
   };
 
   return (
@@ -119,7 +184,27 @@ export default function YouTubeUpload() {
         </CardContent>
       </Card>
 
-      {!isConnected ? (
+      {/* Connection Status */}
+      {isConnected ? (
+        <Card className="border-[#6DFF9C] bg-gradient-to-br from-[#0a1f0a] to-[#0a1525]">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-full bg-[#6DFF9C]/10">
+                  <CheckCircle className="h-8 w-8 text-[#6DFF9C]" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-white">Connected to YouTube</h3>
+                  <p className="text-gray-400">Channel: {channelName}</p>
+                </div>
+              </div>
+              <Button variant="secondary" onClick={disconnectYouTube} size="sm">
+                Disconnect
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
         <Card>
           <CardHeader>
             <CardTitle>Connect to YouTube</CardTitle>
@@ -130,12 +215,59 @@ export default function YouTubeUpload() {
               <div className="flex justify-center mb-4">
                 <Youtube className="h-16 w-16 text-[#FF0000]" />
               </div>
-              <p className="text-gray-400 mb-6">
-                Connect your YouTube account with parental approval
-              </p>
-              <Button onClick={connectToYouTube} size="lg">
-                Connect YouTube Account
-              </Button>
+              
+              {checkingAuth ? (
+                <div className="flex items-center justify-center gap-2 text-gray-400">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Checking connection status...
+                </div>
+              ) : authStatus?.configured ? (
+                <>
+                  <p className="text-gray-400 mb-6">
+                    Connect your YouTube account with parental approval
+                  </p>
+                  <Button 
+                    onClick={connectToYouTube} 
+                    size="lg"
+                    disabled={isConnecting}
+                    className="gap-2 bg-[#FF0000] hover:bg-[#CC0000]"
+                  >
+                    {isConnecting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Connecting...
+                      </>
+                    ) : (
+                      <>
+                        <Youtube className="h-4 w-4" />
+                        Connect YouTube Account
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="p-4 bg-[hsl(45,100%,50%)]/10 border border-[hsl(45,100%,50%)]/30 rounded-lg mb-6">
+                    <div className="flex items-center gap-2 text-[hsl(45,100%,60%)] mb-2">
+                      <Settings className="h-4 w-4" />
+                      <span className="font-semibold">Setup Required</span>
+                    </div>
+                    <p className="text-sm text-gray-400">
+                      YouTube connection is not configured yet. Ask your parent or guardian to:
+                    </p>
+                    <ol className="text-sm text-gray-400 list-decimal list-inside mt-2 space-y-1">
+                      <li>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-[#2BD4FF] hover:underline">Google Cloud Console</a></li>
+                      <li>Enable YouTube Data API v3</li>
+                      <li>Create OAuth 2.0 credentials</li>
+                      <li>Add the credentials to this app's settings</li>
+                    </ol>
+                  </div>
+                  <Button disabled size="lg" className="gap-2">
+                    <Youtube className="h-4 w-4" />
+                    Connect YouTube Account
+                  </Button>
+                </>
+              )}
             </div>
 
             <div className="pt-4 border-t-2 border-[hsl(240,10%,20%)]">
@@ -169,9 +301,11 @@ export default function YouTubeUpload() {
             </div>
           </CardContent>
         </Card>
-      ) : (
+      )}
+
+      {/* Upload Form - Only show when connected */}
+      {isConnected && (
         <>
-          {/* Upload Form */}
           <Card>
             <CardHeader>
               <CardTitle>Upload New Video</CardTitle>

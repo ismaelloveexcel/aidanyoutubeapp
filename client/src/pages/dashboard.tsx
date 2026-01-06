@@ -89,8 +89,8 @@ export default function Dashboard() {
     const isSetupDone = localStorage.getItem('tubestar-profile');
     return !isSetupDone;
   });
-  const [tempName, setTempName] = useState(profile.name || 'Aidan');
-  const [tempChannel, setTempChannel] = useState(profile.channelName || "Aidan's Channel");
+  const [tempName, setTempName] = useState(profile.name || '');
+  const [tempChannel, setTempChannel] = useState(profile.channelName || '');
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar || 'Rocket');
   const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe ?? true);
 
@@ -129,7 +129,7 @@ export default function Dashboard() {
           <div>
             <p className="text-xs uppercase tracking-[0.25em] text-[#F3C94C] font-semibold">Creator Studio</p>
             <h1 className="text-3xl sm:text-4xl font-display font-bold text-white leading-tight mt-1">
-              {displayName ? `Hey ${displayName}!` : "Hey Aidan!"}
+              {displayName ? `Hey ${displayName}!` : "Hey Creator!"}
             </h1>
             <p className="text-zinc-400 mt-2">Ready to create something awesome today?</p>
           </div>
@@ -282,10 +282,10 @@ export default function Dashboard() {
         <DialogContent className="bg-[#0a1525] border-[#2BD4FF]/30 max-h-[90vh] overflow-y-auto">
           <DialogHeader className="text-center pb-2">
             <DialogTitle className="text-2xl font-bold text-white font-display">
-              Welcome, Aidan!
+              Welcome to TubeStar!
             </DialogTitle>
             <DialogDescription className="text-zinc-400 text-base">
-              Set up your creator profile and pick your avatar
+              Set up your creator profile and pick your avatar to get started
             </DialogDescription>
           </DialogHeader>
 
@@ -296,7 +296,7 @@ export default function Dashboard() {
                 id="name"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
-                placeholder="Aidan"
+                placeholder="Enter your name"
                 className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-10 text-base"
                 data-testid="input-name"
               />
@@ -308,7 +308,7 @@ export default function Dashboard() {
                 id="channel"
                 value={tempChannel}
                 onChange={(e) => setTempChannel(e.target.value)}
-                placeholder="Aidan's Channel"
+                placeholder="My YouTube Channel"
                 className="bg-[#122046] border-[#2BD4FF]/40 text-white placeholder:text-zinc-500 focus:border-[#2BD4FF] focus-visible:ring-[#2BD4FF]/40 h-10 text-base"
                 data-testid="input-channel"
               />

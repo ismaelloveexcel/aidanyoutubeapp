@@ -1,16 +1,181 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Youtube, BarChart3, TrendingUp, Eye, ThumbsUp, MessageCircle, Clock, AlertCircle, Link as LinkIcon } from "lucide-react";
+import { Link } from "wouter";
+
+interface VideoStats {
+  total: number;
+  draft: number;
+  inProgress: number;
+  published: number;
+}
 
 export default function Analytics() {
-  const videos = [
-    { id: 1, title: "My First Gaming Video", views: 1250, likes: 89, comments: 24, watchTime: 3200 },
-    { id: 2, title: "Top 5 Minecraft Secrets", views: 3450, likes: 278, comments: 67, watchTime: 8900 },
-    { id: 3, title: "Daily Vlog #1", views: 890, likes: 45, comments: 12, watchTime: 2100 },
-  ];
+  const [isYouTubeConnected, setIsYouTubeConnected] = useState(false);
 
-  const totalViews = videos.reduce((sum, v) => sum + v.views, 0);
-  const totalLikes = videos.reduce((sum, v) => sum + v.likes, 0);
-  const totalComments = videos.reduce((sum, v) => sum + v.comments, 0);
+  // Fetch video project stats from the database
+  const { data: videoStats, isLoading } = useQuery<VideoStats>({
+    queryKey: ['/api/video-projects/stats'],
+  });
 
+  // Since YouTube is not connected, show the empty state / connection prompt
+  if (!isYouTubeConnected) {
+    return (
+      <div className="space-y-8">
+        <div className="text-center">
+          <h1 className="heading-display text-4xl mb-2">📊 Analytics</h1>
+          <p className="text-gray-400">Track your channel's performance</p>
+        </div>
+
+        {/* YouTube Connection Card */}
+        <Card className="border-[#FF0000]/30 bg-gradient-to-br from-[#1a0a0a] to-[#0a1525]">
+          <CardContent className="p-8">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#FF0000]/10">
+                <Youtube className="h-10 w-10 text-[#FF0000]" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-display font-bold text-white mb-2">
+                  Connect Your YouTube Channel
+                </h2>
+                <p className="text-gray-400 max-w-md mx-auto">
+                  Connect your YouTube account to see real analytics like views, likes, 
+                  comments, and watch time for all your videos.
+                </p>
+              </div>
+              <Link href="/youtube-upload">
+                <Button size="lg" className="gap-2 bg-[#FF0000] hover:bg-[#CC0000]">
+                  <LinkIcon className="h-4 w-4" />
+                  Connect YouTube Account
+                </Button>
+              </Link>
+              <p className="text-xs text-gray-500">
+                Requires parental permission for creators under 13
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Local Stats from the App */}
+        <div>
+          <h2 className="font-display text-2xl mb-4">🎬 Your TubeStar Activity</h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-4xl text-[hsl(320,100%,50%)]">
+                  {isLoading ? "..." : videoStats?.total ?? 0}
+                </CardTitle>
+                <CardDescription>Total Projects</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-4xl text-[hsl(50,100%,50%)]">
+                  {isLoading ? "..." : videoStats?.draft ?? 0}
+                </CardTitle>
+                <CardDescription>Drafts</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-4xl text-[hsl(180,100%,50%)]">
+                  {isLoading ? "..." : videoStats?.inProgress ?? 0}
+                </CardTitle>
+                <CardDescription>In Progress</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-4xl text-[hsl(140,100%,50%)]">
+                  {isLoading ? "..." : videoStats?.published ?? 0}
+                </CardTitle>
+                <CardDescription>Published</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+
+        {/* Empty State for Videos */}
+        <Card>
+          <CardContent className="py-12 text-center">
+            <BarChart3 className="h-16 w-16 mx-auto text-gray-600 mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">No YouTube Analytics Yet</h3>
+            <p className="text-gray-400 max-w-md mx-auto mb-6">
+              Once you connect your YouTube account, you'll see detailed analytics for 
+              all your videos including views, likes, comments, and watch time.
+            </p>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Link href="/ideas">
+                <Button variant="secondary">💡 Generate Video Ideas</Button>
+              </Link>
+              <Link href="/recorder">
+                <Button variant="secondary">🎬 Record a Video</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* What You'll See */}
+        <Card>
+          <CardHeader>
+            <CardTitle>📈 What You'll See When Connected</CardTitle>
+            <CardDescription>Analytics features available after connecting YouTube</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg text-center">
+                <Eye className="h-8 w-8 mx-auto text-[hsl(320,100%,50%)] mb-2" />
+                <h4 className="font-semibold">Views</h4>
+                <p className="text-sm text-gray-400">See how many people watched</p>
+              </div>
+              <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg text-center">
+                <ThumbsUp className="h-8 w-8 mx-auto text-[hsl(180,100%,50%)] mb-2" />
+                <h4 className="font-semibold">Likes</h4>
+                <p className="text-sm text-gray-400">Track your engagement</p>
+              </div>
+              <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg text-center">
+                <MessageCircle className="h-8 w-8 mx-auto text-[hsl(50,100%,50%)] mb-2" />
+                <h4 className="font-semibold">Comments</h4>
+                <p className="text-sm text-gray-400">See what fans are saying</p>
+              </div>
+              <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg text-center">
+                <Clock className="h-8 w-8 mx-auto text-[hsl(280,100%,50%)] mb-2" />
+                <h4 className="font-semibold">Watch Time</h4>
+                <p className="text-sm text-gray-400">How long people watch</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tips for New Creators */}
+        <Card>
+          <CardHeader>
+            <CardTitle>💡 Tips for Growing Your Channel</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="p-4 bg-[hsl(140,100%,50%)] bg-opacity-20 border-2 border-[hsl(140,100%,50%)] rounded-lg">
+                <h4 className="font-semibold mb-2">✓ Post Consistently</h4>
+                <p className="text-sm">Try to upload at the same time each week. Consistency helps build an audience!</p>
+              </div>
+              <div className="p-4 bg-[hsl(50,100%,50%)] bg-opacity-20 border-2 border-[hsl(50,100%,50%)] rounded-lg">
+                <h4 className="font-semibold mb-2">📈 Engage With Comments</h4>
+                <p className="text-sm">Reply to your viewers! It helps build community and boosts your videos.</p>
+              </div>
+              <div className="p-4 bg-[hsl(320,100%,50%)] bg-opacity-20 border-2 border-[hsl(320,100%,50%)] rounded-lg">
+                <h4 className="font-semibold mb-2">🎯 Hook Viewers Early</h4>
+                <p className="text-sm">The first 5 seconds matter most. Start with something exciting!</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Connected state (future: will show real analytics)
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -18,95 +183,13 @@ export default function Analytics() {
         <p className="text-gray-400">Track your channel's performance</p>
       </div>
 
-      {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-4xl text-[hsl(320,100%,50%)]">{totalViews.toLocaleString()}</CardTitle>
-            <CardDescription>Total Views</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-4xl text-[hsl(180,100%,50%)]">{totalLikes}</CardTitle>
-            <CardDescription>Total Likes</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-4xl text-[hsl(50,100%,50%)]">{totalComments}</CardTitle>
-            <CardDescription>Total Comments</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-4xl text-[hsl(280,100%,50%)]">{videos.length}</CardTitle>
-            <CardDescription>Videos Uploaded</CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* Video Performance */}
-      <div>
-        <h2 className="font-display text-2xl mb-4">🎥 Video Performance</h2>
-        <div className="space-y-4">
-          {videos.map((video, index) => (
-            <Card key={video.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">{video.title}</CardTitle>
-                    <CardDescription>Video #{index + 1}</CardDescription>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-display text-[hsl(320,100%,50%)]">
-                      {video.views.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-400">views</div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <div className="text-xl font-semibold">👍 {video.likes}</div>
-                    <div className="text-sm text-gray-400">Likes</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-semibold">💬 {video.comments}</div>
-                    <div className="text-sm text-gray-400">Comments</div>
-                  </div>
-                  <div>
-                    <div className="text-xl font-semibold">⏱️ {Math.floor(video.watchTime / 60)}m</div>
-                    <div className="text-sm text-gray-400">Watch Time</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Insights */}
       <Card>
-        <CardHeader>
-          <CardTitle>💡 Insights & Recommendations</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="p-4 bg-[hsl(140,100%,50%)] bg-opacity-20 border-2 border-[hsl(140,100%,50%)] rounded-lg">
-              <h4 className="font-semibold mb-2">✓ Your Best Performer</h4>
-              <p className="text-sm">"{videos[1].title}" is crushing it! Make more like this.</p>
-            </div>
-            <div className="p-4 bg-[hsl(50,100%,50%)] bg-opacity-20 border-2 border-[hsl(50,100%,50%)] rounded-lg">
-              <h4 className="font-semibold mb-2">📈 Growth Tip</h4>
-              <p className="text-sm">Your gaming videos get 2x more views. Focus on gaming content!</p>
-            </div>
-            <div className="p-4 bg-[hsl(320,100%,50%)] bg-opacity-20 border-2 border-[hsl(320,100%,50%)] rounded-lg">
-              <h4 className="font-semibold mb-2">🎯 Next Goal</h4>
-              <p className="text-sm">You're only 150 views away from 10K total! Keep posting!</p>
-            </div>
-          </div>
+        <CardContent className="py-12 text-center">
+          <TrendingUp className="h-16 w-16 mx-auto text-[#6DFF9C] mb-4" />
+          <h3 className="text-xl font-semibold text-white mb-2">YouTube Connected!</h3>
+          <p className="text-gray-400">
+            Your analytics will appear here once you start getting views.
+          </p>
         </CardContent>
       </Card>
     </div>
