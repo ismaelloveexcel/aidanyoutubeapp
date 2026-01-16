@@ -1,6 +1,12 @@
 # TubeStar - Creator Studio
 
+[![Deploy to Fly.io](https://img.shields.io/badge/Deploy-Fly.io-blueviolet?logo=fly.io)](./GITHUB_DEPLOYMENT.md)
+[![CI/CD Status](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)](../../actions)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+
 A YouTube video creation helper app designed for 8-12 year old kids. Create amazing content with idea generators, script writers, thumbnail designers, and more!
+
+> **🚀 Ready to deploy?** This app has automated deployment configured! See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) for the complete guide.
 
 ## Features
 
@@ -93,38 +99,80 @@ npm run build
 npm start
 ```
 
-## Open in GitHub Codespaces ☁️
+## 🚀 Automated Deployment with GitHub Actions (Recommended)
 
-The easiest way to start developing is with GitHub Codespaces:
+**The easiest way to deploy with professional CI/CD!** This app is configured for completely free, automated deployment using GitHub Actions + Fly.io.
+
+### Why GitHub Actions + Fly.io?
+- ✅ **Completely free** - No credit card required, no auto-sleep
+- ✅ **Fully automated** - Push to `main` → automatic deployment
+- ✅ **Production-ready** - Security scanning, build tests, health checks
+- ✅ **Professional CI/CD** - Build, test, scan, deploy pipeline
+- ✅ **Always-on** - No cold starts or wake delays
+- ✅ **Included PostgreSQL** - 3GB free database storage
+
+### Quick Setup (5 minutes):
+1. Fork this repository on GitHub
+2. Sign up at [fly.io](https://fly.io/signup) (free, no credit card)
+3. Install Fly CLI: `curl -L https://fly.io/install.sh | sh`
+4. Run `fly launch` and create your app + PostgreSQL database
+5. Get your API token: `fly auth token`
+6. Add `FLY_API_TOKEN` to GitHub repository secrets
+7. Push to `main` branch - automatic deployment! 🎉
+
+**📖 Complete guide**: See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) for detailed step-by-step instructions.
+
+### What Happens Automatically:
+- ✅ TypeScript type checking
+- ✅ Build verification
+- ✅ Security scanning (CodeQL)
+- ✅ Dependency audit
+- ✅ Deployment to Fly.io
+- ✅ Health check verification
+
+Every push to `main` triggers the full CI/CD pipeline!
+
+---
+
+## Alternative Deployment Options
+
+### Deploy to Replit (Visual IDE)
+
+Good for beginners who prefer visual interfaces! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete instructions.
+
+**Quick Start:**
+1. Go to [replit.com](https://replit.com) and click "Create Repl"
+2. Select "Import from GitHub" and paste: `https://github.com/ismaelloveexcel/aidanyoutubeapp`
+3. In Tools → Database, create a PostgreSQL database
+4. Open Shell and run `npm run db:push`
+5. Click "Run" ▶️ to start, "Deploy" 🚀 for production
+
+**Replit Pros:**
+- Visual IDE - no command line required
+- Built-in PostgreSQL database
+- One-click deployment
+- Good for learning
+
+**Replit Cons:**
+- Apps sleep after inactivity on free tier
+- Wake time ~10-30 seconds
+- Less control than GitHub Actions
+
+### GitHub Codespaces (Development)
+
+Perfect for development and testing:
 
 1. Click the green "Code" button on the repository page
 2. Select the "Codespaces" tab
 3. Click "Create codespace on main"
-4. Wait for the environment to set up (dependencies install automatically)
-5. Copy `.env.example` to `.env` and set `DATABASE_URL` to your PostgreSQL connection string
+4. Wait for environment setup (automatic)
+5. Copy `.env.example` to `.env` and configure `DATABASE_URL`
 6. Run `npm run db:push` to set up the database schema
 7. Run `npm run dev` to start the development server
 
 The Codespace comes pre-configured with Node.js 20 and all required extensions.
 
-## Deploy to Replit ⭐
-
-This app is fully Replit-ready with one-click deployment! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete step-by-step instructions.
-
-**Quick Start on Replit:**
-1. Go to [replit.com](https://replit.com) and click "Create Repl"
-2. Select "Import from GitHub" and paste: `https://github.com/ismaelloveexcel/aidanyoutubeapp`
-3. In Tools → Database, create a PostgreSQL database (auto-configures `DATABASE_URL`)
-4. Open Shell and run `npm run db:push`
-5. Click "Run" ▶️ to start development
-6. Click "Deploy" 🚀 for production deployment
-
-**Why Replit?**
-- Visual IDE - no command line required
-- Built-in PostgreSQL database
-- One-click deployment
-- Automatic HTTPS
-- Easy environment variable management
+---
 
 **⚠️ Security Note**: Before deploying to production, review [SECURITY.md](./SECURITY.md) for important security considerations.
 
