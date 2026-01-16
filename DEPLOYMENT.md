@@ -6,9 +6,9 @@ This repository includes deployment configurations (`fly.toml` with the app name
 
 ### Confirm Deployment Status
 
-- **Fly.io**: Use `flyctl status -a <app-name>` where `<app-name>` can be found using `flyctl apps list` or in `fly.toml`.
+- **Fly.io**: Use `flyctl status -a <app-name>` (replace `<app-name>` with the `app` value from `fly.toml`) or run `flyctl status` from the repo to use the configured app automatically.
 - **GitHub Actions**: Check the **Actions** tab for the latest successful run of `.github/workflows/deploy.yml` on `main`.
-- **Replit**: Open the Replit project → **Deployments** tab → verify a live deployment and test `/health` if available; otherwise load the app root URL or check logs for 200 responses.
+- **Replit**: Open the Replit project → **Deployments** tab. Verify a live deployment exists. Test `https://<your-deployed-url>/health` (append `/health` to the deployed URL); otherwise load the app root URL or check logs for 200 responses.
 
 ## Deploying to Replit (Quick & Easy) ⭐
 
