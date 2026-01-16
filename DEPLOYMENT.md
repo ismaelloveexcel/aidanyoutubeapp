@@ -1,5 +1,15 @@
 # Deployment Guide for TubeStar Creator Studio
 
+## Deployment Status (Repository Review)
+
+This repository includes deployment configurations (`fly.toml` with the app name defined in the file, `.replit`, and `.github/workflows/deploy.yml`), but does **not** contain a live deployment URL or runtime status. Deployment status **cannot be confirmed** from the repository alone.
+
+### Confirm Deployment Status
+
+- **Fly.io**: Use `flyctl status -a <app-name>` (replace `<app-name>` with the `app` value from `fly.toml`) or run `flyctl status` from the repo to use the configured app automatically.
+- **GitHub Actions**: Check the **Actions** tab for the latest successful run of `.github/workflows/deploy.yml` on `main`.
+- **Replit**: Open the Replit project → **Deployments** tab. Verify a live deployment exists. Test `https://<your-deployed-url>/health` (append `/health` to the deployed URL); otherwise load the app root URL or check logs for 200 responses.
+
 ## Deploying to Replit (Quick & Easy) ⭐
 
 Replit is the easiest platform for deploying TubeStar Creator Studio with a visual interface, built-in database, and one-click deployment.
