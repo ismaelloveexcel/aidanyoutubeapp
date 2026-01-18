@@ -1,12 +1,31 @@
 # TubeStar - Creator Studio
 
 [![Deploy to Fly.io](https://img.shields.io/badge/Deploy-Fly.io-blueviolet?logo=fly.io)](./GITHUB_DEPLOYMENT.md)
+[![Deploy to Render](https://img.shields.io/badge/Deploy-Render-46E3B7?logo=render&logoColor=white)](./RENDER_DEPLOYMENT.md)
+[![Deploy to Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?logo=railway&logoColor=white)](./RAILWAY_DEPLOYMENT.md)
+[![Deploy to Replit](https://img.shields.io/badge/Deploy-Replit-F26207?logo=replit&logoColor=white)](./DEPLOYMENT.md)
 [![CI/CD Status](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF?logo=github-actions&logoColor=white)](../../actions)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
 
 A YouTube video creation helper app designed for 8-12 year old kids. Create amazing content with idea generators, script writers, thumbnail designers, and more!
 
-> **🚀 Ready to deploy?** This app has automated deployment configured! See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) for the complete guide.
+> **🚀 Deploy for FREE in 5-20 minutes!** Choose from 4 free platforms with detailed guides. 
+> - **Quick Start**: [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - Step-by-step deployment with decision flowchart
+> - **Compare Options**: [FREE_DEPLOYMENT_COMPARISON.md](./FREE_DEPLOYMENT_COMPARISON.md) - Choose the best platform for you
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Design](#design)
+- [Getting Started (Local Development)](#getting-started)
+- [🚀 Free Deployment Options](#-free-deployment-options---choose-your-platform)
+- [YouTube Integration](#youtube-integration-optional)
+- [Database Tables](#database-tables)
+- [Safety Features](#safety-features)
+- [License](#license)
+
+---
 
 ## Features
 
@@ -99,66 +118,65 @@ npm run build
 npm start
 ```
 
-## 🚀 Automated Deployment with GitHub Actions (Recommended)
+---
 
-**The easiest way to deploy with professional CI/CD!** This app is configured for completely free, automated deployment using GitHub Actions + Fly.io.
+## 🚀 Free Deployment Options - Choose Your Platform!
 
-### Why GitHub Actions + Fly.io?
-- ✅ **Completely free** - No credit card required, no auto-sleep
-- ✅ **Fully automated** - Push to `main` → automatic deployment
-- ✅ **Production-ready** - Security scanning, build tests, health checks
-- ✅ **Professional CI/CD** - Build, test, scan, deploy pipeline
-- ✅ **Always-on** - No cold starts or wake delays
-- ✅ **Included PostgreSQL** - 3GB free database storage
+Deploy TubeStar Creator Studio **completely free** on any of these platforms. All options include PostgreSQL database and HTTPS!
 
-### Quick Setup (5 minutes):
-1. Fork this repository on GitHub
-2. Sign up at [fly.io](https://fly.io/signup) (free, no credit card)
-3. Install Fly CLI: `curl -L https://fly.io/install.sh | sh`
-4. Run `fly launch` and create your app + PostgreSQL database
-5. Get your API token: `fly auth token`
-6. Add `FLY_API_TOKEN` to GitHub repository secrets
-7. Push to `main` branch - automatic deployment! 🎉
+### Quick Comparison
 
-**📖 Complete guide**: See [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) for detailed step-by-step instructions.
+| Platform | Setup Time | Always-On? | Best For | Guide |
+|----------|------------|------------|----------|-------|
+| **Fly.io** | 15-20 min | ✅ Yes | Production, CI/CD | [GITHUB_DEPLOYMENT.md](./GITHUB_DEPLOYMENT.md) |
+| **Render** | 5-10 min | ⚠️ Auto-sleep (workaround available) | Personal projects | [RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md) |
+| **Railway** | 10-15 min | ✅ Yes | Side projects | [RAILWAY_DEPLOYMENT.md](./RAILWAY_DEPLOYMENT.md) |
+| **Replit** | 5 min | ⚠️ Auto-sleep | Beginners, learning | [DEPLOYMENT.md](./DEPLOYMENT.md) |
 
-### What Happens Automatically:
-- ✅ TypeScript type checking
-- ✅ Build verification
-- ✅ Security scanning (CodeQL)
-- ✅ Dependency audit
-- ✅ Deployment to Fly.io
-- ✅ Health check verification
+### 📊 Detailed Comparison
 
-Every push to `main` triggers the full CI/CD pipeline!
+See [FREE_DEPLOYMENT_COMPARISON.md](./FREE_DEPLOYMENT_COMPARISON.md) for a comprehensive feature-by-feature comparison to help you choose the best platform.
+
+### 🎯 Our Recommendations
+
+**For Production Apps (Public Facing):**
+- **Best Choice:** [Fly.io with GitHub Actions](./GITHUB_DEPLOYMENT.md)
+  - ✅ Always-on (no cold starts)
+  - ✅ Professional CI/CD pipeline
+  - ✅ Best performance and reliability
+  - ✅ Global edge network
+  - ✅ 3GB PostgreSQL included
+
+**For Personal Projects & Demos:**
+- **Easiest:** [Render](./RENDER_DEPLOYMENT.md)
+  - ✅ 5-minute setup via web dashboard
+  - ✅ 750 hours/month (can run 24/7)
+  - ✅ Infrastructure-as-code with `render.yaml`
+  - ✅ Use UptimeRobot to prevent auto-sleep
+
+**For Learning & Beginners:**
+- **Most Beginner-Friendly:** [Replit](./DEPLOYMENT.md)
+  - ✅ Visual IDE in browser
+  - ✅ No CLI or terminal required
+  - ✅ One-click GitHub import
+  - ✅ Built-in database and deployment
+
+**For Developers & Side Projects:**
+- **Best Developer Experience:** [Railway](./RAILWAY_DEPLOYMENT.md)
+  - ✅ Great CLI and dashboard
+  - ✅ No auto-sleep
+  - ✅ Simple database setup
+  - ✅ $5 free credit/month
+
+### 🚀 Quick Start Links
+
+Click any badge at the top of this README to jump directly to the deployment guide for that platform!
 
 ---
 
-## Alternative Deployment Options
+## 🔒 Security & Development
 
-### Deploy to Replit (Visual IDE)
-
-Good for beginners who prefer visual interfaces! See [DEPLOYMENT.md](./DEPLOYMENT.md) for complete instructions.
-
-**Quick Start:**
-1. Go to [replit.com](https://replit.com) and click "Create Repl"
-2. Select "Import from GitHub" and paste: `https://github.com/ismaelloveexcel/aidanyoutubeapp`
-3. In Tools → Database, create a PostgreSQL database
-4. Open Shell and run `npm run db:push`
-5. Click "Run" ▶️ to start, "Deploy" 🚀 for production
-
-**Replit Pros:**
-- Visual IDE - no command line required
-- Built-in PostgreSQL database
-- One-click deployment
-- Good for learning
-
-**Replit Cons:**
-- Apps sleep after inactivity on free tier
-- Wake time ~10-30 seconds
-- Less control than GitHub Actions
-
-### GitHub Codespaces (Development)
+### GitHub Codespaces (Development Environment)
 
 Perfect for development and testing:
 
