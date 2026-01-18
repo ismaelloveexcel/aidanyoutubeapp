@@ -1,0 +1,48 @@
+# Render.com deployment configuration
+# https://render.com/docs/yaml-spec
+
+services:
+  # Main web application
+  - type: web
+    name: tubestar-creator-studio
+    runtime: node
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tubestar-db
+          property: connectionString
+      # Optional: Add these as needed in Render dashboard
+      # - key: GEMINI_API_KEY
+      #   sync: false
+      # - key: YOUTUBE_CLIENT_ID
+      #   sync: false
+      # - key: YOUTUBE_CLIENT_SECRET
+      #   sync: false
+    
+    # Auto-deploy on push to main branch
+    autoDeploy: true
+    
+    # Disk for persistent storage (optional, if needed)
+    # disk:
+    #   name: data
+    #   mountPath: /app/data
+    #   sizeGB: 1
+
+# PostgreSQL database
+databases:
+  - name: tubestar-db
+    databaseName: tubestar
+    user: tubestar
+    plan: free
+    # Free tier: 90 day expiry warning, but data preserved
+    # 256MB RAM, 1GB storage
