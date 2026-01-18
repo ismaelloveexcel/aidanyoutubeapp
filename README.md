@@ -9,7 +9,23 @@
 
 A YouTube video creation helper app designed for 8-12 year old kids. Create amazing content with idea generators, script writers, thumbnail designers, and more!
 
-> **🚀 Deploy for FREE in 5-20 minutes!** Choose from 4 free platforms with detailed guides. See [FREE_DEPLOYMENT_COMPARISON.md](./FREE_DEPLOYMENT_COMPARISON.md) to find the best option for you.
+> **🚀 Deploy for FREE in 5-20 minutes!** Choose from 4 free platforms with detailed guides. 
+> - **Quick Start**: [QUICK_DEPLOY.md](./QUICK_DEPLOY.md) - Fast deployment in 5-20 minutes
+> - **Compare Options**: [FREE_DEPLOYMENT_COMPARISON.md](./FREE_DEPLOYMENT_COMPARISON.md) - Choose the best platform for you
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Design](#design)
+- [Getting Started (Local Development)](#getting-started)
+- [🚀 Free Deployment Options](#-free-deployment-options---choose-your-platform)
+- [YouTube Integration](#youtube-integration-optional)
+- [Database Tables](#database-tables)
+- [Safety Features](#safety-features)
+- [License](#license)
+
+---
 
 ## Features
 
