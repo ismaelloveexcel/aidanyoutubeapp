@@ -44,5 +44,7 @@ databases:
     databaseName: tubestar
     user: tubestar
     plan: free
-    # Free tier: 90 day expiry warning, but data preserved
-    # 256MB RAM, 1GB storage
+    # Free tier: 256MB RAM, 1GB storage
+    # Note: After 90 days, you'll see an expiry warning, but your data 
+    # and database continue working normally. Upgrade to paid plan ($7/month) 
+    # to remove the warning.
