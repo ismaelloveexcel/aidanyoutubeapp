@@ -1,4 +1,4 @@
-// Kid-safe content moderation for TubeStar
+// Kid-safe content moderation for TubeStar with prompt injection protection
 const INAPPROPRIATE_PATTERNS = [
   /\b(kill|murder|stab|shoot|gun|weapon|blood|gore|dead|death|suicide|cutting)\b/gi,
   /\b(sex|nude|naked|porn|xxx|adult|18\+|nsfw)\b/gi,
@@ -8,6 +8,20 @@ const INAPPROPRIATE_PATTERNS = [
   /\b(hate|stupid|idiot|dumb|loser|ugly|fat|retard)\b/gi,
   /\b(drug|weed|marijuana|cocaine|meth|alcohol|beer|wine|drunk|high|vape|smoke)\b/gi,
   /\b(dangerous|hurt yourself|self.?harm)\b/gi,
+];
+
+// Prompt injection patterns (if AI features are added later)
+const PROMPT_INJECTION_PATTERNS = [
+  /ignore (previous|above|all|the)\s+(instruction|prompt|rule)/gi,
+  /disregard (previous|above|all|the)\s+(instruction|prompt|rule)/gi,
+  /forget (previous|above|all|the)\s+(instruction|prompt|rule)/gi,
+  /you are now/gi,
+  /system:\s*you/gi,
+  /new instructions?:/gi,
+  /override (previous|above|all|the)\s+(instruction|prompt|rule)/gi,
+  /<\s*script/gi, // XSS attempts
+  /javascript:/gi,
+  /on(load|error|click|mouse)/gi, // Event handlers
 ];
 
 const FRIENDLY_ALTERNATIVES = ["awesome stuff", "cool things", "amazing content", "epic moments", "fun times"];
@@ -26,6 +40,18 @@ export function checkTextSafety(text: string): ModerationResult {
   const blockedReasons: string[] = [];
   let cleanedText = text;
   let foundIssue = false;
+  
+  // Check for prompt injection attempts
+  for (const pattern of PROMPT_INJECTION_PATTERNS) {
+    if (pattern.test(text)) {
+      foundIssue = true;
+      blockedReasons.push('suspicious input detected');
+      cleanedText = cleanedText.replace(pattern, '[filtered]');
+    }
+    pattern.lastIndex = 0;
+  }
+  
+  // Check for inappropriate content
   for (const pattern of INAPPROPRIATE_PATTERNS) {
     if (pattern.test(text)) {
       foundIssue = true;
@@ -35,6 +61,16 @@ export function checkTextSafety(text: string): ModerationResult {
     }
     pattern.lastIndex = 0;
   }
+  
+  // Log suspicious inputs for admin review
+  if (foundIssue && process.env.NODE_ENV === 'production') {
+    console.warn('[MODERATION] Blocked content:', {
+      timestamp: new Date().toISOString(),
+      reasons: blockedReasons,
+      snippet: text.substring(0, 50),
+    });
+  }
+  
   return {
     isClean: !foundIssue,
     originalText: text,
