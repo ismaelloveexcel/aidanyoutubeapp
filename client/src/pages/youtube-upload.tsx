@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, AlertTriangle, Youtube, CheckCircle, Loader2, ExternalLink, Settings } from "lucide-react";
+import { Upload, AlertTriangle, Youtube, CheckCircle, Loader2, ExternalLink, Settings, HelpCircle, Copy } from "lucide-react";
 import { Link } from "wouter";
 
 interface YouTubeAuthStatus {
@@ -23,6 +24,7 @@ export default function YouTubeUpload() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   const { toast } = useToast();
 
   // Check if YouTube OAuth is configured on the server
@@ -56,12 +58,14 @@ export default function YouTubeUpload() {
     }
   }, [toast]);
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copied to clipboard! 📋" });
+  };
+
   const connectToYouTube = async () => {
     if (!authStatus?.configured) {
-      toast({
-        title: "YouTube Not Configured",
-        description: "Ask your parent or guardian to set up YouTube API credentials.",
-      });
+      setShowHelpModal(true);
       return;
     }
 
