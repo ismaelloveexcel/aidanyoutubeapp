@@ -6,6 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader } from "@/components/ui/loader";
+import { Mic, MicOff, CheckCircle2, AlertCircle, Zap, FileText, Copy, Download, Sparkles } from "lucide-react";
+import { CoachTips, SCRIPT_TIPS } from "@/components/CoachTips";
+import { celebrateSuccess } from "@/lib/confetti";
+import { exportToClipboard, exportToTextFile, exportToPDF, formatScriptForExport } from "@/lib/export-helpers";
+import { useVoiceInput } from "@/hooks/use-voice-input";
+import { incrementStat } from "@/lib/progress-tracking";
 import type { Script } from "@shared/schema";
 
 const SCRIPT_TEMPLATES = {
@@ -56,8 +62,30 @@ export default function Script() {
   const [scriptTitle, setScriptTitle] = useState("");
   const [steps, setSteps] = useState<{ stepId: number; content: string }[]>([]);
   const [editingScript, setEditingScript] = useState<number | null>(null);
+  const [activeStepForVoice, setActiveStepForVoice] = useState<number | null>(null);
+  const [showScore, setShowScore] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Voice input for the active step
+  const { isListening, isSupported, toggleListening } = useVoiceInput({
+    onResult: (transcript) => {
+      if (activeStepForVoice !== null) {
+        const step = steps.find(s => s.stepId === activeStepForVoice);
+        if (step) {
+          const newContent = step.content ? `${step.content} ${transcript}` : transcript;
+          updateStep(activeStepForVoice, newContent);
+        }
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Voice input error",
+        description: error === 'not-allowed' ? 'Please allow microphone access' : 'Something went wrong',
+      });
+    },
+    continuous: false,
+  });
 
   const { data: savedScripts = [], isLoading } = useQuery<Script[]>({
     queryKey: ["/api/scripts"],
@@ -85,9 +113,14 @@ export default function Script() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/scripts"] });
+      celebrateSuccess();
+      
+      // Track progress
+      const newBadge = incrementStat('scriptsCreated');
+      
       toast({
-        title: editingScript ? "Script Updated!" : "Script Saved!",
-        description: "Your script has been saved successfully.",
+        title: editingScript ? "Script Updated! ✅" : "Script Saved! 🎉",
+        description: newBadge ? `Achievement unlocked: ${newBadge.emoji} ${newBadge.name}!` : "Your script has been saved successfully.",
       });
       resetForm();
     },
@@ -139,15 +172,98 @@ export default function Script() {
     setSteps(steps.map(step => step.stepId === stepId ? { ...step, content } : step));
   };
 
+  // Calculate script score
+  const calculateScriptScore = () => {
+    const checks = {
+      hasHook: steps[0]?.content.toLowerCase().includes('hey') || 
+               steps[0]?.content.toLowerCase().includes('what') ||
+               steps[0]?.content.includes('!'),
+      hasCTA: steps[steps.length - 1]?.content.toLowerCase().includes('subscribe') ||
+              steps[steps.length - 1]?.content.toLowerCase().includes('like'),
+      shortSentences: steps.every(step => step.content.split(' ').length < 30),
+      hasEnergy: steps.some(step => 
+        step.content.toLowerCase().includes('epic') ||
+        step.content.toLowerCase().includes('awesome') ||
+        step.content.toLowerCase().includes('crazy') ||
+        step.content.includes('!')
+      ),
+      isComplete: steps.every(step => step.content.trim().length > 10),
+    };
+
+    const score = Object.values(checks).filter(Boolean).length;
+    return { score, total: 5, checks };
+  };
+
+  const makeMoreExciting = () => {
+    const excitingWords = ['EPIC', 'AMAZING', 'AWESOME', 'INCREDIBLE', 'CRAZY'];
+    const randomWord = excitingWords[Math.floor(Math.random() * excitingWords.length)];
+    
+    // Add energy to first step
+    if (steps[0]) {
+      const content = steps[0].content;
+      if (!content.includes('!')) {
+        updateStep(steps[0].stepId, content + '!');
+      }
+      // Add exciting word if not present
+      if (!excitingWords.some(word => content.toUpperCase().includes(word))) {
+        updateStep(steps[0].stepId, `${randomWord}! ${content}`);
+      }
+    }
+    
+    toast({ title: "Script boosted! 🚀", description: "Added more energy to your script!" });
+  };
+
+  const makeShorter = () => {
+    // Simplify each step by removing filler words
+    const fillerWords = ['really', 'very', 'just', 'actually', 'basically', 'literally'];
+    
+    steps.forEach(step => {
+      let content = step.content;
+      fillerWords.forEach(word => {
+        const regex = new RegExp(`\\b${word}\\b`, 'gi');
+        content = content.replace(regex, '');
+      });
+      // Remove extra spaces
+      content = content.replace(/\s+/g, ' ').trim();
+      updateStep(step.stepId, content);
+    });
+    
+    toast({ title: "Script simplified! ✂️", description: "Removed unnecessary words!" });
+  };
+
+  const handleExportScript = async (format: 'clipboard' | 'txt' | 'pdf') => {
+    const content = formatScriptForExport(scriptTitle, steps);
+    
+    try {
+      if (format === 'clipboard') {
+        await exportToClipboard(content);
+        toast({ title: "Copied to clipboard! 📋" });
+      } else if (format === 'txt') {
+        exportToTextFile(content, `script-${scriptTitle.toLowerCase().replace(/\s+/g, '-')}`);
+        toast({ title: "Downloaded as text file! 📄" });
+      } else if (format === 'pdf') {
+        exportToPDF(content, `script-${scriptTitle.toLowerCase().replace(/\s+/g, '-')}`, scriptTitle);
+        toast({ title: "Downloaded as PDF! 📕" });
+      }
+    } catch (error) {
+      toast({ title: "Export failed", description: "Please try again." });
+    }
+  };
+
   if (isLoading) {
     return <Loader text="Loading your scripts..." />;
   }
 
+  const scoreData = selectedTemplate ? calculateScriptScore() : null;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-4xl mx-auto">
+      {/* Coach Tips */}
+      <CoachTips tips={SCRIPT_TIPS} pageName="script" />
+      
       <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">📝 Script Writer</h1>
-        <p className="text-gray-400">Create awesome video scripts with templates</p>
+        <h1 className="heading-display text-3xl sm:text-4xl mb-2">📝 Script Writer</h1>
+        <p className="text-zinc-400 text-sm sm:text-base">Create awesome video scripts with templates</p>
       </div>
 
       {!selectedTemplate ? (
@@ -212,15 +328,73 @@ export default function Script() {
         </>
       ) : (
         <>
-          {/* Script Editor */}
-          <div className="flex items-center justify-between">
-            <Button variant="ghost" onClick={resetForm}>
+          {/* Script Editor Header */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <Button variant="ghost" onClick={resetForm} className="gap-2">
               ← Back to Templates
             </Button>
-            <Button onClick={() => saveScriptMutation.mutate({ templateId: selectedTemplate, title: scriptTitle, steps })}>
-              💾 {editingScript ? "Update" : "Save"} Script
-            </Button>
+            
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowScore(!showScore)}
+                className="gap-2"
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                {showScore ? 'Hide' : 'Show'} Score
+              </Button>
+              <Button 
+                onClick={() => saveScriptMutation.mutate({ templateId: selectedTemplate, title: scriptTitle, steps })}
+                className="gap-2 bg-gradient-to-r from-[#6DFF9C] to-[#4BCC7A] text-[#0a1628]"
+              >
+                💾 {editingScript ? "Update" : "Save"} Script
+              </Button>
+            </div>
           </div>
+
+          {/* Script Score Card */}
+          {showScore && scoreData && (
+            <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#F3C94C]/30">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-display font-bold text-white">Script Quality Score</h3>
+                  <div className="text-3xl font-bold" style={{ color: scoreData.score >= 4 ? '#6DFF9C' : scoreData.score >= 3 ? '#F3C94C' : '#FF6B6B' }}>
+                    {scoreData.score}/{scoreData.total}
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mb-4">
+                  <ScoreItem checked={scoreData.checks.hasHook} text="Strong hook in first 3 seconds" />
+                  <ScoreItem checked={scoreData.checks.hasCTA} text="Call-to-action at the end" />
+                  <ScoreItem checked={scoreData.checks.shortSentences} text="Short, punchy sentences" />
+                  <ScoreItem checked={scoreData.checks.hasEnergy} text="Energetic language (EPIC, AWESOME)" />
+                  <ScoreItem checked={scoreData.checks.isComplete} text="All steps filled out" />
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
+                  <Button
+                    onClick={makeMoreExciting}
+                    variant="secondary"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Zap className="h-4 w-4" />
+                    Make it More Exciting
+                  </Button>
+                  <Button
+                    onClick={makeShorter}
+                    variant="secondary"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Make it Shorter
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader>
@@ -235,22 +409,102 @@ export default function Script() {
             </CardHeader>
             <CardContent className="space-y-4">
               {steps.map((step, index) => (
-                <div key={step.stepId} className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-                  <Label className="text-[hsl(320,100%,50%)] mb-2 block">
-                    Step {index + 1}
-                  </Label>
+                <div key={step.stepId} className="p-4 bg-[#122046]/50 rounded-xl border border-[#2BD4FF]/20">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label className="text-[#2BD4FF] font-semibold">
+                      Step {index + 1}
+                    </Label>
+                    {isSupported && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          if (activeStepForVoice === step.stepId && isListening) {
+                            toggleListening();
+                            setActiveStepForVoice(null);
+                          } else {
+                            setActiveStepForVoice(step.stepId);
+                            toggleListening();
+                          }
+                        }}
+                        className={`gap-2 ${activeStepForVoice === step.stepId && isListening ? 'text-red-500' : 'text-zinc-400'}`}
+                      >
+                        {activeStepForVoice === step.stepId && isListening ? (
+                          <>
+                            <MicOff className="h-4 w-4 animate-pulse" />
+                            Stop
+                          </>
+                        ) : (
+                          <>
+                            <Mic className="h-4 w-4" />
+                            Voice
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                   <textarea
                     value={step.content}
                     onChange={(e) => updateStep(step.stepId, e.target.value)}
-                    className="w-full h-24 bg-[hsl(240,10%,12%)] border-[3px] border-[hsl(240,10%,20%)] rounded-lg p-3 text-white resize-none focus:outline-none focus:border-[hsl(320,100%,50%)]"
-                    placeholder={`Write step ${index + 1}...`}
+                    className="w-full h-28 bg-[#0a1628] border-2 border-[#2BD4FF]/30 rounded-lg p-3 text-white placeholder:text-zinc-600 resize-none focus:outline-none focus:border-[#2BD4FF] transition-colors"
+                    placeholder={`Write step ${index + 1}... ${isSupported ? 'or click Voice to speak' : ''}`}
                   />
+                  {activeStepForVoice === step.stepId && isListening && (
+                    <div className="mt-2 flex items-center gap-2 text-sm text-red-500">
+                      <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                      Listening...
+                    </div>
+                  )}
                 </div>
               ))}
+              
+              {/* Export Options */}
+              <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
+                <Button
+                  variant="secondary"
+                  onClick={() => handleExportScript('clipboard')}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Copy All
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => handleExportScript('txt')}
+                  className="gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Export .TXT
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => handleExportScript('pdf')}
+                  className="gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export .PDF
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </>
       )}
+    </div>
+  );
+}
+
+// Helper component for score checklist
+function ScoreItem({ checked, text }: { checked: boolean; text: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      {checked ? (
+        <CheckCircle2 className="h-5 w-5 text-[#6DFF9C] flex-shrink-0" />
+      ) : (
+        <AlertCircle className="h-5 w-5 text-zinc-600 flex-shrink-0" />
+      )}
+      <span className={`text-sm ${checked ? 'text-white' : 'text-zinc-500'}`}>
+        {text}
+      </span>
     </div>
   );
 }
