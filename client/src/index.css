@@ -88,6 +88,43 @@ body {
   position: relative;
 }
 
+/* Accessibility: Focus visible styles */
+*:focus-visible {
+  outline: 2px solid var(--aurora-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Accessibility: Improve button touch targets on mobile */
+button, a, [role="button"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+@media (max-width: 768px) {
+  button, a, [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Accessibility: Skip to main content link */
+.skip-to-main {
+  position: absolute;
+  left: -9999px;
+  z-index: 999;
+  padding: 1em;
+  background-color: var(--aurora-cyan);
+  color: var(--aurora-eclipse);
+  text-decoration: none;
+}
+
+.skip-to-main:focus {
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+}
+
 /* Card shadows */
 .card, .bg-card {
   box-shadow: 0 4px 24px 0 rgba(43, 212, 255, 0.08);
@@ -655,6 +692,38 @@ body::before {
 .arm-right:after {
   right: 0;
   background-color: var(--aurora-cyan);
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .shimmer,
+  .animate-pulse,
+  .animate-spin {
+    animation: none !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  body {
+    background: #000;
+    color: #fff;
+  }
+  
+  .holo-card,
+  .glass-card {
+    border-width: 2px;
+    border-color: currentColor;
+  }
 }
 
 .leg {
