@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { getModeFromPath } from "@/lib/studioModes";
 import { useCreatorProfile, XP_PER_LEVEL, getXpProgress } from "@/lib/creator-profile";
 import { ModeSwitcher, CreateStepper, GrowNav, LibraryNav } from "@/components/navigation";
+import { BreathingBackground, FloatingParticles } from "@/components/premium";
 import { Zap, Home, PenTool, TrendingUp, FolderOpen, Star } from "lucide-react";
 
 interface LayoutProps {
@@ -30,9 +31,12 @@ export default function Layout({ children }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* TopBar */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#17233b] bg-gradient-to-r from-[#081121]/95 via-[#0a1628]/95 to-[#081121]/95 backdrop-blur-xl shadow-[0_10px_40px_-30px_rgba(0,0,0,0.9)]">
+    <BreathingBackground intensity="subtle">
+      <FloatingParticles density="sparse" />
+      
+      <div className="min-h-screen flex flex-col relative z-10">
+        {/* TopBar */}
+        <header className="sticky top-0 z-50 w-full border-b border-[#17233b] bg-gradient-to-r from-[#081121]/95 via-[#0a1628]/95 to-[#081121]/95 backdrop-blur-xl shadow-[0_10px_40px_-30px_rgba(0,0,0,0.9)]">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6 max-w-6xl mx-auto">
           {/* Logo */}
           <Link href="/">
@@ -112,12 +116,13 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </nav>
 
-      {/* MainContent */}
-      <main className="flex-1 pb-24 md:pb-8">
-        <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16 py-8 sm:py-12">
-          {children}
-        </div>
-      </main>
-    </div>
+        {/* MainContent */}
+        <main className="flex-1 pb-24 md:pb-8">
+          <div className="max-w-5xl mx-auto px-6 sm:px-10 lg:px-16 py-8 sm:py-12">
+            {children}
+          </div>
+        </main>
+      </div>
+    </BreathingBackground>
   );
 }

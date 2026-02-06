@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 import { CoachTips, DASHBOARD_TIPS } from "@/components/CoachTips";
+import { GlowCard, TactileButton } from "@/components/premium";
 import { getProgressStats, getUnlockedBadges, unlockBadge } from "@/lib/progress-tracking";
 
 // Daily tips for young creators
@@ -281,7 +282,7 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Mode Entry Buttons */}
+      {/* Mode Entry Buttons - PREMIUM */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-white">Jump Into</h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -289,32 +290,35 @@ export default function Dashboard() {
             const Icon = entry.icon;
             return (
               <Link key={entry.mode} href={entry.path}>
-                <Card 
-                  className="group relative overflow-hidden p-5 h-full bg-[#0a1525] border-[#1a2a4a]/60 hover:border-opacity-100 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 cursor-pointer"
-                  style={{ borderColor: `${entry.color}40` }}
-                  data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300" 
-                    style={{ background: `linear-gradient(135deg, ${entry.color}, transparent)` }} 
-                  />
-                  <div className="relative space-y-3">
-                    <div 
-                      className="p-3 rounded-xl w-fit group-hover:scale-110 transition-transform duration-200"
-                      style={{ background: `${entry.color}15` }}
-                    >
-                      <Icon className="h-6 w-6" style={{ color: entry.color }} />
+                <GlowCard glowColor={entry.color} className="h-full">
+                  <Card 
+                    className="relative overflow-hidden p-6 h-full bg-gradient-to-br from-[#0a1525] to-[#122046] border-2 cursor-pointer"
+                    style={{ borderColor: `${entry.color}40` }}
+                    data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
+                  >
+                    <div className="relative space-y-4">
+                      <div 
+                        className="p-4 rounded-2xl w-fit transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                        style={{ 
+                          background: `${entry.color}20`,
+                          boxShadow: `0 0 20px ${entry.color}30`,
+                        }}
+                      >
+                        <Icon className="h-7 w-7" style={{ color: entry.color }} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-display font-bold text-white mb-2">
+                          {entry.title}
+                        </h3>
+                        <p className="text-sm text-zinc-400">{entry.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-semibold pt-2" style={{ color: entry.color }}>
+                        Get started 
+                        <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
-                        {entry.title}
-                      </h3>
-                      <p className="text-sm text-zinc-400 mt-1">{entry.description}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm font-medium" style={{ color: entry.color }}>
-                      Get started <ChevronRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </GlowCard>
               </Link>
             );
           })}
