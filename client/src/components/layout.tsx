@@ -5,6 +5,8 @@ import { getModeFromPath } from "@/lib/studioModes";
 import { useCreatorProfile, XP_PER_LEVEL, getXpProgress } from "@/lib/creator-profile";
 import { ModeSwitcher, CreateStepper, GrowNav, LibraryNav } from "@/components/navigation";
 import { BreathingBackground, FloatingParticles } from "@/components/premium";
+import { KeyboardShortcutsHelp } from "@/components/KeyboardShortcutsHelp";
+import { useGlobalKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import { Zap, Home, PenTool, TrendingUp, FolderOpen, Star } from "lucide-react";
 
 interface LayoutProps {
@@ -14,6 +16,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { profile } = useCreatorProfile();
+  
+  // Enable global keyboard shortcuts
+  useGlobalKeyboardShortcuts();
   
   // Detect current mode from route
   const mode = getModeFromPath(location);
@@ -122,6 +127,9 @@ export default function Layout({ children }: LayoutProps) {
             {children}
           </div>
         </main>
+        
+        {/* Keyboard Shortcuts Help */}
+        <KeyboardShortcutsHelp />
       </div>
     </BreathingBackground>
   );

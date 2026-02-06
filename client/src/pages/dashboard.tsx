@@ -27,6 +27,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { AdvancedSettings } from "@/components/AdvancedSettings";
 import { CoachTips, DASHBOARD_TIPS } from "@/components/CoachTips";
 import { GlowCard, TactileButton } from "@/components/premium";
 import { getProgressStats, getUnlockedBadges, unlockBadge } from "@/lib/progress-tracking";
@@ -104,6 +105,7 @@ export default function Dashboard() {
   const [tempChannel, setTempChannel] = useState(profile.channelName || '');
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar || 'Rocket');
   const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe ?? true);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
   
   // Get progress stats
   const progressStats = getProgressStats();
@@ -162,6 +164,12 @@ export default function Dashboard() {
         />
       )}
       
+      {/* Advanced Settings */}
+      <AdvancedSettings 
+        open={showAdvancedSettings}
+        onClose={() => setShowAdvancedSettings(false)}
+      />
+      
       {/* Hero Section with Daily Tip */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -172,14 +180,17 @@ export default function Dashboard() {
             </h1>
             <p className="text-zinc-400 mt-2">Ready to create something awesome today?</p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-zinc-400 hover:text-white"
-            onClick={() => setShowSetup(true)}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
+              onClick={() => setShowAdvancedSettings(true)}
+              title="Advanced Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         {/* Daily Creator Tip */}
