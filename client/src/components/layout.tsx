@@ -17,8 +17,16 @@ export default function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { profile } = useCreatorProfile();
   
-  // Enable global keyboard shortcuts
-  useGlobalKeyboardShortcuts();
+  // Enable global keyboard shortcuts based on user preference
+  const keyboardShortcutsEnabled = typeof window === 'undefined'
+    ? true
+    : localStorage.getItem('tubestar-keyboard-shortcuts') !== 'false';
+  useGlobalKeyboardShortcuts({ enabled: keyboardShortcutsEnabled });
+  
+  // Conditionally render particles based on user preference
+  const particlesEnabled = typeof window === 'undefined'
+    ? true
+    : localStorage.getItem('tubestar-particles') !== 'false';
   
   // Detect current mode from route
   const mode = getModeFromPath(location);
@@ -37,7 +45,7 @@ export default function Layout({ children }: LayoutProps) {
 
   return (
     <BreathingBackground intensity="subtle">
-      <FloatingParticles density="sparse" />
+      {particlesEnabled && <FloatingParticles density="sparse" />}
       
       <div className="min-h-screen flex flex-col relative z-10">
         {/* TopBar */}

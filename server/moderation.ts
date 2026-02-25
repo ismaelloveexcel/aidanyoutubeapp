@@ -62,12 +62,12 @@ export function checkTextSafety(text: string): ModerationResult {
     pattern.lastIndex = 0;
   }
   
-  // Log suspicious inputs for admin review
+  // Log suspicious inputs for admin review (no user content to avoid PII exposure)
   if (foundIssue && process.env.NODE_ENV === 'production') {
     console.warn('[MODERATION] Blocked content:', {
       timestamp: new Date().toISOString(),
       reasons: blockedReasons,
-      snippet: text.substring(0, 50),
+      contentLength: text.length,
     });
   }
   
