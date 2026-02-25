@@ -11,7 +11,7 @@ import { CoachTips, SCRIPT_TIPS } from "@/components/CoachTips";
 import { celebrateSuccess } from "@/lib/confetti";
 import { exportToClipboard, exportToTextFile, exportToPDF, formatScriptForExport } from "@/lib/export-helpers";
 import { useVoiceInput } from "@/hooks/use-voice-input";
-import { incrementStat } from "@/lib/progress-tracking";
+import { incrementStat, unlockBadge } from "@/lib/progress-tracking";
 import type { Script } from "@shared/schema";
 
 const SCRIPT_TEMPLATES = {
@@ -425,6 +425,7 @@ export default function Script() {
                           } else {
                             setActiveStepForVoice(step.stepId);
                             toggleListening();
+                            unlockBadge('voice-recorder');
                           }
                         }}
                         className={`gap-2 ${activeStepForVoice === step.stepId && isListening ? 'text-red-500' : 'text-zinc-400'}`}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -49,6 +49,7 @@ export default function Thumbnail() {
   const [selectedFace, setSelectedFace] = useState("😮");
   const [showFaces, setShowFaces] = useState(false);
   const [previewSize, setPreviewSize] = useState<'desktop' | 'mobile'>('desktop');
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -105,17 +106,23 @@ export default function Thumbnail() {
 
   const copyToClipboard = async () => {
     try {
-      const canvas = document.getElementById('thumbnail-canvas') as HTMLCanvasElement;
-      if (canvas) {
-        canvas.toBlob(async (blob) => {
-          if (blob) {
+      const canvas = canvasRef.current;
+      if (!canvas) {
+        toast({ title: "Copy failed", description: "Generate a thumbnail first by clicking Download." });
+        return;
+      }
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          try {
             await navigator.clipboard.write([
               new ClipboardItem({ 'image/png': blob })
             ]);
             toast({ title: "Copied to clipboard! 📋" });
+          } catch (err) {
+            toast({ title: "Copy failed", description: "Try downloading instead." });
           }
-        });
-      }
+        }
+      });
     } catch (error) {
       toast({ title: "Copy failed", description: "Try downloading instead." });
     }
@@ -167,7 +174,7 @@ export default function Thumbnail() {
     }
 
     // Store canvas reference for copying
-    canvas.id = 'thumbnail-canvas';
+    canvasRef.current = canvas;
 
     // Download
     canvas.toBlob((blob) => {

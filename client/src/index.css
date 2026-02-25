@@ -712,6 +712,22 @@ body::before {
   }
 }
 
+/* Class-based reduced motion override (from AdvancedSettings) */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html.reduce-motion .shimmer,
+html.reduce-motion .animate-pulse,
+html.reduce-motion .animate-spin {
+  animation: none !important;
+}
+
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   body {
@@ -724,6 +740,18 @@ body::before {
     border-width: 2px;
     border-color: currentColor;
   }
+}
+
+/* Class-based high contrast override (from AdvancedSettings) */
+html.high-contrast body {
+  background: #000;
+  color: #fff;
+}
+
+html.high-contrast .holo-card,
+html.high-contrast .glass-card {
+  border-width: 2px;
+  border-color: currentColor;
 }
 
 .leg {

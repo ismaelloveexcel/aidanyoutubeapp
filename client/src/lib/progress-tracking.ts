@@ -162,13 +162,18 @@ export function getProgressStats(): ProgressStats {
     }
   }
   
+  // Initialize lastActiveDate to yesterday so the first real activity starts a streak
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const defaultLastActiveDate = yesterday.toISOString().split('T')[0];
+
   return {
     ideasGenerated: 0,
     scriptsCreated: 0,
     thumbnailsDesigned: 0,
     currentStreak: 0,
     longestStreak: 0,
-    lastActiveDate: new Date().toISOString().split('T')[0],
+    lastActiveDate: defaultLastActiveDate,
     completedChallenges: 0,
     unlockedBadges: [],
   };

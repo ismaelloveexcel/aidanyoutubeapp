@@ -3,13 +3,14 @@
  * With icons, colors, and animations
  */
 import { motion } from 'framer-motion';
+import type { ReactNode } from 'react';
 import { CheckCircle2, AlertCircle, Info, XCircle, Sparkles } from 'lucide-react';
 
 interface PremiumToastProps {
   type?: 'success' | 'error' | 'info' | 'achievement';
   title: string;
   description?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   duration?: number;
 }
 
@@ -93,11 +94,10 @@ export function PremiumToast({
       {/* Progress bar */}
       <motion.div
         className="h-1"
-        style={{ backgroundColor: color }}
+        style={{ backgroundColor: color, transformOrigin: 'left' }}
         initial={{ scaleX: 1 }}
         animate={{ scaleX: 0 }}
         transition={{ duration: duration / 1000, ease: 'linear' }}
-        style={{ transformOrigin: 'left' }}
       />
     </motion.div>
   );

@@ -17,6 +17,16 @@ export function useKeyboardShortcuts(shortcuts: KeyboardShortcut[], enabled = tr
     if (!enabled) return;
     
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Ignore shortcuts when typing in editable elements
+      const target = event.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
       for (const shortcut of shortcuts) {
         const ctrlMatch = shortcut.ctrl ? event.ctrlKey || event.metaKey : !event.ctrlKey && !event.metaKey;
         const shiftMatch = shortcut.shift ? event.shiftKey : !event.shiftKey;
@@ -78,6 +88,6 @@ export const GLOBAL_SHORTCUTS: KeyboardShortcut[] = [
   },
 ];
 
-export function useGlobalKeyboardShortcuts() {
-  useKeyboardShortcuts(GLOBAL_SHORTCUTS);
+export function useGlobalKeyboardShortcuts({ enabled = true }: { enabled?: boolean } = {}) {
+  useKeyboardShortcuts(GLOBAL_SHORTCUTS, enabled);
 }
