@@ -1,7 +1,9 @@
 import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { GlowCard, TactileButton } from "@/components/premium";
+import { Volume2, Info, Sparkles } from "lucide-react";
 
 const SOUNDS = [
   { id: "airhorn", name: "Air Horn", emoji: "📢", color: "hsl(0, 100%, 50%)" },
@@ -31,7 +33,7 @@ export default function Soundboard() {
 
   const playSound = (soundId: string) => {
     setPlaying(soundId);
-    setTimeout(() => setPlaying(null), 500);
+    setTimeout(() => setPlaying(null), 800);
 
     const ctx = getAudioContext();
     const now = ctx.currentTime;
@@ -118,89 +120,158 @@ export default function Soundboard() {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">🔊 Soundboard</h1>
-        <p className="text-gray-400">Add fun sound effects to your videos!</p>
+    <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-[#A259FF]/20">
+            <Volume2 className="h-7 w-7 text-[#A259FF]" />
+          </div>
+        </div>
+        <h1 className="heading-display text-3xl sm:text-4xl text-white">🔊 Soundboard</h1>
+        <p className="text-zinc-400 text-sm sm:text-base">Add epic sound effects to your videos!</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>💡 How to Use</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-gray-400">
-            Click any button to hear the sound effect. In your video editor, you can add these sounds at the perfect moment
-            for comedic timing, transitions, or emphasis!
-          </p>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {SOUNDS.map((sound) => (
-          <motion.div
-            key={sound.id}
-            animate={playing === sound.id ? { scale: 0.95 } : { scale: 1 }}
-            transition={{ duration: 0.1 }}
-          >
-            <Card
-              className="cursor-pointer hover:scale-105 transition-transform"
-              onClick={() => playSound(sound.id)}
-              style={{ backgroundColor: sound.color }}
-            >
-              <CardContent className="p-6 text-center">
-                <div className="text-5xl mb-3">{sound.emoji}</div>
-                <h3 className="font-display text-lg text-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
-                  {sound.name}
-                </h3>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>🎵 Pro Sound Tips</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-              <h4 className="font-semibold mb-2">✓ Timing is Everything</h4>
-              <p className="text-sm text-gray-400">
-                Place sound effects right at the moment of action for maximum impact
-              </p>
+      <Card className="bg-gradient-to-r from-[#122046] to-[#0a1628] border-[#A259FF]/30">
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-xl bg-[#A259FF]/20">
+              <Info className="h-5 w-5 text-[#A259FF]" />
             </div>
-            <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-              <h4 className="font-semibold mb-2">✓ Don't Overdo It</h4>
-              <p className="text-sm text-gray-400">
-                Use 2-3 sound effects per video max - too many gets annoying
-              </p>
-            </div>
-            <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-              <h4 className="font-semibold mb-2">✓ Match the Mood</h4>
-              <p className="text-sm text-gray-400">
-                Pick sounds that fit your video's tone (funny, dramatic, etc.)
-              </p>
-            </div>
-            <div className="p-4 bg-[hsl(240,10%,15%)] rounded-lg">
-              <h4 className="font-semibold mb-2">✓ Volume Control</h4>
-              <p className="text-sm text-gray-400">
-                Keep sound effects quieter than your voice - they should enhance, not overpower
+            <div>
+              <h3 className="font-semibold text-white mb-2">How to Use</h3>
+              <p className="text-zinc-400 text-sm">
+                Click any button to hear the sound effect. Perfect for adding comedy, drama, or excitement to your videos!
               </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {SOUNDS.map((sound) => (
+          <GlowCard key={sound.id} glowColor={sound.color}>
+            <motion.div
+              animate={playing === sound.id ? { 
+                scale: 0.92,
+                rotate: [0, -2, 2, 0],
+              } : { 
+                scale: 1,
+                rotate: 0,
+              }}
+              transition={{ 
+                type: 'spring',
+                stiffness: 300,
+                damping: 15,
+              }}
+            >
+              <div
+                className="relative cursor-pointer p-6 rounded-2xl overflow-hidden group"
+                onClick={() => playSound(sound.id)}
+                style={{ 
+                  background: `linear-gradient(135deg, ${sound.color}20, ${sound.color}10)`,
+                  border: `2px solid ${sound.color}40`,
+                }}
+              >
+                {/* Ripple effect when playing */}
+                <AnimatePresence>
+                  {playing === sound.id && (
+                    <motion.div
+                      className="absolute inset-0"
+                      initial={{ scale: 0.8, opacity: 0.5 }}
+                      animate={{ scale: 1.5, opacity: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.8 }}
+                      style={{
+                        background: `radial-gradient(circle, ${sound.color}60, transparent 70%)`,
+                      }}
+                    />
+                  )}
+                </AnimatePresence>
+                
+                <div className="relative text-center">
+                  <motion.div 
+                    className="text-5xl sm:text-6xl mb-3"
+                    animate={playing === sound.id ? {
+                      scale: [1, 1.2, 1],
+                      rotate: [0, 5, -5, 0],
+                    } : {}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {sound.emoji}
+                  </motion.div>
+                  <h3 className="font-display text-base sm:text-lg font-bold text-white drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]">
+                    {sound.name}
+                  </h3>
+                  
+                  {playing === sound.id && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute -top-2 -right-2"
+                    >
+                      <Volume2 className="h-5 w-5 text-white animate-pulse" />
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </GlowCard>
+        ))}
+      </div>
+
+      <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#F3C94C]/30">
         <CardHeader>
-          <CardTitle>📝 Using These Sounds</CardTitle>
+          <CardTitle className="flex items-center gap-3 text-white">
+            <Sparkles className="h-6 w-6 text-[#F3C94C]" />
+            Pro Sound Tips
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-400">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="p-4 bg-[#0a1628]/50 rounded-xl border border-[#6DFF9C]/20">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-[#6DFF9C]">✓</span> Timing is Everything
+              </h4>
+              <p className="text-sm text-zinc-400">
+                Place sound effects right at the moment of action for maximum impact
+              </p>
+            </div>
+            <div className="p-4 bg-[#0a1628]/50 rounded-xl border border-[#F3C94C]/20">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-[#F3C94C]">✓</span> Don't Overdo It
+              </h4>
+              <p className="text-sm text-zinc-400">
+                Use 2-3 sound effects per video max - too many gets annoying
+              </p>
+            </div>
+            <div className="p-4 bg-[#0a1628]/50 rounded-xl border border-[#2BD4FF]/20">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-[#2BD4FF]">✓</span> Match the Mood
+              </h4>
+              <p className="text-sm text-zinc-400">
+                Pick sounds that fit your video's tone (funny, dramatic, etc.)
+              </p>
+            </div>
+            <div className="p-4 bg-[#0a1628]/50 rounded-xl border border-[#A259FF]/20">
+              <h4 className="font-semibold text-white mb-2 flex items-center gap-2">
+                <span className="text-[#A259FF]">✓</span> Volume Control
+              </h4>
+              <p className="text-sm text-zinc-400">
+                Keep sound effects quieter than your voice - they enhance, not overpower
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-gradient-to-r from-[#122046] to-[#0a1628] border-[#2BD4FF]/30">
+        <CardHeader>
+          <CardTitle className="text-white">📝 Using These Sounds</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-zinc-400 leading-relaxed">
             These are synthesized sound effects you can use freely! Click any button to preview the sound.
-            For even more sound effects, check out royalty-free libraries like Freesound.org or YouTube Audio Library.
+            For even more sound effects, check out royalty-free libraries like <span className="text-[#2BD4FF] font-semibold">Freesound.org</span> or <span className="text-[#6DFF9C] font-semibold">YouTube Audio Library</span>.
             Always verify the license before using external sounds in your videos!
           </p>
         </CardContent>

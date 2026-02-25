@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CreatorProfileProvider } from "@/lib/creator-profile";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/layout";
 import Dashboard from "@/pages/dashboard";
@@ -24,36 +25,42 @@ import AIAssistant from "@/pages/ai-assistant";
 import Login from "@/pages/login";
 import Roadmap from "@/pages/roadmap";
 import Repository from "@/pages/repository";
+import ChallengeMode from "@/pages/challenge-mode";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/login" component={Login} />
-      <Route>
-        <Layout>
-          <Switch>
-            <Route path="/" component={Dashboard} />
-            <Route path="/roadmap" component={Roadmap} />
-            <Route path="/ideas" component={Ideas} />
-            <Route path="/script" component={Script} />
-            <Route path="/templates" component={Templates} />
-            <Route path="/thumbnail" component={Thumbnail} />
-            <Route path="/soundboard" component={Soundboard} />
-            <Route path="/recorder" component={VideoRecorder} />
-            <Route path="/editor" component={VideoEditor} />
-            <Route path="/viral-optimizer" component={ViralOptimizer} />
-            <Route path="/youtube-upload" component={YouTubeUpload} />
-            <Route path="/progress" component={Progress} />
-            <Route path="/analytics" component={Analytics} />
-            <Route path="/calendar" component={Calendar} />
-            <Route path="/multi-platform" component={MultiPlatform} />
-            <Route path="/ai-assistant" component={AIAssistant} />
-            <Route path="/repository" component={Repository} />
-            <Route component={NotFound} />
-          </Switch>
-        </Layout>
-      </Route>
-    </Switch>
+    <ErrorBoundary>
+      <Switch>
+        <Route path="/login" component={Login} />
+        <Route>
+          <Layout>
+            <ErrorBoundary>
+              <Switch>
+                <Route path="/" component={Dashboard} />
+                <Route path="/roadmap" component={Roadmap} />
+                <Route path="/ideas" component={Ideas} />
+                <Route path="/script" component={Script} />
+                <Route path="/templates" component={Templates} />
+                <Route path="/thumbnail" component={Thumbnail} />
+                <Route path="/soundboard" component={Soundboard} />
+                <Route path="/recorder" component={VideoRecorder} />
+                <Route path="/editor" component={VideoEditor} />
+                <Route path="/viral-optimizer" component={ViralOptimizer} />
+                <Route path="/youtube-upload" component={YouTubeUpload} />
+                <Route path="/progress" component={Progress} />
+                <Route path="/challenge-mode" component={ChallengeMode} />
+                <Route path="/analytics" component={Analytics} />
+                <Route path="/calendar" component={Calendar} />
+                <Route path="/multi-platform" component={MultiPlatform} />
+                <Route path="/ai-assistant" component={AIAssistant} />
+                <Route path="/repository" component={Repository} />
+                <Route component={NotFound} />
+              </Switch>
+            </ErrorBoundary>
+          </Layout>
+        </Route>
+      </Switch>
+    </ErrorBoundary>
   );
 }
 

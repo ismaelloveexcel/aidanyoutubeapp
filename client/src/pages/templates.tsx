@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { GlowCard } from "@/components/premium";
+import { Sparkles, Film, ArrowLeft } from "lucide-react";
 
 const VIDEO_TEMPLATES = [
     {
@@ -130,95 +132,126 @@ export default function Templates() {
   const categories = Array.from(new Set(VIDEO_TEMPLATES.map(t => t.category)));
 
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">📋 Video Templates</h1>
-        <p className="text-gray-400">Professional templates for popular video styles</p>
+    <div className="space-y-8 max-w-6xl mx-auto">
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-3">
+          <div className="p-3 rounded-xl bg-[#2BD4FF]/20">
+            <Film className="h-7 w-7 text-[#2BD4FF]" />
+          </div>
+        </div>
+        <h1 className="heading-display text-3xl sm:text-4xl text-white">📋 Video Templates</h1>
+        <p className="text-zinc-400 text-sm sm:text-base">Professional templates for trending video styles</p>
       </div>
 
       {!selectedTemplate ? (
         <>
-          {categories.map((category) => (
-            <div key={category}>
-              <h2 className="font-display text-2xl mb-4">{category}</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {VIDEO_TEMPLATES.filter(t => t.category === category).map((template) => (
-                  <Card
-                    key={template.id}
-                    className="cursor-pointer hover:scale-105 transition-transform"
-                    onClick={() => setSelectedTemplate(template)}
-                  >
-                    <CardContent className="p-6">
-                      <div className="text-4xl mb-3">{template.emoji}</div>
-                      <h3 className="font-display text-xl mb-2">{template.name}</h3>
-                      <p className="text-sm text-gray-400">{template.description}</p>
-                    </CardContent>
-                  </Card>
-                ))}
+          {categories.map((category, catIndex) => {
+            const categoryColors = ['#6DFF9C', '#F3C94C', '#2BD4FF', '#A259FF'];
+            const color = categoryColors[catIndex % categoryColors.length];
+            
+            return (
+              <div key={category} className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Sparkles className="h-5 w-5" style={{ color }} />
+                  <h2 className="font-display text-xl sm:text-2xl text-white">{category}</h2>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {VIDEO_TEMPLATES.filter(t => t.category === category).map((template) => (
+                    <GlowCard key={template.id} glowColor={color}>
+                      <Card
+                        className="cursor-pointer h-full bg-gradient-to-br from-[#122046] to-[#0a1628] border-2"
+                        onClick={() => setSelectedTemplate(template)}
+                        style={{ borderColor: `${color}40` }}
+                      >
+                        <CardContent className="p-6">
+                          <div className="text-5xl mb-4">{template.emoji}</div>
+                          <h3 className="font-display text-lg sm:text-xl text-white mb-2">{template.name}</h3>
+                          <p className="text-sm text-zinc-400">{template.description}</p>
+                        </CardContent>
+                      </Card>
+                    </GlowCard>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </>
       ) : (
         <>
-          <Button variant="ghost" onClick={() => setSelectedTemplate(null)}>
-            ← Back to Templates
+          <Button 
+            variant="ghost" 
+            onClick={() => setSelectedTemplate(null)}
+            className="gap-2 text-zinc-400 hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Templates
           </Button>
 
-          <div className="text-center mb-6">
-            <div className="text-6xl mb-4">{selectedTemplate.emoji}</div>
-            <h2 className="font-display text-3xl mb-2">{selectedTemplate.name}</h2>
-            <p className="text-gray-400">{selectedTemplate.description}</p>
+          <div className="text-center mb-8">
+            <div className="text-7xl sm:text-8xl mb-4">{selectedTemplate.emoji}</div>
+            <h2 className="font-display text-3xl sm:text-4xl text-white mb-3">{selectedTemplate.name}</h2>
+            <p className="text-zinc-400 text-base">{selectedTemplate.description}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+            <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#6DFF9C]/30">
               <CardHeader>
-                <CardTitle>🎬 Intro</CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  🎬 Intro
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{selectedTemplate.intro}</p>
+                <p className="text-zinc-300">{selectedTemplate.intro}</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#F3C94C]/30">
               <CardHeader>
-                <CardTitle>📹 Main Content</CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  📹 Main Content
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{selectedTemplate.mainContent}</p>
+                <p className="text-zinc-300">{selectedTemplate.mainContent}</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#2BD4FF]/30">
               <CardHeader>
-                <CardTitle>👋 Outro</CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  👋 Outro
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{selectedTemplate.outro}</p>
+                <p className="text-zinc-300">{selectedTemplate.outro}</p>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#A259FF]/30">
               <CardHeader>
-                <CardTitle>✨ Transitions</CardTitle>
+                <CardTitle className="text-white flex items-center gap-2">
+                  ✨ Transitions
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{selectedTemplate.transitions}</p>
+                <p className="text-zinc-300">{selectedTemplate.transitions}</p>
               </CardContent>
             </Card>
           </div>
 
-          <Card>
+          <Card className="bg-gradient-to-r from-[#122046] to-[#0a1628] border-2 border-[#F3C94C]/30">
             <CardHeader>
-              <CardTitle>💡 Pro Tips</CardTitle>
+              <CardTitle className="text-white flex items-center gap-3">
+                <Sparkles className="h-6 w-6 text-[#F3C94C]" />
+                Pro Tips
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {selectedTemplate.proTips.map((tip, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <span className="text-[hsl(320,100%,50%)]">✓</span>
-                    <span>{tip}</span>
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-[#6DFF9C] text-xl mt-0.5">✓</span>
+                    <span className="text-zinc-300">{tip}</span>
                   </li>
                 ))}
               </ul>

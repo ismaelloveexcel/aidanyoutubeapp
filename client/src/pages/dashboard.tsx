@@ -23,7 +23,14 @@ import {
   Zap,
   Target,
   Star,
+  Award,
+  Trophy,
 } from "lucide-react";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
+import { AdvancedSettings } from "@/components/AdvancedSettings";
+import { CoachTips, DASHBOARD_TIPS } from "@/components/CoachTips";
+import { GlowCard, TactileButton } from "@/components/premium";
+import { getProgressStats, getUnlockedBadges, unlockBadge } from "@/lib/progress-tracking";
 
 // Daily tips for young creators
 const DAILY_TIPS = [
@@ -89,10 +96,20 @@ export default function Dashboard() {
     const isSetupDone = localStorage.getItem('tubestar-profile');
     return !isSetupDone;
   });
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    const hasCompletedOnboarding = localStorage.getItem('tubestar-onboarding-complete');
+    const isSetupDone = localStorage.getItem('tubestar-profile');
+    return isSetupDone && !hasCompletedOnboarding;
+  });
   const [tempName, setTempName] = useState(profile.name || '');
   const [tempChannel, setTempChannel] = useState(profile.channelName || '');
   const [selectedAvatar, setSelectedAvatar] = useState(profile.avatar || 'Rocket');
   const [rememberMe, setRememberMeLocal] = useState(profile.rememberMe ?? true);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
+  
+  // Get progress stats
+  const progressStats = getProgressStats();
+  const unlockedBadges = getUnlockedBadges();
 
   // Fetch recent projects for "Continue" functionality
   const { data: recentProjects, isLoading: projectsLoading } = useQuery<VideoProject[]>({
@@ -110,7 +127,20 @@ export default function Dashboard() {
       setAvatar(selectedAvatar);
       setRememberMe(rememberMe);
       setShowSetup(false);
+      
+      // Check if should show onboarding
+      const hasCompletedOnboarding = localStorage.getItem('tubestar-onboarding-complete');
+      if (!hasCompletedOnboarding) {
+        setShowOnboarding(true);
+      }
     }
+  };
+
+  const handleOnboardingComplete = (data: any) => {
+    localStorage.setItem('tubestar-onboarding-complete', 'true');
+    unlockBadge('completed-onboarding');
+    setShowOnboarding(false);
+    // Could save the onboarding data to backend if needed
   };
 
   const displayName = profile.name?.trim() || "";
@@ -123,6 +153,23 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6 pb-14">
+      {/* Coach Tips */}
+      <CoachTips tips={DASHBOARD_TIPS} pageName="dashboard" />
+      
+      {/* Onboarding Wizard */}
+      {showOnboarding && (
+        <OnboardingWizard 
+          open={showOnboarding} 
+          onComplete={handleOnboardingComplete}
+        />
+      )}
+      
+      {/* Advanced Settings */}
+      <AdvancedSettings 
+        open={showAdvancedSettings}
+        onClose={() => setShowAdvancedSettings(false)}
+      />
+      
       {/* Hero Section with Daily Tip */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -133,14 +180,17 @@ export default function Dashboard() {
             </h1>
             <p className="text-zinc-400 mt-2">Ready to create something awesome today?</p>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            className="text-zinc-400 hover:text-white"
-            onClick={() => setShowSetup(true)}
-          >
-            <Settings className="h-4 w-4" />
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
+              onClick={() => setShowAdvancedSettings(true)}
+              title="Advanced Settings"
+            >
+              <Settings className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         
         {/* Daily Creator Tip */}
@@ -165,26 +215,54 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Stats Row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-2xl font-bold text-[#6DFF9C]" data-testid="stat-videos">
-            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : videoStats?.published ?? 0}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center hover:border-[#6DFF9C]/30 transition-colors">
+          <div className="text-2xl sm:text-3xl font-bold text-[#6DFF9C]" data-testid="stat-ideas">
+            {progressStats.ideasGenerated}
           </div>
-          <p className="text-xs text-zinc-500 mt-1">Videos Made</p>
+          <p className="text-xs text-zinc-500 mt-1">Ideas</p>
         </div>
-        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-2xl font-bold text-[#F3C94C]" data-testid="stat-in-progress">
-            {statsLoading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : (videoStats?.inProgress ?? 0) + (videoStats?.draft ?? 0)}
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center hover:border-[#F3C94C]/30 transition-colors">
+          <div className="text-2xl sm:text-3xl font-bold text-[#F3C94C]" data-testid="stat-scripts">
+            {progressStats.scriptsCreated}
           </div>
-          <p className="text-xs text-zinc-500 mt-1">In Progress</p>
+          <p className="text-xs text-zinc-500 mt-1">Scripts</p>
         </div>
-        <div className="p-3 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center">
-          <div className="text-2xl font-bold text-[#2BD4FF]" data-testid="stat-streak">
-            🔥 {Math.min(MAX_STREAK_DISPLAY, (videoStats?.published ?? 0))}
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center hover:border-[#2BD4FF]/30 transition-colors">
+          <div className="text-2xl sm:text-3xl font-bold text-[#2BD4FF]" data-testid="stat-thumbnails">
+            {progressStats.thumbnailsDesigned}
+          </div>
+          <p className="text-xs text-zinc-500 mt-1">Thumbnails</p>
+        </div>
+        <div className="p-3 sm:p-4 rounded-xl bg-[#0a1525] border border-[#1a2a4a]/60 text-center hover:border-[#A259FF]/30 transition-colors">
+          <div className="text-2xl sm:text-3xl font-bold text-[#A259FF]" data-testid="stat-streak">
+            🔥 {progressStats.currentStreak}
           </div>
           <p className="text-xs text-zinc-500 mt-1">Day Streak</p>
         </div>
       </div>
+
+      {/* Badges Preview */}
+      {unlockedBadges.length > 0 && (
+        <Link href="/progress">
+          <Card className="p-4 bg-gradient-to-r from-[#122046] to-[#0a1628] border-[#F3C94C]/30 hover:border-[#F3C94C]/50 transition-all cursor-pointer group">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Trophy className="h-6 w-6 text-[#F3C94C]" />
+                <div>
+                  <h3 className="font-semibold text-white">Latest Achievements</h3>
+                  <div className="flex gap-2 mt-1">
+                    {unlockedBadges.slice(-3).map((badge) => (
+                      <span key={badge.id} className="text-2xl">{badge.emoji}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-zinc-500 group-hover:text-[#F3C94C] transition-colors" />
+            </div>
+          </Card>
+        </Link>
+      )}
 
       {/* Continue Project Card */}
       {lastProject && (
@@ -215,7 +293,7 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Mode Entry Buttons */}
+      {/* Mode Entry Buttons - PREMIUM */}
       <section className="space-y-4">
         <h2 className="text-lg font-semibold text-white">Jump Into</h2>
         <div className="grid gap-4 sm:grid-cols-3">
@@ -223,32 +301,35 @@ export default function Dashboard() {
             const Icon = entry.icon;
             return (
               <Link key={entry.mode} href={entry.path}>
-                <Card 
-                  className="group relative overflow-hidden p-5 h-full bg-[#0a1525] border-[#1a2a4a]/60 hover:border-opacity-100 hover:scale-[1.02] hover:shadow-xl transition-all duration-200 cursor-pointer"
-                  style={{ borderColor: `${entry.color}40` }}
-                  data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
-                >
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-15 transition-opacity duration-300" 
-                    style={{ background: `linear-gradient(135deg, ${entry.color}, transparent)` }} 
-                  />
-                  <div className="relative space-y-3">
-                    <div 
-                      className="p-3 rounded-xl w-fit group-hover:scale-110 transition-transform duration-200"
-                      style={{ background: `${entry.color}15` }}
-                    >
-                      <Icon className="h-6 w-6" style={{ color: entry.color }} />
+                <GlowCard glowColor={entry.color} className="h-full">
+                  <Card 
+                    className="relative overflow-hidden p-6 h-full bg-gradient-to-br from-[#0a1525] to-[#122046] border-2 cursor-pointer"
+                    style={{ borderColor: `${entry.color}40` }}
+                    data-testid={`mode-entry-${entry.mode.toLowerCase()}`}
+                  >
+                    <div className="relative space-y-4">
+                      <div 
+                        className="p-4 rounded-2xl w-fit transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
+                        style={{ 
+                          background: `${entry.color}20`,
+                          boxShadow: `0 0 20px ${entry.color}30`,
+                        }}
+                      >
+                        <Icon className="h-7 w-7" style={{ color: entry.color }} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-display font-bold text-white mb-2">
+                          {entry.title}
+                        </h3>
+                        <p className="text-sm text-zinc-400">{entry.description}</p>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm font-semibold pt-2" style={{ color: entry.color }}>
+                        Get started 
+                        <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-white group-hover:text-white transition-colors">
-                        {entry.title}
-                      </h3>
-                      <p className="text-sm text-zinc-400 mt-1">{entry.description}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm font-medium" style={{ color: entry.color }}>
-                      Get started <ChevronRight className="h-4 w-4" />
-                    </div>
-                  </div>
-                </Card>
+                  </Card>
+                </GlowCard>
               </Link>
             );
           })}

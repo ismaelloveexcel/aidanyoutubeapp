@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { useCreatorProfile, calculateLevel, getXpProgress, XP_PER_LEVEL } from "@/lib/creator-profile";
 import { useToast } from "@/hooks/use-toast";
+import { getProgressStats, getUnlockedBadges, getLockedBadges } from "@/lib/progress-tracking";
+import { Trophy, Award, Star, TrendingUp, Zap, Target } from "lucide-react";
 
 interface Badge {
   id: string;
@@ -57,6 +59,12 @@ export default function Progress() {
   const xp = profile.xp;
   const level = profile.level;
 
+  // Get progress stats from our tracking system
+  const progressStats = getProgressStats();
+  const unlockedBadgesFromTracking = getUnlockedBadges();
+  const lockedBadgesFromTracking = getLockedBadges();
+
+  // Merge with existing badge system
   const [badges, setBadges] = useState<Badge[]>(ALL_BADGES);
   const [dailyChallenges, setDailyChallenges] = useState<DailyChallenge[]>([
     { id: "1", title: "Create a Thumbnail", description: "Design and save a new thumbnail", xpReward: 50, completed: false },
@@ -102,46 +110,84 @@ export default function Progress() {
     }
   };
 
+  // Additional stats cards
+  const statCards = [
+    { label: "Ideas Generated", value: progressStats.ideasGenerated, icon: Zap, color: "#6DFF9C" },
+    { label: "Scripts Written", value: progressStats.scriptsCreated, icon: Star, color: "#F3C94C" },
+    { label: "Thumbnails Made", value: progressStats.thumbnailsDesigned, icon: Award, color: "#2BD4FF" },
+    { label: "Current Streak", value: `${progressStats.currentStreak}`, icon: TrendingUp, color: "#A259FF" },
+  ];
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-6xl mx-auto">
       <div className="text-center">
-        <h1 className="heading-display text-4xl mb-2">🏆 Your Progress</h1>
-        <p className="text-gray-400">Level up and unlock awesome badges!</p>
+        <h1 className="heading-display text-3xl sm:text-4xl mb-2">🏆 Your Progress</h1>
+        <p className="text-zinc-400 text-sm sm:text-base">Level up and unlock awesome badges!</p>
       </div>
 
       {/* Level & XP */}
-      <Card className="border-4" style={{ borderColor: currentLevelInfo.color }}>
-        <CardContent className="p-8">
-          <div className="text-center mb-6">
-            <div className="text-6xl mb-4">
-              {level}
+      <Card className="border-4 bg-gradient-to-r from-[#122046] to-[#0a1628]" style={{ borderColor: currentLevelInfo.color }}>
+        <CardContent className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="text-center sm:text-left">
+              <div className="flex items-center gap-4 justify-center sm:justify-start mb-2">
+                <div className="w-16 h-16 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(243,201,76,0.4)]" style={{ backgroundColor: currentLevelInfo.color }}>
+                  <span className="text-3xl font-display font-bold text-[#0a1628]">{level}</span>
+                </div>
+                <div>
+                  <h2 className="font-display text-3xl text-white">{currentLevelInfo.name}</h2>
+                  <p className="text-zinc-400 text-sm">{xp.toLocaleString()} Total XP</p>
+                </div>
+              </div>
             </div>
-            <h2 className="font-display text-3xl mb-2">{currentLevelInfo.name}</h2>
-            <p className="text-gray-400">
-              {xp.toLocaleString()} XP
-              {nextLevelInfo && ` • ${xpToNextLevel} XP to Level ${level + 1}`}
-            </p>
-          </div>
 
-          {nextLevelInfo && (
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Level {level}</span>
-                <span>Level {level + 1}</span>
+            {nextLevelInfo && (
+              <div className="flex-1 max-w-md w-full">
+                <div className="flex justify-between text-sm text-zinc-400 mb-2">
+                  <span>Level {level}</span>
+                  <span className="font-semibold" style={{ color: nextLevelInfo.color }}>
+                    {xpToNextLevel} XP to Level {level + 1}
+                  </span>
+                </div>
+                <div className="h-4 bg-[#0a1628] rounded-full overflow-hidden">
+                  <div
+                    className="h-full transition-all duration-500 relative"
+                    style={{
+                      width: `${(xpInCurrentLevel / XP_PER_LEVEL) * 100}%`,
+                      background: `linear-gradient(90deg, ${currentLevelInfo.color}, ${nextLevelInfo.color})`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent shimmer" />
+                  </div>
+                </div>
               </div>
-              <div className="h-6 bg-[hsl(240,10%,15%)] rounded-full overflow-hidden">
-                <div
-                  className="h-full transition-all duration-500"
-                  style={{
-                    width: `${(xpInCurrentLevel / XP_PER_LEVEL) * 100}%`,
-                    background: `linear-gradient(90deg, ${currentLevelInfo.color}, ${nextLevelInfo.color})`,
-                  }}
-                />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </CardContent>
       </Card>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {statCards.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.label} className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-zinc-700">
+              <CardContent className="p-4 sm:p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div 
+                    className="p-2 rounded-lg"
+                    style={{ backgroundColor: `${stat.color}20` }}
+                  >
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" style={{ color: stat.color }} />
+                  </div>
+                  <p className="text-xs sm:text-sm text-zinc-400">{stat.label}</p>
+                </div>
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
       {/* Daily Challenges */}
       <div>
@@ -172,28 +218,40 @@ export default function Progress() {
         </div>
       </div>
 
-      {/* Unlocked Badges */}
+      {/* Unlocked Badges - Show both tracking system badges and manual badges */}
       <div>
-        <h2 className="font-display text-2xl mb-4">
-          🎖️ Badges Unlocked ({unlockedBadges.length}/{badges.length})
+        <h2 className="font-display text-xl sm:text-2xl mb-4 flex items-center gap-3">
+          <Trophy className="h-6 w-6 text-[#F3C94C]" />
+          Badges Unlocked ({unlockedBadges.length + unlockedBadgesFromTracking.length}/{badges.length + unlockedBadgesFromTracking.length + lockedBadgesFromTracking.length})
         </h2>
-        {unlockedBadges.length === 0 ? (
-          <Card>
+        {unlockedBadges.length === 0 && unlockedBadgesFromTracking.length === 0 ? (
+          <Card className="bg-gradient-to-br from-[#122046] to-[#0a1628] border-zinc-700">
             <CardContent className="text-center py-12">
               <div className="text-6xl mb-4">🏅</div>
-              <p className="text-gray-400">
+              <p className="text-zinc-400">
                 Complete activities to unlock your first badge!
               </p>
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {unlockedBadges.map(badge => (
-              <Card key={badge.id} className="text-center">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            {/* Show badges from tracking system */}
+            {unlockedBadgesFromTracking.map(badge => (
+              <Card key={badge.id} className="text-center bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#6DFF9C]/30 hover:scale-105 transition-transform">
                 <CardContent className="p-4">
-                  <div className="text-5xl mb-2">{badge.emoji}</div>
-                  <div className="font-semibold text-sm">{badge.name}</div>
-                  <div className="text-xs text-gray-400 mt-1">{badge.description}</div>
+                  <div className="text-4xl sm:text-5xl mb-2">{badge.emoji}</div>
+                  <div className="font-semibold text-sm text-white">{badge.name}</div>
+                  <div className="text-xs text-zinc-400 mt-1">{badge.description}</div>
+                </CardContent>
+              </Card>
+            ))}
+            {/* Show manually unlocked badges */}
+            {unlockedBadges.map(badge => (
+              <Card key={badge.id} className="text-center bg-gradient-to-br from-[#122046] to-[#0a1628] border-[#6DFF9C]/30 hover:scale-105 transition-transform">
+                <CardContent className="p-4">
+                  <div className="text-4xl sm:text-5xl mb-2">{badge.emoji}</div>
+                  <div className="font-semibold text-sm text-white">{badge.name}</div>
+                  <div className="text-xs text-zinc-400 mt-1">{badge.description}</div>
                 </CardContent>
               </Card>
             ))}

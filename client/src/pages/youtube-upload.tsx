@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, AlertTriangle, Youtube, CheckCircle, Loader2, ExternalLink, Settings } from "lucide-react";
+import { Upload, AlertTriangle, Youtube, CheckCircle, Loader2, ExternalLink, Settings, HelpCircle, Copy } from "lucide-react";
 import { Link } from "wouter";
 
 interface YouTubeAuthStatus {
@@ -23,6 +24,7 @@ export default function YouTubeUpload() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
   const { toast } = useToast();
 
   // Check if YouTube OAuth is configured on the server
@@ -56,12 +58,18 @@ export default function YouTubeUpload() {
     }
   }, [toast]);
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({ title: "Copied to clipboard! 📋" });
+    } catch {
+      toast({ title: "Copy failed", description: "Could not access clipboard." });
+    }
+  };
+
   const connectToYouTube = async () => {
     if (!authStatus?.configured) {
-      toast({
-        title: "YouTube Not Configured",
-        description: "Ask your parent or guardian to set up YouTube API credentials.",
-      });
+      setShowHelpModal(true);
       return;
     }
 
@@ -147,6 +155,7 @@ export default function YouTubeUpload() {
   };
 
   return (
+    <>
     <div className="space-y-8">
       <div className="text-center">
         <div className="flex items-center justify-center gap-3 mb-2">
@@ -450,5 +459,29 @@ export default function YouTubeUpload() {
         </CardContent>
       </Card>
     </div>
+
+    {/* Parental Help Modal */}
+    <Dialog open={showHelpModal} onOpenChange={setShowHelpModal}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>👨‍👩‍👧 Parental Help: Set Up YouTube</DialogTitle>
+          <DialogDescription>
+            Ask a parent or guardian to follow these steps to connect your YouTube account.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 mt-2 text-sm">
+          <ol className="list-decimal list-inside space-y-2 text-gray-300">
+            <li>Go to <a href="https://console.cloud.google.com" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Google Cloud Console</a> and sign in.</li>
+            <li>Create a new project (or select an existing one).</li>
+            <li>Enable the <strong>YouTube Data API v3</strong> for the project.</li>
+            <li>Under <strong>Credentials</strong>, create an <strong>OAuth 2.0 Client ID</strong> (Web application).</li>
+            <li>Add your app's URL as an authorized redirect URI.</li>
+            <li>Copy the <strong>Client ID</strong> and <strong>Client Secret</strong> and add them to the app's environment variables as <code>YOUTUBE_CLIENT_ID</code> and <code>YOUTUBE_CLIENT_SECRET</code>.</li>
+          </ol>
+          <p className="text-gray-400 text-xs">Once configured, come back here and click "Connect YouTube Account".</p>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
