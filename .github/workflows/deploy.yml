@@ -66,7 +66,7 @@ jobs:
         uses: github/codeql-action/analyze@v3
 
   deploy:
-    name: Deploy to Fly.io
+    name: Deploy to Render
     needs: [build-and-test]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -74,22 +74,18 @@ jobs:
       contents: read
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Fly.io CLI
-        uses: superfly/flyctl-actions/setup-flyctl@1.5
-
-      - name: Deploy to Fly.io
-        run: flyctl deploy --remote-only
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-
-      - name: Verify deployment health
+      - name: Trigger Render deploy hook
         run: |
-          echo "Waiting for deployment to stabilize..."
-          sleep 10
-          flyctl status
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Error: RENDER_DEPLOY_HOOK_URL secret is not set."
+            echo "Follow the setup steps in RENDER_DEPLOYMENT.md to add it."
+            exit 1
+          fi
+          echo "Triggering Render deployment..."
+          curl -fsSL -X POST "$RENDER_DEPLOY_HOOK_URL" || {
+            echo "Error: Failed to trigger Render deploy hook. Check that RENDER_DEPLOY_HOOK_URL is correct."
+            exit 1
+          }
+          echo "Deploy triggered. Monitor progress at https://dashboard.render.com"
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
-        continue-on-error: true
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

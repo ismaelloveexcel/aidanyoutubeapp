@@ -4,6 +4,14 @@
 
 ---
 
+## ⚡ Easiest Automated Deployment (Recommended)
+
+**Render + GitHub Actions** — 5 steps, no CLI needed, fully automated on every `git push`:
+
+👉 **[See exact steps in RENDER_DEPLOYMENT.md](./RENDER_DEPLOYMENT.md#-automated-deployment--exact-steps-easiest-option)**
+
+---
+
 ## 🎯 Choose Your Platform (30 seconds)
 
 ### I'm a complete beginner
@@ -13,7 +21,7 @@
 → Go to **[Render (10 min)](#render-10-minutes)**
 
 ### I want production-quality with CI/CD
-→ Go to **[Fly.io (20 min)](#flyio-20-minutes)**
+→ Go to **[Render (10 min)](#render-10-minutes)** — already wired up in `.github/workflows/deploy.yml`
 
 ### I want great developer experience
 → Go to **[Railway (15 min)](#railway-15-minutes)**
